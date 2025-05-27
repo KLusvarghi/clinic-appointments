@@ -1,6 +1,7 @@
 // criando os schemas (basicamente o que vai ser salvo no banco de dados, tabelas, tipos de dados, etc)
 import { relations } from "drizzle-orm";
 import {
+  boolean,
   integer,
   pgEnum,
   pgTable,
@@ -10,14 +11,62 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
+// schemas criados pelo better-auth para implementar a autenticação
+
 // "users" é o nome da tabela e dentro são as prorpiedades
 export const usersTable = pgTable("users", {
-  id: uuid("id").defaultRandom().primaryKey(),
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").notNull(),
+  image: text("image"),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
 });
 
 export const usersTableRelations = relations(usersTable, ({ many }) => ({
   usersToClinics: many(usersToClinicsTable), // um usuário pode ter várias clinicas
 }));
+
+export const sessionsTable = pgTable("sessions", {
+  id: text("id").primaryKey(),
+  expiresAt: timestamp("expires_at").notNull(),
+  token: text("token").notNull().unique(),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  userId: text("user_id")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+});
+
+export const accountsTable = pgTable("accounts", {
+  id: text("id").primaryKey(),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  idToken: text("id_token"),
+  accessTokenExpiresAt: timestamp("access_token_expires_at"),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+  scope: text("scope"),
+  password: text("password"),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
+});
+
+export const verificationsTable = pgTable("verifications", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at"),
+  updatedAt: timestamp("updated_at"),
+});
 
 export const clinicsTable = pgTable("clinics", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -31,7 +80,7 @@ export const clinicsTable = pgTable("clinics", {
 
 // Quando se fazemos uma relação n-n (many to many), criamos uma tabela intermediária que lidará com as chaves estrangeiras
 export const usersToClinicsTable = pgTable("users_to_clinics", {
-  userId: uuid("user_id")
+  userId: text("user_id")
     .notNull()
     .references(() => usersTable.id, { onDelete: "cascade" }),
   clinicId: uuid("clinic_id")
@@ -90,7 +139,7 @@ export const doctorsTable = pgTable("doctors", {
   avaliableFromTime: time("avaliable_from_time").notNull(),
   avaliableToTime: time("avaliable_to_time").notNull(),
   specialty: text("specialty").notNull(),
-  
+
   // valores monetarios
   // não utilizamos o tipo "float" -> porque ele tem como objetivo ECONOMIZAR MEMORIA
   // E dentro do postgress, ele nos tras o tipo "numeric"
@@ -105,13 +154,17 @@ export const doctorsTable = pgTable("doctors", {
 });
 
 // poruqe fazer isso se já dizemos que que tem essa relação em "clinicId)"? porque apenas o campo "clinicId" não nos da acesso aos dados da clinica, e sendo necessario isso para que ele faça os joins
-export const doctorsTableRelations = relations(doctorsTable, ({ one, many }) => ({
-  clinic: one(clinicsTable, { // Um medico pertence a uma clinica
-    fields: [doctorsTable.clinicId], // dizendo que o campo "clinicId" dentro de "doctorsTable" referencia o campo 'id' dentro de "clinicsTable"
-    references: [clinicsTable.id],
+export const doctorsTableRelations = relations(
+  doctorsTable,
+  ({ one, many }) => ({
+    clinic: one(clinicsTable, {
+      // Um medico pertence a uma clinica
+      fields: [doctorsTable.clinicId], // dizendo que o campo "clinicId" dentro de "doctorsTable" referencia o campo 'id' dentro de "clinicsTable"
+      references: [clinicsTable.id],
+    }),
+    appointments: many(appointmentsTable), // Um medico pode ter varios agendamentos
   }),
-  appointments: many(appointmentsTable), // Um medico pode ter varios agendamentos
-}));
+);
 
 // o tipo "Enum" é um tipo de dado que nos permite definir um conjunto de valores possíveis para uma coluna
 // nesse caso, o "patient_sex" é um enum que nos permite definir os valores possíveis para a coluna "sex"
@@ -143,7 +196,7 @@ export const patientsTableRelations = relations(patientsTable, ({ one }) => ({
 }));
 
 export const appointmentsTable = pgTable("appointments", {
-  id: uuid("id").defaultRandom().primaryKey(),
+  id: text("id").primaryKey(),
   // o tipo timestamp ele apaenas armazena a data com o hora
   // já o "time" ele armazena apenas a hora e os minutos (tempo)
   date: timestamp("date").notNull(),
