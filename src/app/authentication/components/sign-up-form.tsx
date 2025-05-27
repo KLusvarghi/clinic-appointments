@@ -98,7 +98,7 @@ const SignUpForm = () => {
           </CardContent>
           <CardFooter>
             <Button className="w-full" type="submit">
-              Submit
+              Create my account
             </Button>
           </CardFooter>
         </form>
