@@ -23,15 +23,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-const registerSchema = z.object({
-  name: z.string().trim().min(1, { message: "Name is required" }),
-  email: z.string().trim().email({ message: "Invalid email address" }),
-  password: z
-    .string()
-    .trim()
-    .min(8, { message: "Password must be at least 8 characters long" }),
-});
-
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }),
   password: z
@@ -40,18 +31,17 @@ const loginSchema = z.object({
     .min(8, { message: "Password must be at least 8 characters long" }),
 });
 
-const SignUpForm = () => {
-  const form = useForm<z.infer<typeof registerSchema>>({
-    resolver: zodResolver(registerSchema),
+const SignInForm = () => {
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
-      name: "",
       email: "",
       password: "",
     },
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof registerSchema>) {
+  function onSubmit(values: z.infer<typeof loginSchema>) {
     console.log(values);
   }
 
@@ -60,23 +50,10 @@ const SignUpForm = () => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <CardHeader>
-            <CardTitle>Register</CardTitle>
-            <CardDescription>Register to your account here.</CardDescription>
+            <CardTitle>Login</CardTitle>
+            <CardDescription>Login to access your account here.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Kauã" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="email"
@@ -106,7 +83,7 @@ const SignUpForm = () => {
           </CardContent>
           <CardFooter>
             <Button className="w-full" type="submit">
-              Submit
+              Access my account
             </Button>
           </CardFooter>
         </form>
@@ -115,4 +92,4 @@ const SignUpForm = () => {
   );
 };
 
-export default SignUpForm;
+export default SignInForm;
