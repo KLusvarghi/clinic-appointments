@@ -48,17 +48,23 @@ const SignUpForm = () => {
 
   async function onSubmit(values: z.infer<typeof registerSchema>) {
     // https://www.better-auth.com/docs/basic-usage#sign-up
-    await authClient.signUp.email({
-      email: values.email,
-      password: values.password,
-      name: values.name,
-      // ele só é chamado depois que o email do usuário é validado 
-      // callbackURL: "/dashboard", // redireciona para a dashboard apos o sign up
-    }, {
-      onSuccess: () => {
-        router.push("/dashboard")
-      }
-    });
+    await authClient.signUp.email(
+      {
+        email: values.email,
+        password: values.password,
+        name: values.name,
+        // ele só é chamado depois que o email do usuário é validado
+        // callbackURL: "/dashboard", // redireciona para a dashboard apos o sign up
+      },
+      {
+        onSuccess: () => {
+          router.push("/dashboard");
+        },
+        onError: () => {
+          router.push("/dashboard");
+        },
+      },
+    );
   }
 
   return (
