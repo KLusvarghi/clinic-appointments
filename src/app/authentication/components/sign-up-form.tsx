@@ -1,6 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -22,6 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
 
 const registerSchema = z.object({
   name: z.string().trim().min(1, { message: "Name is required" }),
@@ -33,6 +36,7 @@ const registerSchema = z.object({
 });
 
 const SignUpForm = () => {
+  const router = useRouter();
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -42,9 +46,19 @@ const SignUpForm = () => {
     },
   });
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof registerSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof registerSchema>) {
+    // https://www.better-auth.com/docs/basic-usage#sign-up
+    await authClient.signUp.email({
+      email: values.email,
+      password: values.password,
+      name: values.name,
+      // ele só é chamado depois que o email do usuário é validado 
+      // callbackURL: "/dashboard", // redireciona para a dashboard apos o sign up
+    }, {
+      onSuccess: () => {
+        router.push("/dashboard")
+      }
+    });
   }
 
   return (
@@ -89,7 +103,7 @@ const SignUpForm = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input placeholder="********" {...field} />
+                    <Input placeholder="********" type="password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -97,8 +111,17 @@ const SignUpForm = () => {
             />
           </CardContent>
           <CardFooter>
-            <Button className="w-full" type="submit">
-              Create my account
+            {/* quando for enviado o submit, conseguimos capturar e desabilitar o button */}
+            <Button
+              className="w-full"
+              type="submit"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? (
+                <Loader2 className="mr-2 w-4 animate-spin" />
+              ) : (
+                "Create my account"
+              )}
             </Button>
           </CardFooter>
         </form>
