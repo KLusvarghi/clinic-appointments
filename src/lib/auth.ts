@@ -11,6 +11,13 @@ export const auth = betterAuth({
     usePlural: true, // para que o drizzle use o plural do nome da tabela
     schema, // passando o schema que criamos lá de "schemas"
   }),
+  // Configuração para autenticação com google:
+  socialProviders: {
+    google: { 
+        clientId: process.env.GOOGLE_CLIENT_ID as string, 
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, 
+    }, 
+},
   // lembra do schema que o better-auth criou? enttão, temos que deixar explicito o nome das variáveis que usamos conforme as tabelas:
   user: {
     modelName: "usersTable",
