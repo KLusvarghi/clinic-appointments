@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -61,6 +61,9 @@ export function AppSidebar() {
   // para se ter acesso as clinicas do usuário, eu poderia criar uma rota para isso, mas neste caso, iremos:
   const session = authClient.useSession();
 
+  // para que possamos colocar em destaque a rota ativa, podemos usar o hook "usePathname"
+  const pathName = usePathname();
+
   const handleSignOut = async () => {
     console.log("signing out");
     await authClient.signOut({
@@ -84,7 +87,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild isActive={pathName === item.url}>
                     <Link href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
