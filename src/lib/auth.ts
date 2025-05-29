@@ -42,6 +42,7 @@ export const auth = betterAuth({
       return {
         user: {
           ...user, // retorna todos os dados do user
+          // Tendo que fazer essa validação que pelo menos retorne undefined e não de crash a aplicação 
           clinic: clinic?.clinicId
             ? {
                 id: clinic?.clinicId,
