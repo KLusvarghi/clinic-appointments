@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import GoogleIcon from "@/components/icons/google";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -46,7 +47,7 @@ const SignInForm = () => {
   });
 
   // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof loginSchema>) {
+  const handleSubmit = async (values: z.infer<typeof loginSchema>) => {
     await authClient.signIn.email(
       {
         email: values.email,
@@ -61,12 +62,20 @@ const SignInForm = () => {
         },
       },
     );
-  }
+  };
+
+  const handleGoogleSignIn = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/dashboard", // fará com que redirecione para dashboard
+      scopes: ["email", "profile"], // isso é para pegar o email e o perfil do usuário
+    });
+  };
 
   return (
     <Card>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <CardHeader>
             <CardTitle>Login</CardTitle>
             <CardDescription>
@@ -102,13 +111,24 @@ const SignInForm = () => {
             />
           </CardContent>
           <CardFooter>
-            <Button className="w-full" type="submit">
-              {form.formState.isSubmitting ? (
-                <Loader2 className="mr-2 w-4 animate-spin" />
-              ) : (
-                "Access my account"
-              )}
-            </Button>
+            <div className="w-full space-y-2">
+              <Button className="w-full" type="submit">
+                {form.formState.isSubmitting ? (
+                  <Loader2 className="mr-2 w-4 animate-spin" />
+                ) : (
+                  "Access my account"
+                )}
+              </Button>
+              <Button
+                className="w-full"
+                variant="outline"
+                onClick={handleGoogleSignIn}
+                type="button"
+              >
+                <GoogleIcon />
+                Sign in with Google
+              </Button>
+            </div>
           </CardFooter>
         </form>
       </Form>
