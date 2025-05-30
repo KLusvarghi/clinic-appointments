@@ -130,7 +130,10 @@ const SignUpForm = () => {
               disabled={form.formState.isSubmitting}
             >
               {form.formState.isSubmitting ? (
-                <Loader2 className="mr-2 w-4 animate-spin" />
+                <>
+                  <Loader2 className="mr-2 w-4 animate-spin" /> Creating
+                  account...
+                </>
               ) : (
                 "Create my account"
               )}

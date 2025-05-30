@@ -114,7 +114,10 @@ const SignInForm = () => {
             <div className="w-full space-y-2">
               <Button className="w-full" type="submit">
                 {form.formState.isSubmitting ? (
-                  <Loader2 className="mr-2 w-4 animate-spin" />
+                  <>
+                    <Loader2 className="mr-2 w-4 animate-spin" />
+                    Accessing account...
+                  </>
                 ) : (
                   "Access my account"
                 )}

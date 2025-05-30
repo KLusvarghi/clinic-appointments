@@ -129,15 +129,16 @@ export const doctorsTable = pgTable("doctors", {
   clinicId: uuid("clinic_id")
     .notNull()
     .references(() => clinicsTable.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
   avatarImageUrl: text("avatar_image_url"),
 
   // 1 = monday, 2 = tuesday, 3 = wednesday, 4 = thursday, 5 = friday, 6 = saturday, 0 = sunday
-  avaliableFromWeekDay: integer("avaliable_from_week_day").notNull(), // 1 = monday
-  avaliableToWeekDay: integer("avaliable_to_week_day").notNull(), // 5 = friday
+  availableFromWeekDay: integer("available_from_week_day").notNull(),// 1 = monday
+  availableToWeekDay: integer("available_to_week_day").notNull(),// 5 = friday
 
   // o tipo "time" é para horas e minutos
-  avaliableFromTime: time("avaliable_from_time").notNull(),
-  avaliableToTime: time("avaliable_to_time").notNull(),
+  availableFromTime: time("available_from_time").notNull(),
+  availableToTime: time("available_to_time").notNull(),
   specialty: text("specialty").notNull(),
 
   // valores monetarios

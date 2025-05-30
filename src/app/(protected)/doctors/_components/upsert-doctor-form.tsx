@@ -1,9 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
+import { toast } from "sonner";
 import { z } from "zod";
 
+import { upsertDoctor } from "@/actions/upsert-doctor";
+// import { upsertDoctor } from "@/actions/upsert-doctor";
 import { Button } from "@/components/ui/button";
 import {
   DialogContent,
@@ -36,7 +40,7 @@ const doctorFormSchema = z
   .object({
     name: z.string().trim().min(1, { message: "Doctor name is required" }),
     specialty: z.string().trim().min(1, { message: "Specialty is required" }),
-    appointmentPrice: z.string().min(1, {
+    appointmentPrice: z.number().min(1, {
       message: "Appointment price is required",
     }),
     availableFromWeekDay: z.string(),
@@ -63,14 +67,18 @@ const doctorFormSchema = z
     },
   );
 
-const UpsertDoctorForm = () => {
+  interface UpsertDoctorFormProps {
+    onSuccess?: () => void
+  }
+
+const UpsertDoctorForm = ({onSuccess}: UpsertDoctorFormProps) => {
   const form = useForm<z.infer<typeof doctorFormSchema>>({
     resolver: zodResolver(doctorFormSchema),
     defaultValues: {
       name: "",
       specialty: "",
       // depois, eu só converto esse valor para number, quando for enviar para o banco de dados
-      appointmentPrice: "0",
+      appointmentPrice: 0,
       availableFromWeekDay: "1",
       availableToWeekDay: "5",
       availableFromTime: "",
@@ -78,19 +86,30 @@ const UpsertDoctorForm = () => {
     },
   });
 
+  // o primeiro parametro é o server action que faz a inserção ou update do doctor ao banco dedados
+  //  o segundo parametro é um objetos que posso passar o onSuccess e o onError
+  const upersetDoctorAction = useAction(upsertDoctor, {
+    onSuccess: () => {
+      toast.success("Doctor added successfully");
+      form.reset()
+      onSuccess?.()
+    },
+    onError: (error) => {
+      console.log(error)
+      toast.error("Error adding doctor");
+    },
+  });
+
   const handleSubmit = async (values: z.infer<typeof doctorFormSchema>) => {
-    console.log(values);
-    // try {
-    //   // e para chamar a server action, basta:
-    //   // await createClinic(data.name);
-    // } catch (error) {
-    //   // como no nosso server component, temos o redirect, temos que tratar isso aqui, já que ele gerá um erro que não é um erro de servidor, mas sim um erro de redirect:
-    //   if (isRedirectError(error)) {
-    //     return;
-    //   }
-    //   console.log(error);
-    //   toast.error("Error creating clinic");
-    // }
+    // aqui, eu estou chamando a action que está no server component, e passando os valores do form
+    upersetDoctorAction.execute({
+      ...values,
+      // e como no schema la'do "uppsert-doctor", eu defini que o availableFromWeekDay e o availableToWeekDay como strings e aqui eles são numbers, eu preciso converter para string
+      availableFromWeekDay: parseInt(values.availableFromWeekDay),
+      availableToWeekDay: parseInt(values.availableToWeekDay),
+      // e o price, eu preciso converter para number e multiplicar por 100, pois o banco de dados espera o valor em centavos
+      appointmentPriceInCents: values.appointmentPrice * 100,
+    });
   };
 
   return (
@@ -369,10 +388,11 @@ const UpsertDoctorForm = () => {
           />
 
           <DialogFooter>
-            <Button type="submit" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? (
+            {/* temos como verificar se nossa action está sendo executada, e usamos isso para desabilitar o botão */}
+            <Button type="submit" disabled={upersetDoctorAction.isPending}>
+              {upersetDoctorAction.isPending ? (
                 <>
-                  <Loader2 className="mr-2 w-4 animate-spin" /> Adding doctor
+                  <Loader2 className="mr-2 w-4 animate-spin" /> Adding doctor...
                 </>
               ) : (
                 "Add doctor"

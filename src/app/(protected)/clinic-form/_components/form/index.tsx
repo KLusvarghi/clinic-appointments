@@ -67,7 +67,7 @@ const ClinicForm = () => {
             <Button type="submit" disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting ? (
                 <>
-                  <Loader2 className="mr-2 w-4 animate-spin" /> Creating clinic
+                  <Loader2 className="mr-2 w-4 animate-spin" /> Creating clinic...
                 </>
               ) : (
                 "Create clinic"
