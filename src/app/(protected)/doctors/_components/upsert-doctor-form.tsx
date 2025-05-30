@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { doctorsTable } from "@/db/schema";
 
 import { medicalSpecialties } from "../_constants";
 
@@ -67,22 +68,23 @@ const doctorFormSchema = z
     },
   );
 
-  interface UpsertDoctorFormProps {
-    onSuccess?: () => void
-  }
+interface UpsertDoctorFormProps {
+  doctor?: typeof doctorsTable.$inferSelect;
+  onSuccess?: () => void;
+}
 
-const UpsertDoctorForm = ({onSuccess}: UpsertDoctorFormProps) => {
+const UpsertDoctorForm = ({ doctor, onSuccess }: UpsertDoctorFormProps) => {
   const form = useForm<z.infer<typeof doctorFormSchema>>({
     resolver: zodResolver(doctorFormSchema),
     defaultValues: {
-      name: "",
-      specialty: "",
+      name: doctor?.name || "",
+      specialty: doctor?.specialty || "",
       // depois, eu só converto esse valor para number, quando for enviar para o banco de dados
-      appointmentPrice: 0,
-      availableFromWeekDay: "1",
-      availableToWeekDay: "5",
-      availableFromTime: "",
-      availableToTime: "",
+      appointmentPrice: doctor?.appointmentPriceInCents || 0,
+      availableFromWeekDay: doctor?.availableFromWeekDay?.toString() || "1",
+      availableToWeekDay: doctor?.availableToWeekDay?.toString() || "5",
+      availableFromTime: doctor?.availableFromTime || "",
+      availableToTime: doctor?.availableToTime || "",
     },
   });
 
@@ -91,11 +93,11 @@ const UpsertDoctorForm = ({onSuccess}: UpsertDoctorFormProps) => {
   const upersetDoctorAction = useAction(upsertDoctor, {
     onSuccess: () => {
       toast.success("Doctor added successfully");
-      form.reset()
-      onSuccess?.()
+      form.reset();
+      onSuccess?.();
     },
     onError: (error) => {
-      console.log(error)
+      console.log(error);
       toast.error("Error adding doctor");
     },
   });
@@ -104,6 +106,8 @@ const UpsertDoctorForm = ({onSuccess}: UpsertDoctorFormProps) => {
     // aqui, eu estou chamando a action que está no server component, e passando os valores do form
     upersetDoctorAction.execute({
       ...values,
+      // tendo que passar o id do doctor, caso seja um update, caso não seja, ele vai ser undefined e vai criar outro doctor
+      id: doctor?.id,
       // e como no schema la'do "uppsert-doctor", eu defini que o availableFromWeekDay e o availableToWeekDay como strings e aqui eles são numbers, eu preciso converter para string
       availableFromWeekDay: parseInt(values.availableFromWeekDay),
       availableToWeekDay: parseInt(values.availableToWeekDay),
@@ -114,8 +118,12 @@ const UpsertDoctorForm = ({onSuccess}: UpsertDoctorFormProps) => {
 
   return (
     <DialogContent>
-      <DialogHeader>Add a doctor</DialogHeader>
-      <DialogDescription>Add a new doctor to your clinic.</DialogDescription>
+      <DialogHeader>{doctor ? doctor.name : "Add a doctor"}</DialogHeader>
+      <DialogDescription>
+        {doctor
+          ? "Edit the information of the doctor"
+          : "Add a new doctor to your clinic."}
+      </DialogDescription>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <FormField
@@ -389,11 +397,19 @@ const UpsertDoctorForm = ({onSuccess}: UpsertDoctorFormProps) => {
 
           <DialogFooter>
             {/* temos como verificar se nossa action está sendo executada, e usamos isso para desabilitar o botão */}
+            {doctor && (
+              <Button type="submit" disabled={upersetDoctorAction.isPending}>
+                Cancel
+              </Button>
+            )}
             <Button type="submit" disabled={upersetDoctorAction.isPending}>
               {upersetDoctorAction.isPending ? (
                 <>
-                  <Loader2 className="mr-2 w-4 animate-spin" /> Adding doctor...
+                  <Loader2 className="mr-2 w-4 animate-spin" />
+                  {doctor ? "Updating doctor..." : "Adding doctor..."}
                 </>
+              ) : doctor ? (
+                "Save changes"
               ) : (
                 "Add doctor"
               )}

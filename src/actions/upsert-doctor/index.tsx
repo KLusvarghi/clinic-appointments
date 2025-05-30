@@ -3,6 +3,7 @@
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
 import { db } from "@/db";
@@ -77,4 +78,6 @@ export const upsertDoctor = actionClient
           availableToTime: availableToTimeUTC.format("HH:mm:ss"),
         },
       });
+    // Após inserir ou atualizar o médico, vamos refazer a pagina de médicos, assim aparece de imediato quando cria ou atualiza a página
+    revalidatePath("/doctors");
   });
