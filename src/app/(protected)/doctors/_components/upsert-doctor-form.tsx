@@ -1,12 +1,24 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, TrashIcon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { deleteDoctor } from "@/actions/delete-doctor";
 import { upsertDoctor } from "@/actions/upsert-doctor";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 // import { upsertDoctor } from "@/actions/upsert-doctor";
 import { Button } from "@/components/ui/button";
 import {
@@ -74,6 +86,20 @@ interface UpsertDoctorFormProps {
 }
 
 const UpsertDoctorForm = ({ doctor, onSuccess }: UpsertDoctorFormProps) => {
+  const deleteDoctorAction = useAction(deleteDoctor, {
+    onSuccess: () => {
+      toast.success("Médico deletado com sucesso.");
+    },
+    onError: () => {
+      toast.error("Erro ao deletar médico.");
+    },
+  });
+
+  const handleDeleteDoctorClick = () => {
+    // para que eu não tenha que fazer um optional chaining, eu verifico se o doctor existe
+    if (!doctor) return;
+    deleteDoctorAction.execute({ id: doctor.id });
+  };
   const form = useForm<z.infer<typeof doctorFormSchema>>({
     shouldUnregister: true, // para que o form seja resetado quando o dialog for fechado
     resolver: zodResolver(doctorFormSchema),
@@ -399,9 +425,31 @@ const UpsertDoctorForm = ({ doctor, onSuccess }: UpsertDoctorFormProps) => {
           <DialogFooter>
             {/* temos como verificar se nossa action está sendo executada, e usamos isso para desabilitar o botão */}
             {doctor && (
-              <Button type="submit" disabled={upersetDoctorAction.isPending}>
-                Cancel
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline">
+                    <TrashIcon />
+                    Delete doctor
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you sure you want to delete this doctor?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will delete the doctor
+                      and all scheduled appointments.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDeleteDoctorClick}>
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
             <Button type="submit" disabled={upersetDoctorAction.isPending}>
               {upersetDoctorAction.isPending ? (
