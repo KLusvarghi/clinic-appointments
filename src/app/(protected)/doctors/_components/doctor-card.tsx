@@ -22,7 +22,6 @@ import UpsertDoctorForm from "./upsert-doctor-form";
 
 interface DoctorCardProps {
   // Assim conseguimos pegar o tipo do doctor que vem do banco de dados
-
   doctor: typeof doctorsTable.$inferSelect;
 }
 
@@ -77,6 +76,7 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => {
             <Button className="w-full">See details</Button>
           </DialogTrigger>
           <UpsertDoctorForm
+            isOpen={isUpsertDoctorDialogOpen}
             doctor={{
               ...doctor,
               // o "doctor" é o que vem do banco, então o horário está em UTC, então precisamos converter para o horário local
