@@ -50,8 +50,8 @@ const items = [
     icon: Stethoscope,
   },
   {
-    title: "Pacients",
-    url: "/pacients",
+    title: "Patients",
+    url: "/patients",
     icon: UsersRound,
   },
 ];
