@@ -194,11 +194,13 @@ export function UpsertPatientForm({
             >
               {upsertPatientAction.isPending ? (
                 <>
-                  {" "}
-                  <Loader2 /> saveing...
+                  <Loader2 className="mr-2 w-4 animate-spin" />
+                  {patient ? "Updating patient..." : "Adding patient..."}
                 </>
+              ) : patient ? (
+                "Save changes"
               ) : (
-                "Save"
+                "Add patient"
               )}
             </Button>
           </DialogFooter>

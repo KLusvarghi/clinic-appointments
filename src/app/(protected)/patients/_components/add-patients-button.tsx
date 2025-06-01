@@ -29,7 +29,7 @@ export function AddPatientButton() {
         <DialogHeader>
           <DialogTitle>Add New Patient</DialogTitle>
         </DialogHeader>
-        <UpsertPatientForm onSuccess={() => setOpen(false)} />
+        <UpsertPatientForm onSuccess={() => setOpen(false)} isOpen={open} />
       </DialogContent>
     </Dialog>
   );

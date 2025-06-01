@@ -1,17 +1,9 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
-import { EditIcon, MoreVerticalIcon, TrashIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { patientsTable } from "@/db/schema";
+
+import TableActions from "./table-actions";
 
 // conseguimos inferir o tipo das colunas com o $inferSelect, assim pegando o calor de cada coluna conforme o nosso schema
 export const patientsTableColumns: ColumnDef<
@@ -33,7 +25,7 @@ export const patientsTableColumns: ColumnDef<
     header: "Phone",
     cell: ({ row }) => {
       const phone = row.original.phoneNumber;
-      return `(${phone.slice(0,2)}) ${phone.slice(2,7)}-${phone.slice(7)}`;
+      return `(${phone.slice(0, 2)}) ${phone.slice(2, 7)}-${phone.slice(7)}`;
     },
   },
   {
@@ -49,21 +41,8 @@ export const patientsTableColumns: ColumnDef<
   {
     id: "actions",
     cell: (params) => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button variant="ghost" size="icon">
-              <MoreVerticalIcon className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>{params.row.original.name}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem> <EditIcon/> Edit</DropdownMenuItem>
-            <DropdownMenuItem> <TrashIcon/> Exclude</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      const patient = params.row.original;
+      return <TableActions patient={patient} />;
     },
   },
 ];
