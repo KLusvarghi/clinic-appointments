@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, TrashIcon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
 import { toast } from "sonner";
@@ -49,7 +50,7 @@ import { doctorsTable } from "@/db/schema";
 
 import { medicalSpecialties } from "../_constants";
 
-const doctorFormSchema = z
+const formSchema = z
   .object({
     name: z.string().trim().min(1, { message: "Doctor name is required" }),
     specialty: z.string().trim().min(1, { message: "Specialty is required" }),
@@ -81,11 +82,16 @@ const doctorFormSchema = z
   );
 
 interface UpsertDoctorFormProps {
+  isOpen: boolean;
   doctor?: typeof doctorsTable.$inferSelect;
   onSuccess?: () => void;
 }
 
-const UpsertDoctorForm = ({ doctor, onSuccess }: UpsertDoctorFormProps) => {
+const UpsertDoctorForm = ({
+  isOpen,
+  doctor,
+  onSuccess,
+}: UpsertDoctorFormProps) => {
   const deleteDoctorAction = useAction(deleteDoctor, {
     onSuccess: () => {
       toast.success("Médico deletado com sucesso.");
@@ -100,20 +106,40 @@ const UpsertDoctorForm = ({ doctor, onSuccess }: UpsertDoctorFormProps) => {
     if (!doctor) return;
     deleteDoctorAction.execute({ id: doctor.id });
   };
-  const form = useForm<z.infer<typeof doctorFormSchema>>({
+
+  const form = useForm<z.infer<typeof formSchema>>({
     shouldUnregister: true, // para que o form seja resetado quando o dialog for fechado
-    resolver: zodResolver(doctorFormSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      name: doctor?.name || "",
-      specialty: doctor?.specialty || "",
+      name: doctor?.name ?? "",
+      specialty: doctor?.specialty ?? "",
       // depois, eu só converto esse valor para number, quando for enviar para o banco de dados
-      appointmentPrice: doctor?.appointmentPriceInCents || 0,
-      availableFromWeekDay: doctor?.availableFromWeekDay?.toString() || "1",
-      availableToWeekDay: doctor?.availableToWeekDay?.toString() || "5",
-      availableFromTime: doctor?.availableFromTime || "",
-      availableToTime: doctor?.availableToTime || "",
+      appointmentPrice: doctor?.appointmentPriceInCents
+        ? doctor.appointmentPriceInCents / 100
+        : 0,
+      availableFromWeekDay: doctor?.availableFromWeekDay?.toString() ?? "1",
+      availableToWeekDay: doctor?.availableToWeekDay?.toString() ?? "5",
+      availableFromTime: doctor?.availableFromTime ?? "",
+      availableToTime: doctor?.availableToTime ?? "",
     },
   });
+
+  // para que quando se edita um doctor e ao clicar para alterar novamente, o form seja resetado com os valores do doctor, fazemo:
+  useEffect(() => {
+    if (isOpen) {
+      form.reset({
+        name: doctor?.name ?? "",
+        specialty: doctor?.specialty ?? "",
+        appointmentPrice: doctor?.appointmentPriceInCents
+          ? doctor.appointmentPriceInCents / 100
+          : 0,
+        availableFromWeekDay: doctor?.availableFromWeekDay?.toString() ?? "1",
+        availableToWeekDay: doctor?.availableToWeekDay?.toString() ?? "5",
+        availableFromTime: doctor?.availableFromTime ?? "",
+        availableToTime: doctor?.availableToTime ?? "",
+      });
+    }
+  }, [isOpen, form, doctor]);
 
   // o primeiro parametro é o server action que faz a inserção ou update do doctor ao banco dedados
   //  o segundo parametro é um objetos que posso passar o onSuccess e o onError
@@ -129,7 +155,7 @@ const UpsertDoctorForm = ({ doctor, onSuccess }: UpsertDoctorFormProps) => {
     },
   });
 
-  const handleSubmit = async (values: z.infer<typeof doctorFormSchema>) => {
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     // aqui, eu estou chamando a action que está no server component, e passando os valores do form
     upersetDoctorAction.execute({
       ...values,
