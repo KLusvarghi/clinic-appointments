@@ -13,8 +13,9 @@
 - [] Ter como o user (admin) verificar os médicos deletado e restaurar se quiser
   - pra isso, tem que verificar se ao fazer a exclusão ele deleta de fato ou apenas
 - [] O paciente terá acesso a dados basicos sobre a clinica, do médico e de suas consultas, receitas, anotações ou prontuário
-- []
 - [] pesquisar sistemas de administração igual a esse
+- [] implementar validações nas server actions
+- [] melhorar a validação da sessão para algo componentizado (podendo usar gerenciador de contexto)
 
 ---
 
