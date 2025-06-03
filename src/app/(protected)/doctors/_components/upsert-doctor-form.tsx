@@ -20,7 +20,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-// import { upsertDoctor } from "@/actions/upsert-doctor";
 import { Button } from "@/components/ui/button";
 import {
   DialogContent,
@@ -146,11 +145,10 @@ const UpsertDoctorForm = ({
   const upersetDoctorAction = useAction(upsertDoctor, {
     onSuccess: () => {
       toast.success("Doctor added successfully");
-      form.reset();
+      // form.reset();
       onSuccess?.();
     },
-    onError: (error) => {
-      console.log(error);
+    onError: () => {
       toast.error("Error adding doctor");
     },
   });
