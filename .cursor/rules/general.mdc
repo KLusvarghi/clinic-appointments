@@ -27,7 +27,7 @@ React/Next.js:
 - Sempre use Tailwind para estilização.
 - Use componentes da biblioteca shadcn/ui ao criar/modificar components (veja https://ui.shadcn).
 - Sempre use Zod para validação de formulários.
-- Sempre use React Hook Form para criação e validação de formulários. Use o componente [form.tsx](mdc:src/components/ui/form.tsx) para criar esses formulários. Exemplo: [upsert-doctor-form.tsx](mdc:src/app/(protected)
+- Sempre use React Hook Form para criação e validação de formulários. Use o componente [form.tsx](mdc:src/components/ui/form.tsx) para criar esses formulários. Exemplo: [upsert-doctor-form.tsx](mdc:src/app/(protected) 
 - Quando necessário, crie componentes e funções reutilizáveis para reduzir a duplicidade de código.
 - Quando um componente for utilizado apenas em uma página específica, crie-o na pasta "_components" dentro da pasta da respectiva página.
 - Sempre use a biblioteca "next-safe-action" ao criar com Server Actions. Use a Server Action. Exemplo: [index.tsx](mdc:src/actions/upsert-doctor/index.tsx) como referência.
