@@ -133,8 +133,8 @@ export const doctorsTable = pgTable("doctors", {
   avatarImageUrl: text("avatar_image_url"),
 
   // 1 = monday, 2 = tuesday, 3 = wednesday, 4 = thursday, 5 = friday, 6 = saturday, 0 = sunday
-  availableFromWeekDay: integer("available_from_week_day").notNull(),// 1 = monday
-  availableToWeekDay: integer("available_to_week_day").notNull(),// 5 = friday
+  availableFromWeekDay: integer("available_from_week_day").notNull(), // 1 = monday
+  availableToWeekDay: integer("available_to_week_day").notNull(), // 5 = friday
 
   // o tipo "time" é para horas e minutos
   availableFromTime: time("available_from_time").notNull(),
@@ -197,14 +197,11 @@ export const patientsTableRelations = relations(patientsTable, ({ one }) => ({
 }));
 
 export const appointmentsTable = pgTable("appointments", {
-  id: text("id").primaryKey(),
+  id: uuid("id").defaultRandom().primaryKey(),
   // o tipo timestamp ele apaenas armazena a data com o hora
   // já o "time" ele armazena apenas a hora e os minutos (tempo)
   date: timestamp("date").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => new Date()),
+  appointmentPriceInCents: integer("appointment_price_in_cents").notNull(),
 
   // dizendo que ele é um uuid. sua coluna se chama "clinic_id". ele faz referencia a "clinicsTable" e a coluna "id"
   // com isso ele já entende que é um FK (foreign key)
@@ -217,6 +214,11 @@ export const appointmentsTable = pgTable("appointments", {
   doctorId: uuid("doctor_id")
     .notNull()
     .references(() => doctorsTable.id, { onDelete: "cascade" }),
+  
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 export const appointmentsTableRelations = relations(
