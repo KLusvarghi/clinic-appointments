@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-// import { ptBR } from "date-fns/locale";
+import { ptBR } from "date-fns/locale";
 import dayjs from "dayjs";
 import { CalendarIcon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
@@ -82,7 +82,6 @@ export function AddAppointmentForm({
   const createAppointmentAction = useAction(addAppointment, {
     onSuccess: () => {
       toast.success("Appointment created successfully");
-      form.reset();
       onSuccess();
     },
     onError: () => {
@@ -161,17 +160,17 @@ export function AddAppointmentForm({
   // essa função é responsavel por verificar se a data selecionada está disponível para o médico selecionado (neste caso são os dias da semana)
   const isDateAvailable = (date: Date) => {
     if (!selectedDoctorId) return false;
-
-    // pegando os dados do doctor selecionado
     const selectedDoctor = doctors.find(
       (doctor) => doctor.id === selectedDoctorId,
     );
     if (!selectedDoctor) return false;
-    const dayOfWeek = date.getDay(); // pegando o dia da semana da data selecionada (0 ao 6)
-    // verificando se o dia da semana da data selecionada está entre o dia da semana de inicio e fim do médico selecionado
+    const dayOfWeek = date.getDay();
+    console.log("selectedDoctor?.availableFromWeekDay", selectedDoctor?.availableFromWeekDay)
+    console.log("selectedDoctor?.availableToWeekDay", selectedDoctor?.availableToWeekDay)
+    console.log("dayOfWeek", dayOfWeek)
     return (
       dayOfWeek >= selectedDoctor?.availableFromWeekDay &&
-      dayOfWeek <= selectedDoctor?.availableToWeekDay // se o dia da semana da data selecionada estiver entre o dia da semana de inicio e fim do médico selecionado, retorna true
+      dayOfWeek <= selectedDoctor?.availableToWeekDay
     );
   };
 
@@ -293,8 +292,8 @@ export function AddAppointmentForm({
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {field.value ? (
                           // isso fará com que o calendario mostre a data em português
-                          // format(field.value, "PPP", { locale: ptBR })
-                          format(field.value, "PPP")
+                          format(field.value, "PPP", { locale: ptBR })
+                          // format(field.value, "PPP")
                         ) : (
                           <span>Select a date</span>
                         )}
@@ -306,11 +305,10 @@ export function AddAppointmentForm({
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      initialFocus
                       disabled={(date) =>
                         date < new Date() || !isDateAvailable(date)
                       }
-                      // initialFocus
+                      initialFocus
                       // para que o calendario mostre os meses em português
                       // locale={ptBR}
                     />

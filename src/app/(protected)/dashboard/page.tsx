@@ -1,8 +1,11 @@
 import dayjs from "dayjs";
 import { and, count, desc, eq, gte, lte, sql, sum } from "drizzle-orm";
+import { Calendar } from "lucide-react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DataTable } from "@/components/ui/data-table";
 import {
   PageActions,
   PageContainer,
@@ -16,6 +19,7 @@ import { db } from "@/db";
 import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
+import { AppointmentsTableColumns } from "../appointments/_components/table-column";
 import { AppointmentsChart } from "./_components/appointments-chart";
 import { DatePicker } from "./_components/date-picker";
 import StatsCard from "./_components/stats-card";
@@ -65,6 +69,10 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
     );
   }
 
+  // aqui ele pega a data de hoje e subtrai 10 dias e pega o inicio desse periodo
+  const chartStartDate = dayjs().subtract(10, "days").startOf("day").toDate();
+  const chartEndDate = dayjs().add(10, "days").endOf("day").toDate();
+
   const [
     // como ele nos retorna uma lista, pegamos o primeiro item
     [totalRevenue],
@@ -73,6 +81,8 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
     [totalPatients],
     topDoctors,
     topSpecialties,
+    todayAppointments,
+    dailyAppointmentsData,
   ] = await Promise.all([
     // Total de receita
     // quando se quer fazer querys mais complexas com o drizzle, como (count, sum, etc), é melhor usar o "select"
@@ -164,34 +174,41 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
       )
       .groupBy(doctorsTable.specialty) // agrupando pela especialidade
       .orderBy(desc(count(appointmentsTable.id))),
-  ]);
-
-  // aqui ele pega a data de hoje e subtrai 10 dias e pega o inicio desse periodo
-  const chartStartDate = dayjs().subtract(10, "days").startOf("day").toDate();
-  const chartEndDate = dayjs().add(10, "days").endOf("day").toDate();
-
-  const dailyAppointmentsData = await db
-    .select({
-      // nesse date, ele está convertendo para string, pois ele vem como um objeto date do javascript
-      date: sql<string>`DATE(${appointmentsTable.date})`.as("date"),
-      appointments: count(appointmentsTable.id), // conto o total de agendamentos
-      // o coalesce é para caso não tenha receita, ele retorna 0
-      // mas ele faz a soma dos valores dos agendamentos de cada dia e converte para number
-      revenue:
-        sql<number>`COALESCE(SUM(${appointmentsTable.appointmentPriceInCents}), 0)`.as(
-          "revenue",
-        ),
-    })
-    .from(appointmentsTable)
-    .where(
-      and(
-        eq(appointmentsTable.clinicId, session.user.clinic.id), // onde o clinicId é igual ao clinicId da sessão
-        gte(appointmentsTable.date, chartStartDate), // onde a data é maior ou igual ao inicio do periodo
-        lte(appointmentsTable.date, chartEndDate), // onde a data é menor ou igual ao fim do periodo
+      // pegando os agendamentos de hojes
+    db.query.appointmentsTable.findMany({
+      where: and(
+        eq(appointmentsTable.clinicId, session.user.clinic.id),
+        gte(appointmentsTable.date, new Date()),
+        lte(appointmentsTable.date, new Date()),
       ),
-    )
-    .groupBy(sql`DATE(${appointmentsTable.date})`) // agrupando pelos dias
-    .orderBy(sql`DATE(${appointmentsTable.date})`); // ordenando pelos dias (1, 2, 3....)
+      with: {
+        patient: true,
+        doctor: true,
+      },
+    }),
+    db
+      .select({
+        // nesse date, ele está convertendo para string, pois ele vem como um objeto date do javascript
+        date: sql<string>`DATE(${appointmentsTable.date})`.as("date"),
+        appointments: count(appointmentsTable.id), // conto o total de agendamentos
+        // o coalesce é para caso não tenha receita, ele retorna 0
+        // mas ele faz a soma dos valores dos agendamentos de cada dia e converte para number
+        revenue:
+          sql<number>`COALESCE(SUM(${appointmentsTable.appointmentPriceInCents}), 0)`.as(
+            "revenue",
+          ),
+      })
+      .from(appointmentsTable)
+      .where(
+        and(
+          eq(appointmentsTable.clinicId, session.user.clinic.id), // onde o clinicId é igual ao clinicId da sessão
+          gte(appointmentsTable.date, chartStartDate), // onde a data é maior ou igual ao inicio do periodo
+          lte(appointmentsTable.date, chartEndDate), // onde a data é menor ou igual ao fim do periodo
+        ),
+      )
+      .groupBy(sql`DATE(${appointmentsTable.date})`) // agrupando pelos dias
+      .orderBy(sql`DATE(${appointmentsTable.date})`), // ordenando pelos dias (1, 2, 3....)s
+  ]);
 
   return (
     <PageContainer>
@@ -216,7 +233,23 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
         <div className="grid grid-cols-[2.25fr_1fr] gap-4">
           <AppointmentsChart dailyAppointmentsData={dailyAppointmentsData} />
           <TopDoctors doctors={topDoctors} />
-          <TopSpecialties topSpecialties={topSpecialties} />  
+        </div>
+        <div className="grid grid-cols-[2.25fr_1fr] gap-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <Calendar className="text-muted-foreground" />
+                <CardTitle className="text-base">Today Appointments</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <DataTable
+                columns={AppointmentsTableColumns}
+                data={todayAppointments}
+              />
+            </CardContent>
+          </Card>
+          <TopSpecialties topSpecialties={topSpecialties} />
         </div>
       </PageContent>
     </PageContainer>
