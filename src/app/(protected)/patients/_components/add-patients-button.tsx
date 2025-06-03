@@ -15,10 +15,10 @@ import {
 import { UpsertPatientForm } from "./upsert-patient-form";
 
 export function AddPatientButton() {
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
@@ -29,7 +29,7 @@ export function AddPatientButton() {
         <DialogHeader>
           <DialogTitle>Add New Patient</DialogTitle>
         </DialogHeader>
-        <UpsertPatientForm onSuccess={() => setOpen(false)} isOpen={open} />
+        <UpsertPatientForm onSuccess={() => setIsOpen(false)} isOpen={isOpen} />
       </DialogContent>
     </Dialog>
   );
