@@ -20,6 +20,7 @@ import { AppointmentsChart } from "./_components/appointments-chart";
 import { DatePicker } from "./_components/date-picker";
 import StatsCard from "./_components/stats-card";
 import TopDoctors from "./_components/top-doctors";
+import TopSpecialties from "./_components/top-specialties";
 
 // pegando os valores de from e to do date-picker que estão na url
 interface DashboardPageProps {
@@ -71,6 +72,7 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
     [totalDoctors],
     [totalPatients],
     topDoctors,
+    topSpecialties,
   ] = await Promise.all([
     // Total de receita
     // quando se quer fazer querys mais complexas com o drizzle, como (count, sum, etc), é melhor usar o "select"
@@ -145,6 +147,23 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
       .orderBy(desc(count(appointmentsTable.id)))
       // limitando para 10 médicos
       .limit(10),
+    db
+      .select({
+        specialty: doctorsTable.specialty, // selecionando as especialidades da tabela de médicos
+        appointments: count(appointmentsTable.id), // contando o total de agendamentos
+      })
+      .from(appointmentsTable) // pegando da tablema de agendamentos
+      // basicamente irei pegar a especialidade dde cada médico
+      .innerJoin(doctorsTable, eq(appointmentsTable.doctorId, doctorsTable.id)) // fazendo um inner join com a tabela de médicos, para pegar a especialidade de cada médico
+      .where(
+        and(
+          eq(appointmentsTable.clinicId, session.user.clinic.id), // onde o clinicId é igual ao clinicId da sessão
+          gte(appointmentsTable.date, new Date(from)),
+          lte(appointmentsTable.date, new Date(to)),
+        ),
+      )
+      .groupBy(doctorsTable.specialty) // agrupando pela especialidade
+      .orderBy(desc(count(appointmentsTable.id))),
   ]);
 
   // aqui ele pega a data de hoje e subtrai 10 dias e pega o inicio desse periodo
@@ -197,6 +216,7 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
         <div className="grid grid-cols-[2.25fr_1fr] gap-4">
           <AppointmentsChart dailyAppointmentsData={dailyAppointmentsData} />
           <TopDoctors doctors={topDoctors} />
+          <TopSpecialties topSpecialties={topSpecialties} />  
         </div>
       </PageContent>
     </PageContainer>

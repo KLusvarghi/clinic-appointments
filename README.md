@@ -18,8 +18,9 @@
 - [] melhorar a validação da sessão para algo componentizado (podendo usar gerenciador de contexto)
 - [] na dashboard, ao clicar nos agendamentos do médico, abrir um dialog ou uma página com todos os agendamentos daquele medico
   - É valido pensar em uma tela aonde consiga ver todos os agendamentos do médico, conseguindo filtrar os médicos, etc
+  - podemos fazer o mesmo com as "Specialtys"
 - [] implementar um filtro mais inteligente no gráfico principal do dashboard, conseguir manipular melhor as datas
-
+- [] no banco de dados, na tabela de doctor, em "specialty" podemos transformar ele em um enum e cada especialidade ter um icone
 ---
 
 ## Pensando alto
