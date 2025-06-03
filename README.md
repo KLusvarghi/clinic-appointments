@@ -16,6 +16,9 @@
 - [] pesquisar sistemas de administração igual a esse
 - [] implementar validações nas server actions
 - [] melhorar a validação da sessão para algo componentizado (podendo usar gerenciador de contexto)
+- [] na dashboard, ao clicar nos agendamentos do médico, abrir um dialog ou uma página com todos os agendamentos daquele medico
+  - É valido pensar em uma tela aonde consiga ver todos os agendamentos do médico, conseguindo filtrar os médicos, etc
+- [] implementar um filtro mais inteligente no gráfico principal do dashboard, conseguir manipular melhor as datas
 
 ---
 

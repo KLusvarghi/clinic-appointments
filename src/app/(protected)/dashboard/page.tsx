@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { and, count, eq, gte, lte, sum } from "drizzle-orm";
+import { and, count, desc, eq, gte, lte, sql, sum } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -16,8 +16,10 @@ import { db } from "@/db";
 import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
+import { AppointmentsChart } from "./_components/appointments-chart";
 import { DatePicker } from "./_components/date-picker";
 import StatsCard from "./_components/stats-card";
+import TopDoctors from "./_components/top-doctors";
 
 // pegando os valores de from e to do date-picker que estão na url
 interface DashboardPageProps {
@@ -68,6 +70,7 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
     [totalAppointments],
     [totalDoctors],
     [totalPatients],
+    topDoctors,
   ] = await Promise.all([
     // Total de receita
     // quando se quer fazer querys mais complexas com o drizzle, como (count, sum, etc), é melhor usar o "select"
@@ -114,7 +117,62 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
       })
       .from(doctorsTable)
       .where(eq(doctorsTable.clinicId, session.user.clinic.id)),
+    db
+      .select({
+        id: doctorsTable.id,
+        name: doctorsTable.name,
+        avatarImageUrl: doctorsTable.avatarImageUrl,
+        specialty: doctorsTable.specialty,
+        appointments: count(appointmentsTable.id),
+      })
+      .from(doctorsTable) // pegando todos os médicos da clínica
+      // fazendo um left join com a tabela de agendamentos, para pegar o total de agendamentos de cada médico
+      .leftJoin(
+        appointmentsTable, // passando a tabela de agendamentos
+        and(
+          // onde os agendamentos pertencem ao médico
+          eq(appointmentsTable.doctorId, doctorsTable.id),
+          // onde os agendamentos estão dentro do periodo selecionado
+          gte(appointmentsTable.date, new Date(from)),
+          lte(appointmentsTable.date, new Date(to)),
+        ),
+      )
+      // pegando apenas os médicos que pertencem a clínica
+      .where(eq(doctorsTable.clinicId, session.user.clinic.id))
+      // agrupando pelo id do médico
+      .groupBy(doctorsTable.id)
+      // ordenando pelo total de agendamentos, em ordem decrescente
+      .orderBy(desc(count(appointmentsTable.id)))
+      // limitando para 10 médicos
+      .limit(10),
   ]);
+
+  // aqui ele pega a data de hoje e subtrai 10 dias e pega o inicio desse periodo
+  const chartStartDate = dayjs().subtract(10, "days").startOf("day").toDate();
+  const chartEndDate = dayjs().add(10, "days").endOf("day").toDate();
+
+  const dailyAppointmentsData = await db
+    .select({
+      // nesse date, ele está convertendo para string, pois ele vem como um objeto date do javascript
+      date: sql<string>`DATE(${appointmentsTable.date})`.as("date"),
+      appointments: count(appointmentsTable.id), // conto o total de agendamentos
+      // o coalesce é para caso não tenha receita, ele retorna 0
+      // mas ele faz a soma dos valores dos agendamentos de cada dia e converte para number
+      revenue:
+        sql<number>`COALESCE(SUM(${appointmentsTable.appointmentPriceInCents}), 0)`.as(
+          "revenue",
+        ),
+    })
+    .from(appointmentsTable)
+    .where(
+      and(
+        eq(appointmentsTable.clinicId, session.user.clinic.id), // onde o clinicId é igual ao clinicId da sessão
+        gte(appointmentsTable.date, chartStartDate), // onde a data é maior ou igual ao inicio do periodo
+        lte(appointmentsTable.date, chartEndDate), // onde a data é menor ou igual ao fim do periodo
+      ),
+    )
+    .groupBy(sql`DATE(${appointmentsTable.date})`) // agrupando pelos dias
+    .orderBy(sql`DATE(${appointmentsTable.date})`); // ordenando pelos dias (1, 2, 3....)
 
   return (
     <PageContainer>
@@ -136,6 +194,10 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
           totalDoctors={totalDoctors?.total ?? null}
           totalPatients={totalPatients?.total ?? null}
         />
+        <div className="grid grid-cols-[2.25fr_1fr] gap-4">
+          <AppointmentsChart dailyAppointmentsData={dailyAppointmentsData} />
+          <TopDoctors doctors={topDoctors} />
+        </div>
       </PageContent>
     </PageContainer>
   );
