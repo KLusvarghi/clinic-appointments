@@ -33,7 +33,9 @@ export function DatePicker({
   );
 
   const handleDateSelect = (date: DateRange | undefined) => {
-    if (date?.from) setFrom(date.from);
+    if (date?.from) setFrom(date.from, {
+      shallow: false // sendo necessário passar esse "shallow" como false para que o date-picker atualize a url e a nossa query seja refeira e atualize os dados
+    });
     if (date?.to) setTo(date.to);
   };
 
