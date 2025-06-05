@@ -34,15 +34,20 @@ export const auth = betterAuth({
         // E nesse caso precisamos do nome da clinica, para isso, apenas:
         with: {
           clinic: true,
-          // user: true, // caso quisessemos os dados do user
+          user: true, 
         },
       });
       // TODO: No futuro, alterar essa lógica para que retorne todas as clinicas do usuário, não apenas a primeira ocorrencia
+      // TODO: 
       const clinic = clinics?.[0];
+
+      // nesse return, quando a gente queiser pegar a session, poderemos acessar todos esses dados abaixo
       return {
         user: {
           ...user, // retorna todos os dados do user
-          // Tendo que fazer essa validação que pelo menos retorne undefined e não de crash a aplicação 
+          // Tendo que fazer essa validação que pelo menos retorne undefined e não de crash a aplicação
+
+          subscriptionPlan: clinic?.user.subscriptionPlan, // aqui estamos pegando o plano do usuário, que está na tabela de relacionamento entre o user e a clinica
           clinic: clinic?.clinicId
             ? {
                 id: clinic?.clinicId,
@@ -58,6 +63,25 @@ export const auth = betterAuth({
   // lembra do schema que o better-auth criou? enttão, temos que deixar explicito o nome das variáveis que usamos conforme as tabelas:
   user: {
     modelName: "usersTable",
+
+    // passando esses campos adicionais para o schema do user, que não estão no schema que criamos, mas que o better-auth criou
+    additionalFields: {
+      stripeCustomerId: {
+        type: "string",
+        fieldName: "stripeCustomerId",
+        required: false,
+      },
+      stripeSubscriptionId: {
+        type: "string",
+        fieldName: "stripeSubscriptionId",
+        required: false,
+      },
+      subscriptionPlan: {
+        type: "string",
+        fieldName: "subscriptionPlan",
+        required: false,
+      },
+    },
   },
   account: {
     modelName: "accountsTable",

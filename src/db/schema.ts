@@ -13,6 +13,9 @@ import {
 
 // schemas criados pelo better-auth para implementar a autenticação
 
+export const planUserEnum = pgEnum("plan_user", ["free", "essential", "pro"]);
+
+
 // "users" é o nome da tabela e dentro são as prorpiedades
 export const usersTable = pgTable("users", {
   id: text("id").primaryKey(),
@@ -22,6 +25,18 @@ export const usersTable = pgTable("users", {
   image: text("image"),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
+
+  // campos para o plano de assinatura
+  subscriptionPlan: planUserEnum("plan_user"),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  
+  // posseiveis implementações
+  // subscriptionStatus: text("subscription_status").notNull(),
+  // subscriptionStartDate: timestamp("subscription_start_date"),
+  // subscriptionEndDate: timestamp("subscription_end_date"),
+  // subscriptionCanceledAt: timestamp("subscription_canceled_at"),
+  // subscriptionCanceledReason: text("subscription_canceled_reason"),
 });
 
 export const usersTableRelations = relations(usersTable, ({ many }) => ({
