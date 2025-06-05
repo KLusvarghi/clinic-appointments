@@ -31,6 +31,10 @@ const DoctorsPage = async () => {
     redirect("/clinic-form");
   }
 
+  if (!session.user.subscriptionPlan) {
+    redirect("/new-subscription");
+  }
+
   // peganado os doctors da clínica
   const doctors = await db.query.doctorsTable.findMany({
     // o "eq  = equal" e verifica se o algum id da clinica que vem lá do banco é o mesmo id da clinica que vem o user

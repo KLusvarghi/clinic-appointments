@@ -32,6 +32,10 @@ const AppointmentsPage = async () => {
     redirect("/clinic-form");
   }
 
+  if (!session.user.subscriptionPlan) {
+    redirect("/new-subscription");
+  }
+
   // o "promise.all" é usado para executar as consultas em paralelo, então todas essas querys no banco de dados serão executadas ao mesmo tempo, nos dando mais performance
   const [patients, doctors, appointments] = await Promise.all([
     db.query.patientsTable.findMany({
