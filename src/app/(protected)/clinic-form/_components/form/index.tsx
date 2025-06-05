@@ -41,7 +41,6 @@ const ClinicForm = () => {
       if (isRedirectError(error)) {
         return;
       }
-      console.log(error);
       toast.error("Error creating clinic");
     }
   };

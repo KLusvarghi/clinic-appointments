@@ -165,9 +165,6 @@ export function AddAppointmentForm({
     );
     if (!selectedDoctor) return false;
     const dayOfWeek = date.getDay();
-    console.log("selectedDoctor?.availableFromWeekDay", selectedDoctor?.availableFromWeekDay)
-    console.log("selectedDoctor?.availableToWeekDay", selectedDoctor?.availableToWeekDay)
-    console.log("dayOfWeek", dayOfWeek)
     return (
       dayOfWeek >= selectedDoctor?.availableFromWeekDay &&
       dayOfWeek <= selectedDoctor?.availableToWeekDay

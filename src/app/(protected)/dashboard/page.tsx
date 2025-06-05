@@ -57,6 +57,10 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
     redirect("/clinic-form");
   }
 
+  // if (!session.user.subscriptionPlan) {
+  //   redirect("/new-subscription");
+  // }
+
   // extraindo os valores da variável que está na url
   const { from, to } = await searchParams;
 

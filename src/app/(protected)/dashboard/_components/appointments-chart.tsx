@@ -51,8 +51,6 @@ export function AppointmentsChart({ dailyAppointmentsData }: AppointmentsChartPr
     };
   });
 
-  console.log(chartData)
-
   const chartConfig = {
     desktop: {
       label: "appointments",

@@ -2,6 +2,7 @@
 
 import {
   CalendarDays,
+  Gem,
   LayoutDashboard,
   LogOut,
   Stethoscope,
@@ -65,7 +66,6 @@ export function AppSidebar() {
   const pathName = usePathname();
 
   const handleSignOut = async () => {
-    console.log("signing out");
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
@@ -95,6 +95,21 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Others</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathName === "/subscription"}>
+                  <Link href="/subscription">
+                    <Gem />
+                    <span>Subscription </span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
