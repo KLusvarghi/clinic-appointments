@@ -1,3 +1,5 @@
+// schema antigo
+
 // criando os schemas (basicamente o que vai ser salvo no banco de dados, tabelas, tipos de dados, etc)
 import { relations } from "drizzle-orm";
 import {

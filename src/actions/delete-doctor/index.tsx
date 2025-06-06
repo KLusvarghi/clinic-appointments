@@ -2,15 +2,13 @@
 
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
 import { z } from "zod";
 
 import { db } from "@/db";
 import { doctorsTable } from "@/db/schema";
-import { auth } from "@/lib/auth";
-import { actionClient } from "@/lib/safe-action";
+import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 
-export const deleteDoctor = actionClient
+export const deleteDoctor = protectedWithClinicActionClient  
   .schema(
     z.object({
       // recebendo o id do medico a ser deletado
@@ -18,14 +16,8 @@ export const deleteDoctor = actionClient
     }),
   )
   // o ".action" recebe uma arrow function da acção a ser executada
-  .action(async ({ parsedInput }) => { // o "parsedInput" é o que se recebe
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
-    // verificando se o user existe
-    if (!session?.user) {
-      throw new Error("Unauthorized");
-    }
+  .action(async ({ parsedInput, ctx }) => {
+    // o "parsedInput" é o que se recebe
 
     // obtendo o doctor que tenha o mesmo id que tenha no bd
     const doctor = await db.query.doctorsTable.findFirst({
@@ -37,7 +29,7 @@ export const deleteDoctor = actionClient
       throw new Error("Doctor doesn't exist");
     }
     // verifica se o clinicId do doctor é o do clinicId do user
-    if (doctor.clinicId !== session.user.clinic?.id) {
+    if (doctor.clinicId !== ctx.clinic?.id) {
       throw new Error("Doctor doesn't belong to the clinic");
     }
 

@@ -4,12 +4,10 @@
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
 
 import { db } from "@/db";
 import { doctorsTable } from "@/db/schema";
-import { auth } from "@/lib/auth";
-import { actionClient } from "@/lib/safe-action";
+import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 
 import { upsertDoctorSchema } from "./schema";
 
@@ -18,11 +16,11 @@ dayjs.extend(utc);
 
 // resumindo, o action irá pegar o schema e já valida os parametros recebidos do front, e depois, irá executar a lógica do nosso servidor action
 
-export const upsertDoctor = actionClient
+export const upsertDoctor = protectedWithClinicActionClient
   .schema(upsertDoctorSchema) // aqui, definimos o schema que iremos usar para validar os dados recebidos do front - ela tem uma boa integração com o zod
   // e aqui, definimos a action que iremos usar para executar a lógica do nosso servidor action
   // e dentro do action, temos o parsedInput que é o valor que iremos receber do front (que é o valor do forms)
-  .action(async ({ parsedInput }) => {
+  .action(async ({ parsedInput, ctx }) => {
     // um problemas que temos é questão das horas, e para manter a concistencia, temos que armazenar as horas em UTC (sem fuso horário)
     // pra começar vamos pegar os valores que queremos formatar antes de armazenar
     const availableFromTime = parsedInput.availableFromTime; // 15:30:00
@@ -43,16 +41,6 @@ export const upsertDoctor = actionClient
       .set("second", parseInt(availableToTime.split(":")[2]))
       .utc();
 
-    // pegando a sessão do usuário
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
-
-    // e com a sessão que está ativa, verificamos se existe uma clinica associada a ele
-    if (!session?.user.clinic?.id) {
-      throw new Error("Clinic not found");
-    }
-
     // depois de validar, podemos enviar para o banco de dados
     // mas antes, temos que fazer aquela validação de, se não existe o médico, eu irei criar, se não, eu irei atualziar
     await db
@@ -61,7 +49,7 @@ export const upsertDoctor = actionClient
       .values({
         ...parsedInput,
         id: parsedInput.id,
-        clinicId: session?.user.clinic?.id,
+        clinicId: ctx.clinic.id,
 
         // E para armazenar no banco, ele recebe em string, e ai que usamos a lib dayjs para converter a data para string - https://day.js.org/docs/en/display/format
         availableFromTime: availableFromTimeUTC.format("HH:mm:ss"),

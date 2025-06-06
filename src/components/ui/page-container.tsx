@@ -27,9 +27,9 @@ export const PageDescription = ({
 };
 
 export const PageActions = ({ children }: { children: React.ReactNode }) => {
-  return <p className="flex items-center gap-2">{children}</p>;
+  return <div className="flex items-center gap-2">{children}</div>;
 };
 
 export const PageContent = ({ children }: { children: React.ReactNode }) => {
-  return <p className="space-y-6">{children}</p>;
+  return <div className="space-y-6">{children}</div>;
 };

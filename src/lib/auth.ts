@@ -9,6 +9,9 @@ import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { usersToClinicsTable } from "@/db/schema";
 
+// neste caso, exécificamos o tempo para evitar números mágicos, ficando mais facil a compreensão
+const FIVE_MINUES = 5 * 60;
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg", // pg of "postgres"
@@ -88,6 +91,14 @@ export const auth = betterAuth({
   },
   session: {
     modelName: "sessionsTable",
+
+    // aqui  nós implementamos o cache, assim, ao invés de toda vez bater naquela rota de api.getSession, ele antes verifica se existe esse cache no cookie, se existir, ele retorna o cache, se não existir, ele busca no banco de dados e salva no cookie, para que na próxima vez que a pessoa fizer uma requisição, ele já tenha o cache salvo no cookie.
+    // porem, ele apenas verifica se tem chache, mas não valida ele, de certo modo nos ajuda a fazer essa validação de se existe cookie, mas não valida ele
+    // mas de qualquer forma diminue bastante a quantidade de chamadas
+    cookieCache: {
+      enabled: true,
+      maxAge: FIVE_MINUES,
+    },
   },
   verification: {
     modelName: "verificationsTable",

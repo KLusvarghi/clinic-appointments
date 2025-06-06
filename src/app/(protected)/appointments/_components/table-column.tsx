@@ -23,7 +23,7 @@ type AppointmentWithRelations = typeof appointmentsTable.$inferSelect & {
 };
 
 // conseguimos inferir o tipo das colunas com o $inferSelect, assim pegando o calor de cada coluna conforme o nosso schema
-export const AppointmentsTableColumns: ColumnDef<AppointmentWithRelations>[] = [
+export const appointmentsTableColumns: ColumnDef<AppointmentWithRelations>[] = [
   {
     id: "patient",
     accessorKey: "patient.name",

@@ -1,6 +1,5 @@
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 import { DataTable } from "@/components/ui/data-table";
 import {
@@ -14,6 +13,7 @@ import {
 } from "@/components/ui/page-container";
 import { db } from "@/db";
 import { patientsTable } from "@/db/schema";
+import WithAuthentication from "@/hocs/with-authentication";
 import { auth } from "@/lib/auth";
 
 import { AddPatientButton } from "./_components/add-patients-button";
@@ -24,40 +24,29 @@ const PatientsPage = async () => {
     headers: await headers(),
   });
 
-  if (!session?.user) {
-    redirect("/authentication");
-  }
-
-  if (!session.user.clinic) {
-    redirect("/clinic-form");
-  }
-
-  if (!session.user.subscriptionPlan) {
-    redirect("/new-subscription");
-  }
-
   const patients = await db.query.patientsTable.findMany({
-    where: eq(patientsTable.clinicId, session.user.clinic.id),
+    where: eq(patientsTable.clinicId, session!.user.clinic!.id),
   });
 
   return (
-    <PageContainer>
-      <PageHeader>
-        <PageHeaderContent>
-          <PageTitle>Pacientes</PageTitle>
-          <PageDescription>
-            Gerencie os pacientes da sua clínica
-          </PageDescription>
-        </PageHeaderContent>
-        <PageActions>
-          <AddPatientButton />
-        </PageActions>
-      </PageHeader>
-      <PageContent>
-        {/* sendo esse o componente que criamos e para ele passamos as colunas que teremos */}
-        <DataTable data={patients} columns={patientsTableColumns} />
-      </PageContent>
-    </PageContainer>
+    <WithAuthentication mustHavePlan mustHaveClinic>
+      <PageContainer>
+        <PageHeader>
+          <PageHeaderContent>
+            <PageTitle>Pacientes</PageTitle>
+            <PageDescription>
+              Gerencie os pacientes da sua clínica
+            </PageDescription>
+          </PageHeaderContent>
+          <PageActions>
+            <AddPatientButton />
+          </PageActions>
+        </PageHeader>
+        <PageContent>
+          <DataTable data={patients} columns={patientsTableColumns} />
+        </PageContent>
+      </PageContainer>
+    </WithAuthentication>
   );
 };
 

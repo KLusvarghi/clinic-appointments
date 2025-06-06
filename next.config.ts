@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   images: {
     domains: ["lh3.googleusercontent.com"],
   },
+  logging:{
+    fetches: {
+      fullUrl: true,
+    }
+  }
 };
 
 export default nextConfig;

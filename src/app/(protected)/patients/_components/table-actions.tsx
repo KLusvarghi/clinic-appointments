@@ -55,7 +55,7 @@ const TableActions = ({ patient }: TableActionsProps) => {
   return (
     <Dialog open={upsertDialogIsOpen} onOpenChange={setUpsertDialogIsOpen}>
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon">
             <MoreVerticalIcon className="h-4 w-4" />
           </Button>

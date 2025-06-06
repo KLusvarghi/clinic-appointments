@@ -37,7 +37,7 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => {
   const { from, to } = getAvailability(doctor);
 
   return (
-    <Card>
+    <Card className="max-w-md">
       <CardHeader>
         <div className="flex items-center gap-2">
           <Avatar className="h-10 w-10">

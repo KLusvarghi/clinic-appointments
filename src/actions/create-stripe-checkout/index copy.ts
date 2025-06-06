@@ -6,7 +6,7 @@ import Stripe from "stripe";
 import { z } from "zod";
 
 import { auth } from "@/lib/auth";
-import { actionClient } from "@/lib/safe-action";
+import { actionClient } from "@/lib/next-safe-action";
 
 export const createStripeCheckout = actionClient
   // caso a gente tivesse mais de um plano fariamos assim

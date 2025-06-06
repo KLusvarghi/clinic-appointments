@@ -1,6 +1,3 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-
 import {
   Dialog,
   DialogContent,
@@ -8,33 +5,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { auth } from "@/lib/auth";
+import WithAuthentication from "@/hocs/with-authentication";
 
 import ClinicForm from "./_components/form";
 
-const session = await auth.api.getSession({
-  headers: await headers(),
-});
-if (!session) {
-  redirect("/authentication");
-}
-if (!session.user.subscriptionPlan) {
-  redirect("/new-subscription");
-}
-
 const ClinicFormPage = () => {
   return (
-    <div>
-      <Dialog open>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Add a clinic</DialogTitle>
-            <DialogDescription>Add a clinic to continue.</DialogDescription>
-          </DialogHeader>
-          <ClinicForm />
-        </DialogContent>
-      </Dialog>
-    </div>
+    <WithAuthentication mustHavePlan>
+      <div>
+        <Dialog open>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Add a clinic</DialogTitle>
+              <DialogDescription>Add a clinic to continue.</DialogDescription>
+            </DialogHeader>
+            <ClinicForm />
+          </DialogContent>
+        </Dialog>
+      </div>
+    </WithAuthentication>
   );
 };
 

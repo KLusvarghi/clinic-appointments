@@ -1,23 +1,13 @@
 // a página de checkout é a página que o usuário vai ser redirecionado para fazer o pagamento, e ela é obrigatoriamente criado no backend, por isso usaremos uma server action para isso
 "use server";
 
-import { headers } from "next/headers";
 import Stripe from "stripe";
 
-import { auth } from "@/lib/auth";
-import { actionClient } from "@/lib/safe-action";
+import { protectedActionClient } from "@/lib/next-safe-action";
 
-export const createStripeCheckout = actionClient
+export const createStripeCheckout = protectedActionClient
   // neste caso não usaremos o schema
-  .action(async () => {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
-
-    if (!session?.user) {
-      throw new Error("Unauthorized");
-    }
-
+  .action(async ({ ctx }) => {
     if (!process.env.STRIPE_SECRET_KEY) {
       throw new Error("Stripe secret key is not set");
     }
@@ -39,7 +29,7 @@ export const createStripeCheckout = actionClient
       subscription_data: {
         // esse metadata é um objeto que será passado para o stripe/ web hook e será usado para identificar o usuário que fez o pagamento
         metadata: {
-          userId: session.user.id,
+          userId: ctx.user.id,
         },
       },
       // aqui, definimos os itens que o usuário vai poder comprar, sendo que o plano é o item que ele vai comprar

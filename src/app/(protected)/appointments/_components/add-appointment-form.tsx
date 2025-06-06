@@ -15,6 +15,7 @@ import { z } from "zod";
 
 import { addAppointment } from "@/actions/add-appointment";
 import { getAvailableTimes } from "@/actions/get-available-times";
+import type { TimeSlot } from "@/actions/get-available-times/types";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -125,7 +126,7 @@ export function AddAppointmentForm({
         date: dayjs(selectedDate).format("YYYY-MM-DD"), // Precisando formatar para "YYYY-MM-DD", por isso usar o dayjs
         doctorId: selectedDoctorId, // passando o id do médico
       }),
-      // se olhar no devtools, vai ver que a query é executada mesmo antes de selecioanr datra, e para evitar isso fazemos:
+    // se olhar no devtools, vai ver que a query é executada mesmo antes de selecioanr datra, e para evitar isso fazemos:
     enabled: !!selectedDate && !!selectedDoctorId, // para que a query seja executada apenas quando o date e o doctorId forem selecionados
   });
 
@@ -155,7 +156,7 @@ export function AddAppointmentForm({
         time: "",
       });
     }
-  }, [isOpen, form]); 
+  }, [isOpen, form]);
 
   // essa função é responsavel por verificar se a data selecionada está disponível para o médico selecionado (neste caso são os dias da semana)
   const isDateAvailable = (date: Date) => {
@@ -290,8 +291,8 @@ export function AddAppointmentForm({
                         {field.value ? (
                           // isso fará com que o calendario mostre a data em português
                           format(field.value, "PPP", { locale: ptBR })
-                          // format(field.value, "PPP")
                         ) : (
+                          // format(field.value, "PPP")
                           <span>Select a date</span>
                         )}
                       </Button>
@@ -334,23 +335,17 @@ export function AddAppointmentForm({
                   </FormControl>
                   <SelectContent>
                     {/* aqui estamos renderizando os horários disponíveis para o médico */}
-                    {availableTimes?.data?.map(
-                      (time: {
-                        value: string;
-                        available: boolean;
-                        label: string;
-                      }) => (
-                        <SelectItem
-                          key={time.value}
-                          value={time.value}
-                          // caso o valor esteja com o time.available como false, ele desabilita a text
-                          disabled={!time.available}
-                        > 
-                          {/* E se o valor estiver desabilitado ele exibe a mensagem */}
-                          {time.label} {!time.available && "(Unavailable)"}
-                        </SelectItem>
-                      ),
-                    )}
+                    {availableTimes?.data?.map((time: TimeSlot) => (
+                      <SelectItem
+                        key={time.value}
+                        value={time.value}
+                        // caso o valor esteja com o time.available como false, ele desabilita a text
+                        disabled={!time.available}
+                      >
+                        {/* E se o valor estiver desabilitado ele exibe a mensagem */}
+                        {time.label} {!time.available && "(Unavailable)"}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <FormMessage />

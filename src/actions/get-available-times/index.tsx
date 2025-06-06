@@ -4,52 +4,40 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { eq } from "drizzle-orm";
-import { headers } from "next/headers";
 import { z } from "zod";
 
 import { db } from "@/db";
 import { appointmentsTable, doctorsTable } from "@/db/schema";
 import { generateTimeSlots } from "@/helpers/time";
-import { auth } from "@/lib/auth";
-import { actionClient } from "@/lib/safe-action";
+import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 
 dayjs.extend(utc); // para usar o plugin utc (data e hora em UTC)
 dayjs.extend(timezone); // para usar o plugin timezone (data e hora em timezone)
 
-export const getAvailableTimes = actionClient
+export const getAvailableTimes = protectedWithClinicActionClient
   .schema(
     z.object({
       // Precisamos receber o id do doctor e a data selecionada para verificar se o médico está disponível nessa data
-      doctorId: z.string(),
-      date: z.string().date(), // com isso ele retornA: YYYY-MM-DD
+      doctorId: z.string().uuid(),
+      date: z.string().date(),  // YYYY-MM-DD,
     }),
   )
-  .action(async ({ parsedInput }) => {
-    // aqui estamos verificando se o usuário está autenticado
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
-
-    if (!session) {
-      throw new Error("Unauthorized");
-    }
-
-    if (!session.user.clinic) {
-      throw new Error("Clínica não encontrada");
-    }
-
-    // pequando os dados do doctor
+  .action(async ({ parsedInput, ctx }) => {
     const doctor = await db.query.doctorsTable.findFirst({
       where: eq(doctorsTable.id, parsedInput.doctorId),
     });
 
     if (!doctor) {
-      throw new Error("Médico não encontrado");
+      throw new Error("Doctor not found");
+    }
+
+    if (doctor.clinicId !== ctx.clinic.id) {
+      throw new Error("Doctor doesn't belong to the clinic");
     }
 
     // primeiro temos que verificar se o médico está disponivel naquele dia da semana (segunda, terça, etc)
-      // day() retorna o dia da semana, sendo 0 para domingo, 1 para segunda, 2 para terça, etc
-      // o "parsedInput" é o "data" que se recebe no action
+    // day() retorna o dia da semana, sendo 0 para domingo, 1 para segunda, 2 para terça, etc
+    // o "parsedInput" é o "data" que se recebe no action
     const selectedDayOfWeek = dayjs(parsedInput.date).day(); // com isso ele pega o dia da semana
 
     // assim eu valido se o dia da semana está entre o inicial e o final que o médico está trabalhando
@@ -57,7 +45,7 @@ export const getAvailableTimes = actionClient
       selectedDayOfWeek >= doctor.availableFromWeekDay &&
       selectedDayOfWeek <= doctor.availableToWeekDay;
 
-      // caso não seja, ele já retorna um array vazio
+    // caso não seja, ele já retorna um array vazio
     if (!doctorIsAvailable) {
       return [];
     }
@@ -80,7 +68,7 @@ export const getAvailableTimes = actionClient
     const timeSlots = generateTimeSlots();
 
     // como nós salvamos os dados com UTC no bd, precisamos converter para o horário local do médico
-      // basicamnete quando estou criando uma data a partir de uma data em UTC, eu preciso usar o "utc" para converter para o horário local do médico
+    // basicamnete quando estou criando uma data a partir de uma data em UTC, eu preciso usar o "utc" para converter para o horário local do médico
     const doctorAvailableFrom = dayjs()
       .utc()
       .set("hour", Number(doctor.availableFromTime.split(":")[0])) // pegando a hora
@@ -94,7 +82,8 @@ export const getAvailableTimes = actionClient
       .set("second", 0)
       .local();
 
-    const doctorTimeSlots = timeSlots.filter((time) => { // time = 14:00:00
+    const doctorTimeSlots = timeSlots.filter((time) => {
+      // time = 14:00:00
       // para cada time, eu vou criar uma dara com esse time que recebemos com props
       const date = dayjs()
         .utc()
@@ -113,7 +102,7 @@ export const getAvailableTimes = actionClient
     return doctorTimeSlots.map((time) => {
       return {
         value: time,
-        available: !appointmentsOnSelectedDate.includes(time), // se o time não está no array de agendamentos, ele está disponível
+        available: !appointmentsOnSelectedDate.includes(time),
         label: time.substring(0, 5), // isso fará com que retorn apena "12:00" e não "12:00:00"
       };
     });
