@@ -14,6 +14,7 @@ Sistema de agendamento e gerenciamento de clínicas médicas.
 - BetterAuth
 - PostgreSQL
 - Drizzle ORM
+- A lista completa de dependências e versões está em `requirements.ts`, usada para geração de documentação.
 
 ## 📦 Instalação
 
