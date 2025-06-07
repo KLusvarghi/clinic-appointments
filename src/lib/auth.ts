@@ -6,8 +6,8 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 // pegando todos os schemas que estão sendo exportados lá de "schemas"
-import * as schema from "@/db/schema";
-import { usersToClinicsTable } from "@/db/schema";
+import * as schema from "@/db/new_schema";
+import { usersToClinicsTable } from "@/db/new_schema";
 
 // neste caso, exécificamos o tempo para evitar números mágicos, ficando mais facil a compreensão
 const FIVE_MINUES = 5 * 60;
