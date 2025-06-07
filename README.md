@@ -24,7 +24,9 @@ Sistema de agendamento e gerenciamento de clínicas médicas.
 - npm install
 
 3. Configure as variáveis de ambiente conforme o arquivo `.env.example`.
-4. Inicie o servidor de desenvolvimento:
+4. Execute as migrações do banco:
+   - `npx drizzle-kit push`
+5. Inicie o servidor de desenvolvimento:
 
 
 ## 📁 Estrutura do Projeto
@@ -37,6 +39,7 @@ Sistema de agendamento e gerenciamento de clínicas médicas.
 ## 🧪 Testes
 
 - Execute os testes com:
+- `npm run lint`
 
 
 ## 📄 Licença
