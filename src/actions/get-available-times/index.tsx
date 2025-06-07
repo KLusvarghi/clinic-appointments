@@ -14,6 +14,12 @@ import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 dayjs.extend(utc); // para usar o plugin utc (data e hora em UTC)
 dayjs.extend(timezone); // para usar o plugin timezone (data e hora em timezone)
 
+/**
+ * Retorna os horários disponíveis para um médico em determinada data.
+ *
+ * @param parsedInput - Objeto contendo o ID do médico e a data.
+ * @param ctx - Contexto da ação com os dados da clínica.
+ */
 export const getAvailableTimes = protectedWithClinicActionClient
   .schema(
     z.object({

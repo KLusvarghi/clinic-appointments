@@ -5,6 +5,12 @@ import Stripe from "stripe";
 
 import { protectedActionClient } from "@/lib/next-safe-action";
 
+/**
+ * Gera uma sessão de checkout do Stripe para que o usuário possa assinar.
+ *
+ * @param ctx - Contexto contendo o usuário autenticado.
+ * @returns O ID da sessão criada.
+ */
 export const createStripeCheckout = protectedActionClient
   // neste caso não usaremos o schema
   .action(async ({ ctx }) => {

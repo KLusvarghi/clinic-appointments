@@ -10,6 +10,12 @@ import { auth } from "@/lib/auth";
 
 import { UpsertDoctorSchema, upsertDoctorSchema } from "./schema";
 
+/**
+ * Insere ou atualiza um médico sem utilizar next-safe-action.
+ *
+ * @param formData - Dados validados por upsertDoctorSchema.
+ * @returns Uma promessa que é resolvida quando o médico é salvo.
+ */
 export const upsertDoctor = async (formData: UpsertDoctorSchema) => {
   // para validar o que de "formData", usamos o upsertDoctorSchema
   upsertDoctorSchema.parse(formData);
