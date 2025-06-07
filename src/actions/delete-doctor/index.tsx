@@ -7,6 +7,12 @@ import { z } from "zod";
 import { db } from "@/db";
 import { doctorsTable } from "@/db/schema";
 import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
+/**
+ * Exclui um médico se ele pertencer à clínica autenticada.
+ *
+ * @param parsedInput - Objeto contendo o ID do médico.
+ * @param ctx - Contexto da ação com os dados da clínica.
+ */
 
 export const deleteDoctor = protectedWithClinicActionClient  
   .schema(

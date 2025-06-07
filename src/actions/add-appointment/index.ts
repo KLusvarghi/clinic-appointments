@@ -11,6 +11,14 @@ import { getAvailableTimes } from "../get-available-times";
 import type { TimeSlot } from "../get-available-times/types";
 import { addAppointmentSchema } from "./schema";
 
+/**
+ * Cria um agendamento caso o horário escolhido esteja disponível. O
+ * agendamento é associado à clínica do contexto autenticado e as páginas
+ * relevantes são revalidadas.
+ *
+ * @param parsedInput - Dados validados por {@link addAppointmentSchema}.
+ * @param ctx - Contexto contendo a clínica autenticada.
+ */
 export const addAppointment = protectedWithClinicActionClient
   .schema(addAppointmentSchema)
   .action(async ({ parsedInput, ctx }) => {

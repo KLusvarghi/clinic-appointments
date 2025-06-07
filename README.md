@@ -21,6 +21,7 @@ Sistema de agendamento e gerenciamento de clínicas médicas.
 - BetterAuth
 - PostgreSQL
 - Drizzle ORM
+- A lista completa de dependências e versões está em `requirements.ts`, usada para geração de documentação.
 
 ## 📦 Instalação
 
@@ -36,18 +37,6 @@ Sistema de agendamento e gerenciamento de clínicas médicas.
 
 3. Crie um arquivo `.env.local` e defina as variáveis abaixo.
 
-4. Inicie o servidor de desenvolvimento:
-   ```bash
-   npm run dev
-   ```
-
-5. Para gerar a versão de produção:
-   ```bash
-   npm run build
-   npm start
-   ```
-
-## 🔧 Variáveis de Ambiente
 
 Crie um arquivo `.env.local` seguindo o exemplo abaixo:
 
