@@ -8,6 +8,12 @@ import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 
 import { upsertPatientSchema } from "./schema";
 
+/**
+ * Insere ou atualiza o registro de um paciente para a clínica autenticada.
+ *
+ * @param parsedInput - Dados validados por upsertPatientSchema.
+ * @param ctx - Contexto da ação com os dados da clínica.
+ */
 export const upsertPatient = protectedWithClinicActionClient
   .schema(upsertPatientSchema)
   .action(async ({ parsedInput, ctx }) => {

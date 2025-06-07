@@ -16,6 +16,13 @@ dayjs.extend(utc);
 
 // resumindo, o action irá pegar o schema e já valida os parametros recebidos do front, e depois, irá executar a lógica do nosso servidor action
 
+/**
+ * Insere ou atualiza um médico pertencente à clínica autenticada.
+ * Os horários são convertidos para UTC antes de serem salvos.
+ *
+ * @param parsedInput - Dados validados por upsertDoctorSchema.
+ * @param ctx - Contexto da ação com os dados da clínica.
+ */
 export const upsertDoctor = protectedWithClinicActionClient
   .schema(upsertDoctorSchema) // aqui, definimos o schema que iremos usar para validar os dados recebidos do front - ela tem uma boa integração com o zod
   // e aqui, definimos a action que iremos usar para executar a lógica do nosso servidor action

@@ -6,6 +6,11 @@ import { db } from "@/db";
 import { clinicsTable, usersToClinicsTable } from "@/db/schema";
 import { protectedActionClient } from "@/lib/next-safe-action";
 
+/**
+ * Cria uma clínica para o usuário autenticado e o associa a ela.
+ *
+ * @param ctx - Contexto com o usuário autenticado.
+ */
 export const createClinic = protectedActionClient.action(async ({ ctx }) => {
   //  antes de inserir dados, temos que validar se o usuário está logado:
 
