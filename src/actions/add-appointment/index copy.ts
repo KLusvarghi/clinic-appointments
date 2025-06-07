@@ -12,6 +12,11 @@ import { actionClient } from "@/lib/next-safe-action";
 import { getAvailableTimes } from "../get-available-times";
 import { addAppointmentSchema } from "./schema";
 
+/**
+ * Cria um agendamento após validar o horário selecionado.
+ *
+ * @returns Uma promessa que é resolvida quando o agendamento é salvo.
+ */
 export const addAppointment = actionClient
   .schema(addAppointmentSchema)
   .action(async ({ parsedInput }) => {

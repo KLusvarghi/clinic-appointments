@@ -8,6 +8,11 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { actionClient } from "@/lib/next-safe-action";
 
+/**
+ * Gera uma sessão de checkout do Stripe para que o usuário possa assinar.
+ *
+ * @returns O ID da sessão criada.
+ */
 export const createStripeCheckout = actionClient
   // caso a gente tivesse mais de um plano fariamos assim
   // e cada plano vai ter uma sessionId diferente
