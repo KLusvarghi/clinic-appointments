@@ -1,11 +1,10 @@
 // uma boa prática, é sempre validar os dados recebidos do front, e para isso usaremos o zod
 "use server";
 
-
 import { headers } from "next/headers";
 
 import { db } from "@/db";
-import { doctorsTable } from "@/db/schema";
+import { doctorsTable } from "@/db/new_schema";
 import { auth } from "@/lib/auth";
 
 import { UpsertDoctorSchema, upsertDoctorSchema } from "./schema";

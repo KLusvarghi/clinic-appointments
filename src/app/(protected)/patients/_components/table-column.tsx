@@ -1,7 +1,7 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
 
-import { patientsTable } from "@/db/schema";
+import { patientsTable } from "@/db/new_schema";
 
 import TableActions from "./table-actions";
 

@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import GoogleIcon from "@/components/icons/google";
+import LinkedinIcon from "@/components/icons/linkedin";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -72,6 +73,14 @@ const SignInForm = () => {
     });
   };
 
+  const handleLinkedinSignIn = async () => {
+    await authClient.signIn.social({
+      provider: "linkedin",
+      callbackURL: "/dashboard", // fará com que redirecione para dashboard
+      scopes: ["email", "profile"], // isso é para pegar o email e o perfil do usuário
+    });
+  };
+
   return (
     <Card>
       <Form {...form}>
@@ -130,6 +139,15 @@ const SignInForm = () => {
               >
                 <GoogleIcon />
                 Sign in with Google
+              </Button>
+              <Button
+                className="w-full"
+                variant="outline"
+                onClick={handleLinkedinSignIn}
+                type="button"
+              >
+                <LinkedinIcon />
+                Sign in with Linkedin
               </Button>
             </div>
           </CardFooter>

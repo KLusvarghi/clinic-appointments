@@ -13,7 +13,11 @@ import {
   PageTitle,
 } from "@/components/ui/page-container";
 import { db } from "@/db";
-import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
+import {
+  appointmentsTable,
+  doctorsTable,
+  patientsTable,
+} from "@/db/new_schema";
 import WithAuthentication from "@/hocs/with-authentication";
 import { auth } from "@/lib/auth";
 
@@ -21,7 +25,6 @@ import AddAppointmentButton from "./_components/add-appointment-button";
 import { appointmentsTableColumns } from "./_components/table-column";
 
 const AppointmentsPage = async () => {
-
   // COMO ERA FEITA A VALIDAÇÃO NO CLIENT SIDE ANTES
   const session = await auth.api.getSession({
     headers: await headers(),

@@ -12,7 +12,7 @@ import {
   PageTitle,
 } from "@/components/ui/page-container";
 import { db } from "@/db";
-import { patientsTable } from "@/db/schema";
+import { patientsTable } from "@/db/new_schema";
 import WithAuthentication from "@/hocs/with-authentication";
 import { auth } from "@/lib/auth";
 

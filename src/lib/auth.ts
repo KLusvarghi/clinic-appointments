@@ -10,7 +10,7 @@ import * as schema from "@/db/new_schema";
 import { usersToClinicsTable } from "@/db/new_schema";
 
 // neste caso, exécificamos o tempo para evitar números mágicos, ficando mais facil a compreensão
-const FIVE_MINUES = 5 * 60;
+const FIVE_MINUTES = 5 * 60;
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -24,39 +24,42 @@ export const auth = betterAuth({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
+    linkedin: {
+      clientId: process.env.LINKEDIN_CLIENT_ID as string,
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET as string,
+    },
   },
-  // o better auth, quando se quer fazer algo a mais, ele tem esse sistema de plugins, tendo vários tipos e um deles é o "customSession"
-  // para que possamos modificar o que o "authClient.useSession" retorna, precisamos usar esse "customSession" e customizar a sessão do meu usuário:
+
   plugins: [
-    // e ele recebe uma arrowfunction e já desestruturamos as props
+    // criamos um sessão customizada, para que possamos retornar mais informações do usuário, como as clinicas que ele possui, e o plano de assinatura de cada uma delas
     customSession(async ({ user, session }) => {
-      // e aqui dentro, fazemos nada menos que uma query dentro da tabela de relacioamento "users and clinics"
-      // assim tendo apenas os dados do relacionamento entre o user e a clinica
       const clinics = await db.query.usersToClinicsTable.findMany({
         where: eq(usersToClinicsTable.userId, user.id),
-        // E nesse caso precisamos do nome da clinica, para isso, apenas:
+
         with: {
-          clinic: true,
-          user: true, 
+          clinic: {
+            with: {
+              subscriptions: true,
+            },
+          },
+          user: true,
         },
       });
-      // TODO: No futuro, alterar essa lógica para que retorne todas as clinicas do usuário, não apenas a primeira ocorrencia
-      // TODO: 
-      const clinic = clinics?.[0];
 
-      // nesse return, quando a gente queiser pegar a session, poderemos acessar todos esses dados abaixo
+      const clinicsData = clinics.map((c) => ({
+        id: c.clinic.id,
+        name: c.clinic.name,
+        plan: c.clinic.subscriptions?.[0]?.plan,
+      }));
+
+      const clinic = clinicsData[0];
+
       return {
         user: {
-          ...user, // retorna todos os dados do user
-          // Tendo que fazer essa validação que pelo menos retorne undefined e não de crash a aplicação
-
-          subscriptionPlan: clinic?.user.subscriptionPlan, // aqui estamos pegando o plano do usuário, que está na tabela de relacionamento entre o user e a clinica
-          clinic: clinic?.clinicId
-            ? {
-                id: clinic?.clinicId,
-                name: clinic?.clinic?.name,
-              }
-            : undefined,
+          ...user,
+          clinics: clinicsData,
+          plan: clinic?.plan,
+          clinic: clinic ? { id: clinic.id, name: clinic.name } : undefined,
         },
         session,
       };
@@ -97,7 +100,7 @@ export const auth = betterAuth({
     // mas de qualquer forma diminue bastante a quantidade de chamadas
     cookieCache: {
       enabled: true,
-      maxAge: FIVE_MINUES,
+      maxAge: FIVE_MINUTES,
     },
   },
   verification: {

@@ -41,7 +41,7 @@ export const createStripeCheckout = protectedActionClient
       // aqui, definimos os itens que o usuário vai poder comprar, sendo que o plano é o item que ele vai comprar
       line_items: [
         {
-          price: process.env.STRIPE_ESSETIAN_PLAN_PRICE_ID,
+          price: process.env.STRIPE_ESSENTIAL_PLAN_PRICE_ID,
           quantity: 1,
         },
       ],

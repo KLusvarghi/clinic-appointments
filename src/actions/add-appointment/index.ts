@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/db";
-import { appointmentsTable } from "@/db/schema";
+import { appointmentsTable } from "@/db/new_schema";
 import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 
 import { getAvailableTimes } from "../get-available-times";
@@ -22,7 +22,6 @@ import { addAppointmentSchema } from "./schema";
 export const addAppointment = protectedWithClinicActionClient
   .schema(addAppointmentSchema)
   .action(async ({ parsedInput, ctx }) => {
-    // há a necessidade de validar o que vem do frontend, pois o frontend pode enviar dados que não são válidos, como um time que não está disponível, ou uma data que não está disponível, etc
     // getAvailableTimes retorna um array de objetos com o time e se ele está disponível ou não
     const availableTimesResponse = await getAvailableTimes({
       doctorId: parsedInput.doctorId,

@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { appointmentsTable, doctorsTable } from "@/db/schema";
+import { appointmentsTable, doctorsTable } from "@/db/new_schema";
 import { generateTimeSlots } from "@/helpers/time";
 import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 
@@ -25,7 +25,7 @@ export const getAvailableTimes = protectedWithClinicActionClient
     z.object({
       // Precisamos receber o id do doctor e a data selecionada para verificar se o médico está disponível nessa data
       doctorId: z.string().uuid(),
-      date: z.string().date(),  // YYYY-MM-DD,
+      date: z.string().date(), // YYYY-MM-DD,
     }),
   )
   .action(async ({ parsedInput, ctx }) => {

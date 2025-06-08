@@ -39,3 +39,18 @@ export const protectedWithClinicActionClient = protectedActionClient.use(
     });
   },
 );
+
+// aqui nós vamos expandir o actionClient se baseando na de cima
+export const protectedWithPlanActionClient = protectedActionClient.use(
+  async ({ next, ctx }) => {
+    if (!ctx.user.plan) throw new Error("Clinic not found!");
+
+    // e eu consigo retornar um contexto que vai ser passado para todas as actions
+    return next({
+      ctx: {
+        ...ctx.user,
+        plan: ctx.user.plan,
+      },
+    });
+  },
+);

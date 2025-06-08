@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { db } from "@/db";
-import { clinicsTable, usersToClinicsTable } from "@/db/schema";
+import { clinicsTable, usersToClinicsTable } from "@/db/new_schema";
 import { protectedActionClient } from "@/lib/next-safe-action";
 
 /**
@@ -23,7 +23,7 @@ export const createClinic = protectedActionClient.action(async ({ ctx }) => {
       name: ctx.user.name,
     })
     .returning();
-    
+
   //  após criar a clinica, temos outra tabela que faz a relação de usuário com clinica, tendo que fazer essa realção tbm:
   await db.insert(usersToClinicsTable).values({
     userId: ctx.user.id, // id do usuário que está logado

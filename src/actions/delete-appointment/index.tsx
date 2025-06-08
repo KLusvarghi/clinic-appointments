@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { appointmentsTable } from "@/db/schema";
+import { appointmentsTable } from "@/db/new_schema";
 import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 /**
  * Exclui um agendamento pertencente à clínica autenticada.

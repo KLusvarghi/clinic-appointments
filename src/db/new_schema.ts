@@ -35,39 +35,7 @@ export const doctorStatusEnum = pgEnum("doctor_status", [
   "suspended",
 ]);
 
-// Tabela de Contas
-export const accountsTable = pgTable(
-  "accounts",
-  {
-    id: text("id").primaryKey(),
-    accountId: text("account_id").notNull(),
-    providerId: text("provider_id").notNull(),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => usersTable.id, { onDelete: "cascade" }),
-    accessToken: text("access_token"),
-    refreshToken: text("refresh_token"),
-    idToken: text("id_token"),
-    accessTokenExpiresAt: timestamp("access_token_expires_at"),
-    refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
-    scope: text("scope"),
-    password: text("password"),
-    createdAt: timestamp("created_at").notNull(),
-    updatedAt: timestamp("updated_at").notNull(),
-  },
-  (accounts) => ({
-    // 👇 Garantia de unicidade do provedor + conta externa
-    uniqueAccountProvider: unique().on(accounts.accountId, accounts.providerId),
-  }),
-);
-
-export const accountsTableRelations = relations(accountsTable, ({ one }) => ({
-  user: one(usersTable, {
-    fields: [accountsTable.userId],
-    references: [usersTable.id],
-  }),
-}));
-
+// Tabela de Sessões
 export const sessionsTable = pgTable("sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
   expiresAt: timestamp("expires_at").notNull(),
@@ -83,12 +51,12 @@ export const sessionsTable = pgTable("sessions", {
 
 // Tabela de Verificações
 export const verificationsTable = pgTable("verifications", {
-  id: text("id").primaryKey(),
+  id: uuid("id").defaultRandom().primaryKey(),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
-  createdAt: timestamp("created_at"),
-  updatedAt: timestamp("updated_at"),
+  createdAt: timestamp("created_at").$defaultFn(() => new Date()),
+  updatedAt: timestamp("updated_at").$defaultFn(() => new Date()),
 });
 
 // Tabela de Relacionamento Users <-> Clinics
@@ -108,6 +76,7 @@ export const usersToClinicsTable = pgTable("users_to_clinics", {
     .$onUpdate(() => new Date()),
 });
 
+// tabela de relacionamento users <-> clinics
 export const usersToClinicsTableRelations = relations(
   usersToClinicsTable,
   ({ one }) => ({
@@ -147,6 +116,41 @@ export const usersTable = pgTable("users", {
 
 export const usersTableRelations = relations(usersTable, ({ many }) => ({
   usersToClinics: many(usersToClinicsTable),
+}));
+
+
+// Tabela de Contas
+export const accountsTable = pgTable(
+  "accounts",
+  {
+    id: text("id").primaryKey(),
+    accountId: text("account_id").notNull(),
+    providerId: text("provider_id").notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    idToken: text("id_token"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at"),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+    scope: text("scope"),
+    password: text("password"),
+    createdAt: timestamp("created_at").notNull(),
+    updatedAt: timestamp("updated_at").notNull(),
+  },
+  (accounts) => ({
+    // 👇 Garantia de unicidade do provedor + conta externa
+    uniqueAccountProvider: unique().on(accounts.accountId, accounts.providerId),
+  }),
+);
+
+
+export const accountsTableRelations = relations(accountsTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [accountsTable.userId],
+    references: [usersTable.id],
+  }),
 }));
 
 // Tabela Clinics

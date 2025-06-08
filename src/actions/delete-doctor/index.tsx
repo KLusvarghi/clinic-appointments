@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { doctorsTable } from "@/db/schema";
+import { doctorsTable } from "@/db/new_schema";
 import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 /**
  * Exclui um médico se ele pertencer à clínica autenticada.
@@ -14,7 +14,7 @@ import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
  * @param ctx - Contexto da ação com os dados da clínica.
  */
 
-export const deleteDoctor = protectedWithClinicActionClient  
+export const deleteDoctor = protectedWithClinicActionClient
   .schema(
     z.object({
       // recebendo o id do medico a ser deletado

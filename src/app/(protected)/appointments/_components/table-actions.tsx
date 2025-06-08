@@ -1,6 +1,6 @@
 "use client";
 
-import {  Loader2, MoreVerticalIcon, TrashIcon } from "lucide-react";
+import { Loader2, MoreVerticalIcon, TrashIcon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
@@ -25,7 +25,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { appointmentsTable } from "@/db/schema";
+import { appointmentsTable } from "@/db/new_schema";
 
 type AppointmentWithRelations = typeof appointmentsTable.$inferSelect & {
   patient: {

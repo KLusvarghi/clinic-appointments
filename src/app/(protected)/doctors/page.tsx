@@ -11,7 +11,7 @@ import {
   PageTitle,
 } from "@/components/ui/page-container";
 import { db } from "@/db";
-import { doctorsTable } from "@/db/schema";
+import { doctorsTable } from "@/db/new_schema";
 import WithAuthentication from "@/hocs/with-authentication";
 import { auth } from "@/lib/auth";
 

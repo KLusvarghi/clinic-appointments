@@ -45,7 +45,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { doctorsTable } from "@/db/schema";
+import { doctorsTable } from "@/db/new_schema";
 
 import { medicalSpecialties } from "../_constants";
 

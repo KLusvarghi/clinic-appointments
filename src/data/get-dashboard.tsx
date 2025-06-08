@@ -2,7 +2,11 @@ import dayjs from "dayjs";
 import { and, count, desc, eq, gte, lte, sql, sum } from "drizzle-orm";
 
 import { db } from "@/db";
-import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
+import {
+  appointmentsTable,
+  doctorsTable,
+  patientsTable,
+} from "@/db/new_schema";
 
 interface Params {
   from: string;

@@ -1,12 +1,4 @@
-# Contribuindo para o Clinic Appointments
-
-Agradecemos seu interesse em contribuir! Siga as diretrizes abaixo para garantir uma colaboração eficaz.
-
-## 🧰 Requisitos
-
-- Node.js v18 ou superior
-- Yarn ou npm
-- PostgreSQL configurado
+@@ -10,39 +10,54 @@ Agradecemos seu interesse em contribuir! Siga as diretrizes abaixo para garantir
 
 ## 🛠️ Configuração do Projeto
 
@@ -31,6 +23,21 @@ Agradecemos seu interesse em contribuir! Siga as diretrizes abaixo para garantir
 - Use Tailwind CSS para estilização.
 - Utilize componentes da biblioteca shadcn/ui.
 - Para formulários, utilize React Hook Form e Zod para validações.
+
+## 🔍 Lint e Formatação
+
+- Verifique problemas de lint com:
+  - `npm run lint`
+- Formate o código utilizando Prettier:
+  - `npx prettier --write .`
+
+## 🚀 Fluxo de Trabalho
+
+- Utilize o GitHub Flow criando branches de funcionalidade a partir da `main`.
+- Abra o Pull Request a partir desse branch após concluir a implementação.
+- Prefira mensagens de commit no formato **Conventional Commits** e relacione issues usando `#número`.
+
+Todos os testes disponíveis devem ser executados e aprovados antes de abrir o PR.
 
 ## 📁 Estrutura de Pastas
 

@@ -46,7 +46,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { doctorsTable, patientsTable } from "@/db/schema";
+import { doctorsTable, patientsTable } from "@/db/new_schema";
 import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
