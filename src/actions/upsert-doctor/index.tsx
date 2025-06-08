@@ -55,7 +55,7 @@ export const upsertDoctor = protectedWithClinicActionClient
       .insert(doctorsTable)
       .values({
         ...parsedInput,
-        id: parsedInput.id,
+        id: parsedInput.id!,
         clinicId: ctx.clinic.id,
 
         // E para armazenar no banco, ele recebe em string, e ai que usamos a lib dayjs para converter a data para string - https://day.js.org/docs/en/display/format

@@ -79,7 +79,7 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
     session: {
       user: {
         clinic: {
-          id: session!.user.clinic!.id,
+          id: session?.user.clinic?.id ?? "",
         },
       },
     },

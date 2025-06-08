@@ -35,7 +35,7 @@ const ClinicForm = () => {
   const handleSubmit = async (data: z.infer<typeof clinicFormSchema>) => {
     try {
       // e para chamar a server action, basta:
-      await createClinic(data.name);
+      await createClinic({ name: data.name });
     } catch (error) {
       // como no nosso server component, temos o redirect, temos que tratar isso aqui, já que ele gerá um erro que não é um erro de servidor, mas sim um erro de redirect:
       if (isRedirectError(error)) {

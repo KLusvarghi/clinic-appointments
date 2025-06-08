@@ -18,6 +18,7 @@ export const auth = betterAuth({
     usePlural: true, // para que o drizzle use o plural do nome da tabela
     schema, // passando o schema que criamos lá de "schemas"
   }),
+  
   // Configuração para autenticação com google:
   socialProviders: {
     google: {
@@ -72,19 +73,19 @@ export const auth = betterAuth({
 
     // passando esses campos adicionais para o schema do user, que não estão no schema que criamos, mas que o better-auth criou
     additionalFields: {
-      stripeCustomerId: {
-        type: "string",
-        fieldName: "stripeCustomerId",
+      preferences: {
+        type: "string[]",
+        fieldName: "preferences",
         required: false,
       },
-      stripeSubscriptionId: {
-        type: "string",
-        fieldName: "stripeSubscriptionId",
+      lastLoginAt: {
+        type: "date",
+        fieldName: "lastLoginAt",
         required: false,
       },
-      subscriptionPlan: {
-        type: "string",
-        fieldName: "subscriptionPlan",
+      deletedAt: {
+        type: "date",
+        fieldName: "deletedAt",
         required: false,
       },
     },

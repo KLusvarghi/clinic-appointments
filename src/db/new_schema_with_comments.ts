@@ -57,7 +57,9 @@ export const doctorStatusEnum = pgEnum("doctor_status", [
 export const accountsTable = pgTable(
   "accounts",
   {
-    id: text("id").primaryKey(),
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
     accountId: text("account_id").notNull(), // ID do usuário no provedor externo
     providerId: text("provider_id").notNull(), // Nome do provedor (google, github, etc.)
     userId: text("user_id")
@@ -92,7 +94,9 @@ export const accountsTableRelations = relations(accountsTable, ({ one }) => ({
  * Usado para confirmação de email, reset de senha, 2FA
  */
 export const verificationsTable = pgTable("verifications", {
-  id: text("id").primaryKey(),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
   identifier: text("identifier").notNull(), // Email, telefone ou outro identificador
   value: text("value").notNull(), // Código/token de verificação
   expiresAt: timestamp("expires_at").notNull(), // Data de expiração do código
@@ -515,7 +519,11 @@ FLUXO PRINCIPAL DO SISTEMA:
 
 // implementação futura
 export const auditActionEnum = pgEnum("audit_action", [
-  "create", "update", "delete", "view", "export"
+  "create",
+  "update",
+  "delete",
+  "view",
+  "export",
 ]);
 
 export const auditLogsTable = pgTable("audit_logs", {
