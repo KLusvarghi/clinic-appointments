@@ -29,6 +29,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 
+// import { GoogleSignInButton } from "./GoogleSignInButton";
+
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }),
   password: z
@@ -55,8 +57,16 @@ const SignInForm = () => {
         password: values.password,
       },
       {
-        onSuccess: () => {
-          router.push("/dashboard");
+        onSuccess: async () => {
+          toast.success("Conta criada com sucesso, verifique seu e-mail");
+          const res = await fetch("/api/email/resend-verification", {
+            method: "POST",
+          });
+          if (res.ok) {
+            router.push("/auth/verify-pending");
+          } else {
+            toast.error("Não foi possível reenviar o e-mail.");
+          }
         },
         onError: () => {
           toast.error("Email ou senha inválidos");
@@ -71,6 +81,25 @@ const SignInForm = () => {
       callbackURL: "/dashboard", // fará com que redirecione para dashboard
       scopes: ["email", "profile"], // isso é para pegar o email e o perfil do usuário
     });
+    // try {
+    //   const res = await fetch("/api/auth/sign-in", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({
+    //       email: values.email,
+    //       password: values.password,
+    //     }),
+    //   });
+
+    //   if (res.ok) {
+    //     router.push("/dashboard");
+    //   } else {
+    //     const error = await res.json();
+    //     toast.error(error?.error || "Erro ao entrar");
+    //   }
+    // } catch {
+    //   toast.error("Erro de rede");
+    // }
   };
 
   const handleLinkedinSignIn = async () => {
@@ -118,6 +147,7 @@ const SignInForm = () => {
                 </FormItem>
               )}
             />
+            {/* <Link href="/auth/verify-pending">Verifique seu e-mail</Link> */}
           </CardContent>
           <CardFooter>
             <div className="w-full space-y-2">
@@ -140,6 +170,7 @@ const SignInForm = () => {
                 <GoogleIcon />
                 Sign in with Google
               </Button>
+              {/* <GoogleSignInButton /> */}
               <Button
                 className="w-full"
                 variant="outline"

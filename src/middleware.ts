@@ -15,7 +15,7 @@ export function middleware(request: NextRequest) {
   const sessionCookie = getSessionCookie(request);
 
   if (!sessionCookie) {
-    return NextResponse.redirect(new URL("/authentication", request.url));
+    return NextResponse.redirect(new URL("/auth", request.url));
   }
 
   // se nada acontecer, ele apenas direciona para a rota que ele estava tentando acessar

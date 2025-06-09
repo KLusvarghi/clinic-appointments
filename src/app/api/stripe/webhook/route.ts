@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
 import { db } from "@/db";
-import { usersTable } from "@/db/new_schema";
+import { subscriptionsTable } from "@/db/new_schema";
 
 export const POST = async (request: Request) => {
   // Essa chave usaremos para validar que quem está chamando nossa rota POST/nosso webhook, está autoriazada, que no caso tem que ser o stripe
@@ -66,13 +66,13 @@ export const POST = async (request: Request) => {
 
       // agora, precisamos atualizar o plano do usuário no banco de dados
       await db
-        .update(usersTable)
+        .update(subscriptionsTable)
         .set({
-          subscriptionPlan: "essential",
+          plan: "essential",
           stripeCustomerId: customer,
           stripeSubscriptionId: subscription,
         })
-        .where(eq(usersTable.id, userId));
+        .where(eq(subscriptionsTable.id, userId));
       break;
 
     case "customer.subscription.deleted": {
@@ -92,13 +92,13 @@ export const POST = async (request: Request) => {
 
       // agora, precisamos atualizar o plano do usuário no banco de dados
       await db
-        .update(usersTable)
+        .update(subscriptionsTable)
         .set({
-          subscriptionPlan: "free",
+          plan: "free",
           stripeCustomerId: null,
           stripeSubscriptionId: null,
         })
-        .where(eq(usersTable.id, userId));
+        .where(eq(subscriptionsTable.id, userId));
     }
   }
   // tendo que retornar isso porque o stripe espera uma resposta, se não enviarmos que o webhook foi processado, ele continuará tentando processars

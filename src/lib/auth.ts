@@ -9,6 +9,7 @@ import { db } from "@/db";
 import * as schema from "@/db/new_schema";
 import { usersToClinicsTable } from "@/db/new_schema";
 
+import { sendVerificationEmail } from "./email/send-verification-email";
 import { parseCookies } from "./utils";
 
 // neste caso, exécificamos o tempo para evitar números mágicos, ficando mais facil a compreensão
@@ -77,6 +78,24 @@ export const auth = betterAuth({
         session,
       };
     }),
+    // rateLimit({
+    //   windowMs: FIVE_MINUTES,
+    //   max: 10,
+    //   keyGenerator: ({ request }: { request: Request }) =>
+    //     request.headers.get("x-forwarded-for") || "anonymous",
+    //   skip: ({ request }: { request: Request }) =>
+    //     process.env.NODE_ENV === "development",
+    //   customRules: {
+    //     "/sign-in/email": {
+    //       window: 60,
+    //       max: 3,
+    //     },
+    //     "/sign-up/email": {
+    //       window: 60,
+    //       max: 3,
+    //     },
+    //   },
+    // }),
   ],
 
   // lembra do schema que o better-auth criou? enttão, temos que deixar explicito o nome das variáveis que usamos conforme as tabelas:
@@ -119,8 +138,13 @@ export const auth = betterAuth({
   verification: {
     modelName: "verificationsTable",
   },
+  emailVerification: {
+    sendVerificationEmail,
+    sendOnSignUp: true,
+  },
   emailAndPassword: {
     // queremos que o user possar logar com email e senha. https://www.better-auth.com/docs/basic-usage#email--password
     enabled: true,
+    requireEmailVerification: true,
   },
 });

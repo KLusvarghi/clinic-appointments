@@ -22,7 +22,7 @@ const WithAuthentication = async ({
   });
 
   if (!session?.user) {
-    redirect("/authentication");
+    redirect("/auth");
   }
 
   if (mustHavePlan && !session.user.plan) {
@@ -33,7 +33,11 @@ const WithAuthentication = async ({
     redirect("/clinic-form");
   }
 
-  if (mustHaveRole && session.user.clinic?.role !== mustHaveRole) {
+  if (
+    mustHaveRole &&
+    mustHaveClinic &&
+    session.user.clinic?.role !== mustHaveRole
+  ) {
     redirect("/dashboard");
   }
   return children;

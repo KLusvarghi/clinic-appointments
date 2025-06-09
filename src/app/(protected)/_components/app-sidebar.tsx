@@ -76,7 +76,7 @@ export function AppSidebar() {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.push("/authentication");
+          router.push("/auth");
         },
       },
     });
@@ -110,7 +110,10 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathName === "/subscription"}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathName === "/subscription"}
+                >
                   <Link href="/subscription">
                     <Gem />
                     <span>Subscription </span>
