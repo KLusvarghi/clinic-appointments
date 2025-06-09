@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { headers } from "next/headers";
 
 import {
@@ -24,7 +24,10 @@ const DoctorsPage = async () => {
   });
 
   const doctors = await db.query.doctorsTable.findMany({
-    where: eq(doctorsTable.clinicId, session!.user.clinic!.id),
+    where: and(
+      eq(doctorsTable.clinicId, session!.user.clinic!.id),
+      isNull(doctorsTable.deletedAt),
+    ),
   });
 
   return (

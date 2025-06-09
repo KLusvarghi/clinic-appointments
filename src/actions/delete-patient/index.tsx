@@ -33,7 +33,10 @@ export const deletePatient = protectedWithClinicActionClient
       throw new Error("Patient doesn't belong to the clinic");
     }
 
-    await db.delete(patientsTable).where(eq(patientsTable.id, parsedInput.id));
+    await db
+      .update(patientsTable)
+      .set({ deletedAt: new Date() })
+      .where(eq(patientsTable.id, parsedInput.id));
     revalidatePath("/patients");
 
     return { success: true };

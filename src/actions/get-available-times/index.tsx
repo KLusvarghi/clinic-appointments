@@ -3,7 +3,7 @@
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/db";
@@ -30,7 +30,10 @@ export const getAvailableTimes = protectedWithClinicActionClient
   )
   .action(async ({ parsedInput, ctx }) => {
     const doctor = await db.query.doctorsTable.findFirst({
-      where: eq(doctorsTable.id, parsedInput.doctorId),
+      where: and(
+        eq(doctorsTable.id, parsedInput.doctorId),
+        isNull(doctorsTable.deletedAt),
+      ),
     });
 
     if (!doctor) {
@@ -58,7 +61,10 @@ export const getAvailableTimes = protectedWithClinicActionClient
 
     // caso o medico tenha disponibilidade nesse dia, nó pegaremos todos agendamento do médico
     const appointments = await db.query.appointmentsTable.findMany({
-      where: eq(appointmentsTable.doctorId, parsedInput.doctorId),
+      where: and(
+        eq(appointmentsTable.doctorId, parsedInput.doctorId),
+        isNull(appointmentsTable.deletedAt),
+      ),
     });
 
     console.log(appointments)
