@@ -47,7 +47,7 @@ const AppointmentsPage = async () => {
   ]);
 
   return (
-    <WithAuthentication mustHavePlan mustHaveClinic>
+    <WithAuthentication  mustHaveClinic>
       <PageContainer>
         <PageHeader>
           <PageHeaderContent>

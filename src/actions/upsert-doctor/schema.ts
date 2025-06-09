@@ -4,7 +4,7 @@ import { z } from "zod";
 
 export const upsertDoctorSchema = z
   .object({
-    id: z.string().uuid().optional(), // caso não exista, ele será undefined
+    id: z.string().optional(), // caso não exista, ele será undefined
     name: z.string().trim().min(1, { message: "Doctor name is required" }),
     specialty: z.string().min(1, { message: "Specialty is required" }),
     appointmentPriceInCents: z

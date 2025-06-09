@@ -19,7 +19,7 @@ const SubscriptionPage = async () => {
   });
 
   return (
-    <WithAuthentication mustHaveClinic mustHavePlan>
+    <WithAuthentication mustHaveClinic>
       <PageContainer>
         <PageHeader>
           <PageHeaderContent>

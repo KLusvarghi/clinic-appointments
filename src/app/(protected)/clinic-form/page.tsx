@@ -11,7 +11,7 @@ import ClinicForm from "./_components/form";
 
 const ClinicFormPage = () => {
   return (
-    <WithAuthentication mustHavePlan mustHaveRole="ADMIN">
+    <WithAuthentication  mustHaveRole="ADMIN">
       <div>
         <Dialog open>
           <DialogContent className="sm:max-w-[425px]">

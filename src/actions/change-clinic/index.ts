@@ -25,7 +25,8 @@ export const changeClinic = protectedActionClient
       throw new Error("Clinic not found");
     }
 
-    cookies().set("clinic_id", parsedInput.clinicId, { path: "/" });
+    const cookieStore = await cookies();
+    cookieStore.set("clinic_id", parsedInput.clinicId, { path: "/" });
 
     return {
       id: clinic.clinic.id,

@@ -21,7 +21,7 @@ export const auth = betterAuth({
     schema, // passando o schema que criamos lá de "schemas"
   }),
 
-  // Configuração para autenticação com google:
+  // Configuração para autenticação com google e Linkedin:
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -56,7 +56,7 @@ export const auth = betterAuth({
         role: c.role,
       }));
 
-      const cookies = parseCookies(ctx.headers.get("cookie"));
+      const cookies = parseCookies(ctx.headers?.get("cookie"));
       const selectedClinicId = cookies["clinic_id"];
       const currentClinic =
         clinicsData.find((c) => c.id === selectedClinicId) ?? clinicsData[0];

@@ -17,7 +17,7 @@ import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 export const deletePatient = protectedWithClinicActionClient
   .schema(
     z.object({
-      id: z.string().uuid(),
+      id: z.string(),
     }),
   )
   .action(async ({ parsedInput, ctx }) => {

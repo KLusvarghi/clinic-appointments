@@ -24,7 +24,7 @@ export const getAvailableTimes = protectedWithClinicActionClient
   .schema(
     z.object({
       // Precisamos receber o id do doctor e a data selecionada para verificar se o médico está disponível nessa data
-      doctorId: z.string().uuid(),
+      doctorId: z.string(),
       date: z.string().date(), // YYYY-MM-DD,
     }),
   )
@@ -60,6 +60,8 @@ export const getAvailableTimes = protectedWithClinicActionClient
     const appointments = await db.query.appointmentsTable.findMany({
       where: eq(appointmentsTable.doctorId, parsedInput.doctorId),
     });
+
+    console.log(appointments)
 
     // e aqui pegamos todos os agendamentos do médico nesse dia, apenas do dia selecionado
     const appointmentsOnSelectedDate = appointments

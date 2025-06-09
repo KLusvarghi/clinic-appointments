@@ -18,7 +18,7 @@ export const deleteDoctor = protectedWithClinicActionClient
   .schema(
     z.object({
       // recebendo o id do medico a ser deletado
-      id: z.string().uuid(),
+      id: z.string(),
     }),
   )
   // o ".action" recebe uma arrow function da acção a ser executada

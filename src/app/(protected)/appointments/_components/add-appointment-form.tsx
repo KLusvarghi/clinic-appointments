@@ -177,8 +177,8 @@ export function AddAppointmentForm({
 
   return (
     <DialogContent className="sm:max-w-[500px]">
-      <DialogHeader>
         <DialogTitle>New appointment</DialogTitle>
+      <DialogHeader>
         <DialogDescription>
           Create a new appointment for your clinic.
         </DialogDescription>
