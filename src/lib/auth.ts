@@ -9,6 +9,8 @@ import { db } from "@/db";
 import * as schema from "@/db/new_schema";
 import { usersToClinicsTable } from "@/db/new_schema";
 
+import { parseCookies } from "./utils";
+
 // neste caso, exécificamos o tempo para evitar números mágicos, ficando mais facil a compreensão
 const FIVE_MINUTES = 5 * 60;
 
@@ -33,7 +35,7 @@ export const auth = betterAuth({
 
   plugins: [
     // criamos um sessão customizada, para que possamos retornar mais informações do usuário, como as clinicas que ele possui, e o plano de assinatura de cada uma delas
-    customSession(async ({ user, session }) => {
+    customSession(async ({ user, session }, ctx) => {
       const clinics = await db.query.usersToClinicsTable.findMany({
         where: eq(usersToClinicsTable.userId, user.id),
 
@@ -54,7 +56,10 @@ export const auth = betterAuth({
         role: c.role,
       }));
 
-      const currentClinic = clinicsData[0];
+      const cookies = parseCookies(ctx.headers.get("cookie"));
+      const selectedClinicId = cookies["clinic_id"];
+      const currentClinic =
+        clinicsData.find((c) => c.id === selectedClinicId) ?? clinicsData[0];
 
       return {
         user: {

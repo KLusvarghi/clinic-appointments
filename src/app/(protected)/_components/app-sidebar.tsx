@@ -11,12 +11,15 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useAction } from "next-safe-action/hooks";
 
+import { changeClinic } from "@/actions/change-clinic";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -61,6 +64,10 @@ export function AppSidebar() {
   const router = useRouter();
   // para se ter acesso as clinicas do usuário, eu poderia criar uma rota para isso, mas neste caso, iremos:
   const session = authClient.useSession();
+
+  const changeClinicAction = useAction(changeClinic, {
+    onSuccess: () => router.refresh(),
+  });
 
   // para que possamos colocar em destaque a rota ativa, podemos usar o hook "usePathname"
   const pathName = usePathname();
@@ -135,6 +142,18 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
+                {session.data?.user.clinics?.map((clinic) => (
+                  <DropdownMenuItem
+                    key={clinic.id}
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      changeClinicAction.execute({ clinicId: clinic.id });
+                    }}
+                  >
+                    {clinic.name}
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut />
                   Log out
