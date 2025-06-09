@@ -10,10 +10,12 @@ const WithAuthentication = async ({
   children,
   mustHavePlan = false,
   mustHaveClinic = false,
+  mustHaveRole,
 }: {
   children: React.ReactNode;
   mustHavePlan?: boolean;
   mustHaveClinic?: boolean;
+  mustHaveRole?: "ADMIN" | "MANAGER" | "ASSISTANT";
 }) => {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -23,14 +25,18 @@ const WithAuthentication = async ({
     redirect("/authentication");
   }
 
-  // if (mustHavePlan && !session.user.plan) {
-  //   redirect("/new-subscription");
-  // }
+  if (mustHavePlan && !session.user.plan) {
+   return
+    // redirect("/new-subscription");
+  }
 
   if (mustHaveClinic && !session.user.clinic) {
     redirect("/clinic-form");
   }
 
+  if (mustHaveRole && session.user.clinic?.role !== mustHaveRole) {
+    redirect("/dashboard");
+  }
   return children;
 };
 

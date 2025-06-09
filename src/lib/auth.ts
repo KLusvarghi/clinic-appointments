@@ -18,7 +18,7 @@ export const auth = betterAuth({
     usePlural: true, // para que o drizzle use o plural do nome da tabela
     schema, // passando o schema que criamos lá de "schemas"
   }),
-  
+
   // Configuração para autenticação com google:
   socialProviders: {
     google: {
@@ -51,16 +51,23 @@ export const auth = betterAuth({
         id: c.clinic.id,
         name: c.clinic.name,
         plan: c.clinic.subscriptions?.[0]?.plan,
+        role: c.role,
       }));
 
-      const clinic = clinicsData[0];
+      const currentClinic = clinicsData[0];
 
       return {
         user: {
           ...user,
           clinics: clinicsData,
-          plan: clinic?.plan,
-          clinic: clinic ? { id: clinic.id, name: clinic.name } : undefined,
+          plan: currentClinic?.plan,
+          clinic: currentClinic
+            ? {
+                id: currentClinic.id,
+                name: currentClinic.name,
+                role: currentClinic.role, // 👈 ADICIONA AQUI
+              }
+            : undefined,
         },
         session,
       };
