@@ -7,6 +7,7 @@ import {
   LogOut,
   Stethoscope,
   UsersRound,
+  KeyRound,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -62,14 +63,13 @@ const items = [
 
 export function AppSidebar() {
   const router = useRouter();
-  // para se ter acesso as clinicas do usuário, eu poderia criar uma rota para isso, mas neste caso, iremos:
   const session = authClient.useSession();
+  const isAdmin = session?.data?.user?.clinic?.role === "ADMIN";
 
   const changeClinicAction = useAction(changeClinic, {
     onSuccess: () => router.refresh(),
   });
 
-  // para que possamos colocar em destaque a rota ativa, podemos usar o hook "usePathname"
   const pathName = usePathname();
 
   const handleSignOut = async () => {
@@ -116,10 +116,23 @@ export function AppSidebar() {
                 >
                   <Link href="/subscription">
                     <Gem />
-                    <span>Subscription </span>
+                    <span>Subscription</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              {isAdmin && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathName === "/sessions"}
+                  >
+                    <Link href="/sessions">
+                      <KeyRound />
+                      <span>Active Sessions</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -129,8 +142,6 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
-              {/* esse componente de baixo é um button por padrão */}
-              {/* e esse "asChild" quer dizer que ele vai aplciar a funcionalidade dele ao elemento filho, assim não renderizando um botão dentro de outro botão */}
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size="lg">
                   <Avatar>

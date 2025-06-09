@@ -35,7 +35,6 @@ const WithAuthentication = async ({
 
   if (
     mustHaveRole &&
-    mustHaveClinic &&
     session.user.clinic?.role !== mustHaveRole
   ) {
     redirect("/dashboard");

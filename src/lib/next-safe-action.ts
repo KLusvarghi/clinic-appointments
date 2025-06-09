@@ -19,7 +19,7 @@ export const protectedActionClient = createSafeActionClient().use(
     // e eu consigo retornar um contexto que vai ser passado para todas as actions
     return next({
       ctx: {
-        user: session.user, 
+        user: session.user,
       },
     });
   },
@@ -50,6 +50,22 @@ export const protectedWithPlanActionClient = protectedActionClient.use(
       ctx: {
         ...ctx.user,
         plan: ctx.user.plan,
+      },
+    });
+  },
+);
+
+export const protectedWithRoleActionClient = protectedActionClient.use(
+  async ({ next, ctx }) => {
+    if (!ctx.user.clinic?.role) throw new Error("Clinic not found!");
+
+    if (ctx.user.clinic.role !== "ADMIN") throw new Error("Unauthorized");
+
+    // e eu consigo retornar um contexto que vai ser passado para todas as actions
+    return next({
+      ctx: {
+        ...ctx.user,
+        role: ctx.user.clinic.role,
       },
     });
   },

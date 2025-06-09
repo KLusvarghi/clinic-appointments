@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
+import { signIn } from "@/services/auth";
 
 // import { GoogleSignInButton } from "./GoogleSignInButton";
 
@@ -51,22 +52,23 @@ const SignInForm = () => {
 
   // 2. Define a submit handler.
   const handleSubmit = async (values: z.infer<typeof loginSchema>) => {
-    await authClient.signIn.email(
+    await signIn(
       {
         email: values.email,
         password: values.password,
       },
       {
-        onSuccess: async () => {
-          toast.success("Conta criada com sucesso, verifique seu e-mail");
-          const res = await fetch("/api/email/resend-verification", {
-            method: "POST",
-          });
-          if (res.ok) {
-            router.push("/auth/verify-pending");
-          } else {
-            toast.error("Não foi possível reenviar o e-mail.");
-          }
+        onSuccess: () => {
+          router.push("/dashboard");
+          // toast.success("Conta criada com sucesso, verifique seu e-mail");
+          // const res = await fetch("/api/email/resend-verification", {
+          //   method: "POST",
+          // });
+          // if (res.ok) {
+          //   router.push("/auth/verify-pending");
+          // } else {
+          //   toast.error("Não foi possível reenviar o e-mail.");
+          // }
         },
         onError: () => {
           toast.error("Email ou senha inválidos");
