@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -45,13 +45,22 @@ const AppointmentsPage = async () => {
   // o "promise.all" é usado para executar as consultas em paralelo, então todas essas querys no banco de dados serão executadas ao mesmo tempo, nos dando mais performance
   const [patients, doctors, appointments] = await Promise.all([
     db.query.patientsTable.findMany({
-      where: eq(patientsTable.clinicId, session.user.clinic.id),
+      where: and(
+        eq(patientsTable.clinicId, session.user.clinic.id),
+        isNull(patientsTable.deletedAt),
+      ),
     }),
     db.query.doctorsTable.findMany({
-      where: eq(doctorsTable.clinicId, session.user.clinic.id),
+      where: and(
+        eq(doctorsTable.clinicId, session.user.clinic.id),
+        isNull(doctorsTable.deletedAt),
+      ),
     }),
     db.query.appointmentsTable.findMany({
-      where: eq(appointmentsTable.clinicId, session.user.clinic.id),
+      where: and(
+        eq(appointmentsTable.clinicId, session.user.clinic.id),
+        isNull(appointmentsTable.deletedAt),
+      ),
       with: {
         patient: true,
         doctor: true,

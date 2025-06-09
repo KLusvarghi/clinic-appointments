@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { headers } from "next/headers";
 
 import { DataTable } from "@/components/ui/data-table";
@@ -32,13 +32,22 @@ const AppointmentsPage = async () => {
   const [patients, doctors, appointments] = await Promise.all([
     db.query.patientsTable.findMany({
       // Para que ele não de erro achando que a session é null (sneod que ele nem renderiza o componente se for nulo), usamos "!" para forçar o typescript a aceitar que a session não é nula
-      where: eq(patientsTable.clinicId, session!.user.clinic!.id),
+      where: and(
+        eq(patientsTable.clinicId, session!.user.clinic!.id),
+        isNull(patientsTable.deletedAt),
+      ),
     }),
     db.query.doctorsTable.findMany({
-      where: eq(doctorsTable.clinicId, session!.user.clinic!.id),
+      where: and(
+        eq(doctorsTable.clinicId, session!.user.clinic!.id),
+        isNull(doctorsTable.deletedAt),
+      ),
     }),
     db.query.appointmentsTable.findMany({
-      where: eq(appointmentsTable.clinicId, session!.user.clinic!.id),
+      where: and(
+        eq(appointmentsTable.clinicId, session!.user.clinic!.id),
+        isNull(appointmentsTable.deletedAt),
+      ),
       with: {
         patient: true,
         doctor: true,

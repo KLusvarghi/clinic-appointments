@@ -39,8 +39,11 @@ export const deleteDoctor = protectedWithClinicActionClient
       throw new Error("Doctor doesn't belong to the clinic");
     }
 
-    // deletando o doctor
-    await db.delete(doctorsTable).where(eq(doctorsTable.id, parsedInput.id));
+    // faz o soft delete do doctor marcando a data de exclusão
+    await db
+      .update(doctorsTable)
+      .set({ deletedAt: new Date() })
+      .where(eq(doctorsTable.id, parsedInput.id));
     revalidatePath("/doctors"); // após a deleção ele recarrega a página
 
     return { success: true };

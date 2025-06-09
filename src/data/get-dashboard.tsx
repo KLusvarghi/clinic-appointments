@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { and, count, desc, eq, gte, lte, sql, sum } from "drizzle-orm";
+import { and, count, desc, eq, gte, isNull, lte, sql, sum } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -51,6 +51,7 @@ export const getDashboard = async ({ from, to, session }: Params) => {
           gte(appointmentsTable.date, new Date(from)),
           // lte = letter than or equal que é menor ou igual a
           lte(appointmentsTable.date, new Date(to)),
+          isNull(appointmentsTable.deletedAt),
         ),
       ),
 
@@ -65,6 +66,7 @@ export const getDashboard = async ({ from, to, session }: Params) => {
           eq(appointmentsTable.clinicId, session.user.clinic.id),
           gte(appointmentsTable.date, new Date(from)),
           lte(appointmentsTable.date, new Date(to)),
+          isNull(appointmentsTable.deletedAt),
         ),
       ),
 
@@ -74,13 +76,23 @@ export const getDashboard = async ({ from, to, session }: Params) => {
         total: count(),
       })
       .from(patientsTable)
-      .where(eq(patientsTable.clinicId, session.user.clinic.id)),
+      .where(
+        and(
+          eq(patientsTable.clinicId, session.user.clinic.id),
+          isNull(patientsTable.deletedAt),
+        ),
+      ),
     db
       .select({
         total: count(),
       })
       .from(doctorsTable)
-      .where(eq(doctorsTable.clinicId, session.user.clinic.id)),
+      .where(
+        and(
+          eq(doctorsTable.clinicId, session.user.clinic.id),
+          isNull(doctorsTable.deletedAt),
+        ),
+      ),
     db
       .select({
         id: doctorsTable.id,
@@ -99,10 +111,16 @@ export const getDashboard = async ({ from, to, session }: Params) => {
           // onde os agendamentos estão dentro do periodo selecionado
           gte(appointmentsTable.date, new Date(from)),
           lte(appointmentsTable.date, new Date(to)),
+          isNull(appointmentsTable.deletedAt),
         ),
       )
       // pegando apenas os médicos que pertencem a clínica
-      .where(eq(doctorsTable.clinicId, session.user.clinic.id))
+      .where(
+        and(
+          eq(doctorsTable.clinicId, session.user.clinic.id),
+          isNull(doctorsTable.deletedAt),
+        ),
+      )
       // agrupando pelo id do médico
       .groupBy(doctorsTable.id)
       // ordenando pelo total de agendamentos, em ordem decrescente
@@ -122,6 +140,8 @@ export const getDashboard = async ({ from, to, session }: Params) => {
           eq(appointmentsTable.clinicId, session.user.clinic.id), // onde o clinicId é igual ao clinicId da sessão
           gte(appointmentsTable.date, new Date(from)),
           lte(appointmentsTable.date, new Date(to)),
+          isNull(appointmentsTable.deletedAt),
+          isNull(doctorsTable.deletedAt),
         ),
       )
       .groupBy(doctorsTable.specialty) // agrupando pela especialidade
@@ -132,6 +152,7 @@ export const getDashboard = async ({ from, to, session }: Params) => {
         eq(appointmentsTable.clinicId, session.user.clinic.id),
         gte(appointmentsTable.date, new Date()),
         lte(appointmentsTable.date, new Date()),
+        isNull(appointmentsTable.deletedAt),
       ),
       with: {
         patient: true,
@@ -156,6 +177,7 @@ export const getDashboard = async ({ from, to, session }: Params) => {
           eq(appointmentsTable.clinicId, session.user.clinic.id), // onde o clinicId é igual ao clinicId da sessão
           gte(appointmentsTable.date, chartStartDate), // onde a data é maior ou igual ao inicio do periodo
           lte(appointmentsTable.date, chartEndDate), // onde a data é menor ou igual ao fim do periodo
+          isNull(appointmentsTable.deletedAt),
         ),
       )
       .groupBy(sql`DATE(${appointmentsTable.date})`) // agrupando pelos dias

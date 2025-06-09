@@ -34,7 +34,8 @@ export const deleteAppointment = protectedWithClinicActionClient
     }
 
     await db
-      .delete(appointmentsTable)
+      .update(appointmentsTable)
+      .set({ deletedAt: new Date() })
       .where(eq(appointmentsTable.id, parsedInput.id));
     revalidatePath("/appointments");
 
