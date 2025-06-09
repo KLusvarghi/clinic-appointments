@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
+import { signIn } from "@/services/auth";
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }),
@@ -48,7 +49,7 @@ const SignInForm = () => {
 
   // 2. Define a submit handler.
   const handleSubmit = async (values: z.infer<typeof loginSchema>) => {
-    await authClient.signIn.email(
+    await signIn(
       {
         email: values.email,
         password: values.password,
