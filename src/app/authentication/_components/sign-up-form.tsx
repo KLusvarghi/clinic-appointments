@@ -25,7 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { authClient } from "@/lib/auth-client";
+import { signUp } from "@/services/auth";
 
 const registerSchema = z.object({
   name: z.string().trim().min(1, { message: "Name is required" }),
@@ -48,14 +48,11 @@ const SignUpForm = () => {
   });
 
   async function onSubmit(values: z.infer<typeof registerSchema>) {
-    // https://www.better-auth.com/docs/basic-usage#sign-up
-    await authClient.signUp.email(
+    await signUp(
       {
         email: values.email,
         password: values.password,
         name: values.name,
-        // ele só é chamado depois que o email do usuário é validado
-        // callbackURL: "/dashboard", // redireciona para a dashboard apos o sign up
       },
       {
         onSuccess: () => {

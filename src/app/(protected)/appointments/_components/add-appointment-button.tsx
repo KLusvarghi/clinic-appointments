@@ -2,10 +2,12 @@
 
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { doctorsTable, patientsTable } from "@/db/schema";
+import { useEmailVerified } from "@/hooks/use-email-verified";
 
 import { AddAppointmentForm } from "./add-appointment-form";
 
@@ -19,11 +21,20 @@ const AddAppointmentButton = ({
   doctors,
 }: AddAppointmentButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const emailVerified = useEmailVerified();
+
+  const handleOpenChange = (open: boolean) => {
+    if (open && !emailVerified) {
+      toast.error("Verify your email to add an appointment");
+      return;
+    }
+    setIsOpen(open);
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button>
+        <Button disabled={!emailVerified}>
           <Plus />
           Add new Appointment
         </Button>
