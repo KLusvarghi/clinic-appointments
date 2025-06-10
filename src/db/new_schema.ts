@@ -55,10 +55,6 @@ export const usersTable = pgTable("users", {
   deletedAt: timestamp("deleted_at"),
 });
 
-export const usersTableRelations = relations(usersTable, ({ many }) => ({
-  usersToClinics: many(usersToClinicsTable),
-}));
-
 // Clinics
 export const clinicsTable = pgTable("clinics", {
   id: text("id")
@@ -71,14 +67,6 @@ export const clinicsTable = pgTable("clinics", {
     .$onUpdate(() => new Date()),
   deletedAt: timestamp("deleted_at"),
 });
-
-export const clinicsTableRelations = relations(clinicsTable, ({ many }) => ({
-  doctors: many(doctorsTable),
-  patients: many(patientsTable),
-  appointments: many(appointmentsTable),
-  usersToClinics: many(usersToClinicsTable),
-  subscriptions: many(subscriptionsTable),
-}));
 
 // Doctors
 export const doctorsTable = pgTable("doctors", {
@@ -105,17 +93,6 @@ export const doctorsTable = pgTable("doctors", {
     .$onUpdate(() => new Date()),
   deletedAt: timestamp("deleted_at"),
 });
-
-export const doctorsTableRelations = relations(
-  doctorsTable,
-  ({ one, many }) => ({
-    clinic: one(clinicsTable, {
-      fields: [doctorsTable.clinicId],
-      references: [clinicsTable.id],
-    }),
-    appointments: many(appointmentsTable),
-  }),
-);
 
 // Patients
 export const patientsTable = pgTable("patients", {
@@ -147,17 +124,6 @@ export const patientsTable = pgTable("patients", {
   deletedAt: timestamp("deleted_at"),
 });
 
-export const patientsTableRelations = relations(
-  patientsTable,
-  ({ one, many }) => ({
-    clinic: one(clinicsTable, {
-      fields: [patientsTable.clinicId],
-      references: [clinicsTable.id],
-    }),
-    appointments: many(appointmentsTable),
-  }),
-);
-
 // Appointments
 export const appointmentsTable = pgTable("appointments", {
   id: text("id")
@@ -187,26 +153,6 @@ export const appointmentsTable = pgTable("appointments", {
   deletedAt: timestamp("deleted_at"),
 });
 
-export const appointmentsTableRelations = relations(
-  appointmentsTable,
-  ({ one, many }) => ({
-    clinic: one(clinicsTable, {
-      fields: [appointmentsTable.clinicId],
-      references: [clinicsTable.id],
-    }),
-    patient: one(patientsTable, {
-      fields: [appointmentsTable.patientId],
-      references: [patientsTable.id],
-    }),
-    doctor: one(doctorsTable, {
-      fields: [appointmentsTable.doctorId],
-      references: [doctorsTable.id],
-    }),
-    prescriptions: many(prescriptionsTable),
-    diagnoses: many(diagnosesTable),
-  }),
-);
-
 // Subscriptions
 export const subscriptionsTable = pgTable("subscriptions", {
   id: text("id")
@@ -226,16 +172,6 @@ export const subscriptionsTable = pgTable("subscriptions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const subscriptionsTableRelations = relations(
-  subscriptionsTable,
-  ({ one }) => ({
-    clinic: one(clinicsTable, {
-      fields: [subscriptionsTable.clinicId],
-      references: [clinicsTable.id],
-    }),
-  }),
-);
-
 // Prescriptions
 export const prescriptionsTable = pgTable("prescriptions", {
   id: text("id")
@@ -254,20 +190,6 @@ export const prescriptionsTable = pgTable("prescriptions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const prescriptionsTableRelations = relations(
-  prescriptionsTable,
-  ({ one }) => ({
-    appointment: one(appointmentsTable, {
-      fields: [prescriptionsTable.appointmentId],
-      references: [appointmentsTable.id],
-    }),
-    clinic: one(clinicsTable, {
-      fields: [prescriptionsTable.clinicId],
-      references: [clinicsTable.id],
-    }),
-  }),
-);
-
 // Diagnoses
 export const diagnosesTable = pgTable("diagnoses", {
   id: text("id")
@@ -283,17 +205,6 @@ export const diagnosesTable = pgTable("diagnoses", {
   description: text("description").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-
-export const diagnosesTableRelations = relations(diagnosesTable, ({ one }) => ({
-  appointment: one(appointmentsTable, {
-    fields: [diagnosesTable.appointmentId],
-    references: [appointmentsTable.id],
-  }),
-  clinic: one(clinicsTable, {
-    fields: [diagnosesTable.clinicId],
-    references: [clinicsTable.id],
-  }),
-}));
 
 // Users to Clinics
 export const usersToClinicsTable = pgTable("users_to_clinics", {
@@ -313,20 +224,6 @@ export const usersToClinicsTable = pgTable("users_to_clinics", {
     .defaultNow()
     .$onUpdate(() => new Date()),
 });
-
-export const usersToClinicsTableRelations = relations(
-  usersToClinicsTable,
-  ({ one }) => ({
-    user: one(usersTable, {
-      fields: [usersToClinicsTable.userId],
-      references: [usersTable.id],
-    }),
-    clinic: one(clinicsTable, {
-      fields: [usersToClinicsTable.clinicId],
-      references: [clinicsTable.id],
-    }),
-  }),
-);
 
 // Sessions
 export const sessionsTable = pgTable("sessions", {
@@ -383,9 +280,128 @@ export const accountsTable = pgTable(
   }),
 );
 
+export const usersTableRelations = relations(usersTable, ({ many }) => ({
+  usersToClinics: many(usersToClinicsTable),
+}));
+
+export const clinicsTableRelations = relations(clinicsTable, ({ many }) => ({
+  doctors: many(doctorsTable),
+  patients: many(patientsTable),
+  appointments: many(appointmentsTable),
+  usersToClinics: many(usersToClinicsTable),
+  subscriptions: many(subscriptionsTable),
+}));
+
+export const doctorsTableRelations = relations(
+  doctorsTable,
+  ({ one, many }) => ({
+    clinic: one(clinicsTable, {
+      fields: [doctorsTable.clinicId],
+      references: [clinicsTable.id],
+    }),
+    appointments: many(appointmentsTable),
+  }),
+);
+
+export const patientsTableRelations = relations(
+  patientsTable,
+  ({ one, many }) => ({
+    clinic: one(clinicsTable, {
+      fields: [patientsTable.clinicId],
+      references: [clinicsTable.id],
+    }),
+    appointments: many(appointmentsTable),
+  }),
+);
+
+export const appointmentsTableRelations = relations(
+  appointmentsTable,
+  ({ one, many }) => ({
+    clinic: one(clinicsTable, {
+      fields: [appointmentsTable.clinicId],
+      references: [clinicsTable.id],
+    }),
+    patient: one(patientsTable, {
+      fields: [appointmentsTable.patientId],
+      references: [patientsTable.id],
+    }),
+    doctor: one(doctorsTable, {
+      fields: [appointmentsTable.doctorId],
+      references: [doctorsTable.id],
+    }),
+    prescriptions: many(prescriptionsTable),
+    diagnoses: many(diagnosesTable),
+  }),
+);
+
+export const subscriptionsTableRelations = relations(
+  subscriptionsTable,
+  ({ one }) => ({
+    clinic: one(clinicsTable, {
+      fields: [subscriptionsTable.clinicId],
+      references: [clinicsTable.id],
+    }),
+  }),
+);
+
+export const prescriptionsTableRelations = relations(
+  prescriptionsTable,
+  ({ one }) => ({
+    appointment: one(appointmentsTable, {
+      fields: [prescriptionsTable.appointmentId],
+      references: [appointmentsTable.id],
+    }),
+    clinic: one(clinicsTable, {
+      fields: [prescriptionsTable.clinicId],
+      references: [clinicsTable.id],
+    }),
+  }),
+);
+
+export const diagnosesTableRelations = relations(diagnosesTable, ({ one }) => ({
+  appointment: one(appointmentsTable, {
+    fields: [diagnosesTable.appointmentId],
+    references: [appointmentsTable.id],
+  }),
+  clinic: one(clinicsTable, {
+    fields: [diagnosesTable.clinicId],
+    references: [clinicsTable.id],
+  }),
+}));
+
+export const usersToClinicsTableRelations = relations(
+  usersToClinicsTable,
+  ({ one }) => ({
+    user: one(usersTable, {
+      fields: [usersToClinicsTable.userId],
+      references: [usersTable.id],
+    }),
+    clinic: one(clinicsTable, {
+      fields: [usersToClinicsTable.clinicId],
+      references: [clinicsTable.id],
+    }),
+  }),
+);
+
 export const accountsTableRelations = relations(accountsTable, ({ one }) => ({
   user: one(usersTable, {
     fields: [accountsTable.userId],
     references: [usersTable.id],
   }),
 }));
+
+export const schema = {
+  usersTable,
+  clinicsTable,
+  doctorsTable,
+  patientsTable,
+  appointmentsTable,
+  subscriptionsTable,
+  prescriptionsTable,
+  diagnosesTable,
+  usersToClinicsTable,
+  sessionsTable,
+  verificationsTable,
+  accountsTable,
+};
+export default schema;
