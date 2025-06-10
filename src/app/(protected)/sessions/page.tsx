@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/page-container";
 import WithAuthentication from "@/hocs/with-authentication";
 
-import SessionsTable from "./_components/sessions-table";
+// import SessionsTable from "./_components/sessions-table";
 
 const SessionsPage = async () => {
 
@@ -24,7 +24,8 @@ const SessionsPage = async () => {
           </PageHeaderContent>
         </PageHeader>
         <PageContent>
-          <SessionsTable />
+          <h1>teste</h1>
+          {/* <SessionsTable /> */}
         </PageContent>
       </PageContainer>
     </WithAuthentication>

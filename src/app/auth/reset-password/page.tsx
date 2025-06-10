@@ -3,7 +3,7 @@
 import { useEffect,useState } from "react";
 import { toast } from "sonner";
 
-export default function VerifyPendingPage() {
+export default function ResetPasswordPage() {
   const [canResend, setCanResend] = useState(false);
   const ONE_MINUTE = 1000 * 60;
   useEffect(() => {
