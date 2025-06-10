@@ -389,3 +389,19 @@ export const accountsTableRelations = relations(accountsTable, ({ one }) => ({
     references: [usersTable.id],
   }),
 }));
+
+export const schema = {
+  usersTable,
+  clinicsTable,
+  doctorsTable,
+  patientsTable,
+  appointmentsTable,
+  subscriptionsTable,
+  prescriptionsTable,
+  diagnosesTable,
+  usersToClinicsTable,
+  sessionsTable,
+  verificationsTable,
+  accountsTable,
+};
+export default schema;
