@@ -1,4 +1,5 @@
 import { integer, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
+
 import { doctors } from "./doctors";
 import { patients } from "./patients";
 
