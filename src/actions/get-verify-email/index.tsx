@@ -1,5 +1,7 @@
 "use server";
 
+import "@/db/new_schema"; // força a avaliação e registro das relations
+
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -14,13 +16,19 @@ export const verifyEmail = actionClient
     }),
   )
   .action(async ({ parsedInput }) => {
-    const hasEmail = await db.query.usersTable.findFirst({
+    const user = await db.query.usersTable.findFirst({
       where: eq(usersTable.email, parsedInput.email),
+      with: {
+        accounts: true,
+      },
     });
 
-    if (!hasEmail) {
+    if (!user) {
       throw new Error("Does not exist any account with this email");
     }
 
-    return true;
+    return {
+      email: user.email,
+      provider: user.accounts.map((account) => account.providerId),
+    };
   });

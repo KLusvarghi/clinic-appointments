@@ -22,7 +22,7 @@ const WithAuthentication = async ({
   });
 
   if (!session?.user) {
-    redirect("/auth");
+    redirect("/auth/sign-in");
   }
 
   if (mustHavePlan && !session.user.plan) {

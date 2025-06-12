@@ -282,6 +282,10 @@ export const accountsTable = pgTable(
 
 export const usersTableRelations = relations(usersTable, ({ many }) => ({
   usersToClinics: many(usersToClinicsTable),
+  accounts: many(accountsTable), // ESSENCIAL
+  // sessions: many(sessionsTable),
+  // appointments: many(appointmentsTable),
+  // subscriptions: many(subscriptionsTable),
 }));
 
 export const clinicsTableRelations = relations(clinicsTable, ({ many }) => ({

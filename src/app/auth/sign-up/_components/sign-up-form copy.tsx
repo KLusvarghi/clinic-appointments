@@ -87,7 +87,7 @@ export function SignUpForm() {
         password: values.password,
       }),
     onSuccess: () => {
-      router.push("/dashboard");
+      router.push("/clinic-form");
     },
     onError: (ctx: { error?: { code?: string } }) => {
       if (ctx?.error?.code === "USER_ALREADY_EXISTS") {

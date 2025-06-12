@@ -8,22 +8,23 @@ import { db } from "@/db";
 import { usersTable, verificationsTable } from "@/db/new_schema";
 import { sendVerificationEmail } from "@/lib/email/send-verification-email";
 
+const schema = z.object({
+  email: z.string().trim().email({ message: "Invalid email address" }),
+});
+
 export async function POST(request: Request) {
-  const email = request.headers.get("email");
+  const body = await request.json();
+  const result = schema.safeParse(body);
 
-  // z.object({
-  //   email: z.string().trim().email({ message: "Invalid email address" }),
-  // });
+  if (!result.success) {
+    return new Response(result.error.message, { status: 400 });
+  }
 
-  const hasEmail = await db.query.usersTable.findFirst({
+  const email = result.data.email;
+
+  const user = await db.query.usersTable.findFirst({
     where: eq(usersTable.email, email),
   });
-
-  const user = db
-    .select()
-    .from(usersTable)
-    .where(eq(usersTable.email, email));
-
 
   if (!user) {
     return new Response("This e-mail does not exist on our sistem", {
@@ -31,26 +32,27 @@ export async function POST(request: Request) {
     });
   }
 
-
-
-  const FIFITEN_MINUTES = 1000 * 60 * 15;
+  const FIFITEN_MINUTES = 1000 * 60 * 15; // 15 minutos
   const token = randomUUID(); // gera um novo token
-  const expiresAt = new Date(Date.now() + FIFITEN_MINUTES); // 15 minutos
+  const expiresAt = new Date(Date.now() + FIFITEN_MINUTES); 
 
-  // // remove tokens antigos se quiser
-  // await db
-  //   .delete(verificationsTable)
-  //   .where(eq(verificationsTable.identifier, session.user.email));
+  // remove tokens antigos se quiser
+  await db
+    .delete(verificationsTable)
+    .where(eq(verificationsTable.identifier, email));
 
-  // // cria novo token
-  // await db.insert(verificationsTable).values({
-  //   identifier: session.user.email,
-  //   value: token,
-  //   expiresAt,
-  // });
+  // cria novo token
+  await db.insert(verificationsTable).values({
+    identifier: user.email,
+    value: token,
+    expiresAt,
+  });
 
   await sendVerificationEmail({
-    user: user,
+    user: {
+      name: user.name,
+      email: user.email,
+    },
     token,
   });
 

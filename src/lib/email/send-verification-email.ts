@@ -1,4 +1,3 @@
-import type { User } from "better-auth";
 import { Resend } from "resend";
 
 import { generateVerificationUrl } from "./generate-verification-url";
@@ -10,7 +9,7 @@ export async function sendVerificationEmail({
   user,
   token,
 }: {
-  user: User;
+  user: { email: string; name?: string };
   token: string;
 }) {
   if (!process.env.RESEND_API_KEY) {
@@ -22,13 +21,15 @@ export async function sendVerificationEmail({
 
   const url = generateVerificationUrl(token);
 
+  console.log("url geradaaaaa", url)
+
   await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL,
     to: user.email,
     subject: "Verifique seu e-mail",
     react: verificationEmailTemplate({
       verificationUrl: url,
-      userName: user.name ?? user.email,
+      userName: user.name ?? user.email ?? "Cliente",
     }),
   });
 }

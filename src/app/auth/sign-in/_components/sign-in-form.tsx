@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { signIn } from "@/services/auth";
 
-import { SocialLoginButton } from "./social-login-button";
+import { SocialLoginButton } from "../../_components/social-login-button";
 
 const emailSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }),
@@ -65,17 +65,23 @@ export function SignInForm() {
     mutationFn: async (values: z.infer<typeof emailSchema>) => {
       const isAvaliableEmail = await verifyEmail({ email: values.email });
       if (isAvaliableEmail?.serverError) {
-        throw new Error();
-      } else {
-        return true;
+        throw new Error("Email not found. Please sign up first.");
       }
+      const provider = isAvaliableEmail?.data?.provider[0];
+      if (provider !== "credential") {
+        throw new Error(
+          `This Email has been created with ${provider}. Sign in with the same provider.`,
+        );
+      }
+      return true;
     },
     onSuccess: () => {
       setEmail(emailForm.getValues("email"));
       setStep("password");
     },
-    onError: () => {
-      toast.error("Email not found. Please sign up first.");
+    onError: (error) => {
+      console.log(error);
+      toast.error(error.message);
     },
   });
 
@@ -112,7 +118,7 @@ export function SignInForm() {
     setStep("email");
     setEmail("");
     loginForm.reset();
-    emailForm.reset()
+    emailForm.reset();
   };
 
   const handleGoogle = async () => {
@@ -253,7 +259,7 @@ export function SignInForm() {
                 </Button>
                 <Button
                   type="button"
-                  className="bg-accent hover:bg-popover h-12 w-full border-1"
+                  className="h-12 w-full text-blue-600"
                   disabled={loginMutation.isPending}
                   onClick={handleBackToEmail}
                   variant="ghost"
