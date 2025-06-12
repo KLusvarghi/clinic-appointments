@@ -90,7 +90,7 @@ Quando usar middleware? Apenas para verificar sessão, clínica ou plano?
 --------------------------------------------
 precisamos implementar o envio do email
 
-e para o suuário quiser reenciar o email, temos que registar isso em banco (eu acho) porque, até o momento eu pego o email pelo params, e se ele mudar e a gente enviar o email, chegará até a caiza de email dele, então ter isso em banco pe mais segudo, a gente salva com tempo de validade, o email e um id, que ao soliciar o envio, ele vai verificar o id no banco, se bater ele resgata o email e envia naquele email
+e para o suuário quiser reenciar o email, temos que registar isso em banco (eu acho) porque, até o momento eu pego o email pelo params, e se ele mudar e a gente enviar o email, chegará até a caiza de email dele, então ter isso em banco pe mais segudo, a gente salva com tempo de validade, o email e um id, que ao soliciar o envio, ele vai verificar o id no banco, se bater ele resgata o email e envia naquele email (talvez eu possa enviar o email junto a requisição e add o campo email, assim ele armazena tudo e quando eu quiser reenviar só consultar o email, validar o token e enviar )
 
 
 outra coisa a se fazer, é ver o metodo de login, porque se ele tentar logar com email e a conta dele estiver vinculado ao google, temos que dizer a ele isso

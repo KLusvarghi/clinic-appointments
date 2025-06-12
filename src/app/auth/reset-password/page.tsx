@@ -76,7 +76,7 @@ export default function ResetPasswordPage() {
   };
 
   const handleResend = async () => {
-    const res = await fetch("/api/email/resend-verification", {
+    const res = await fetch("/api/email/reset-password", {
       method: "POST",
     });
     if (res.ok) {

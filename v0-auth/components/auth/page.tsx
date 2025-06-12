@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { SignInForm } from "@/app/auth/_components/sign-in-form";
+import { SignInForm } from "@/app/auth/sign-in/_components/sign-in-form";
 import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { LogoutConfirmation } from "@/components/auth/LogoutConfirmation";

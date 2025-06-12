@@ -1,7 +1,6 @@
-import { SignInForm } from "../_components/sign-in-form";
+import { SignInForm } from "./_components/sign-in-form";
 
 const AlphSignInPage = async () => {
-
   return (
     <div className="flex w-screen items-center justify-center">
       <div className="w-[400px]">

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
 
-import { SignUpForm } from "../_components/sign-up-form";
+import { SignUpForm } from "./_components/sign-up-form";
 
 const AlphSignUpPage = async () => {
   const session = await auth.api.getSession({ headers: await headers() });

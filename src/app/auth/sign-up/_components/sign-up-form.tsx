@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { signUp } from "@/services/auth";
 
-import { SocialLoginButton } from "./social-login-button";
+import { SocialLoginButton } from "../../_components/social-login-button";
 
 const registerSchema = z.object({
   name: z.string().trim().min(1, { message: "Name is required" }),
