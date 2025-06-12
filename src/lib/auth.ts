@@ -2,7 +2,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { customSession } from "better-auth/plugins";
-import { eq, isNull } from "drizzle-orm";
+import { eq, gt } from "drizzle-orm";
 
 import { db } from "@/db";
 // pegando todos os schemas que estão sendo exportados lá de "schemas"
@@ -14,7 +14,7 @@ import {
   usersToClinicsTable,
 } from "@/db/schema";
 
-import { sendVerificationEmail } from "./email/send-verification-email";
+// import { sendVerificationEmail } from "./email/send-verification-email";
 import { parseCookies } from "./utils";
 
 type UserToClinic = typeof usersToClinicsTable.$inferSelect;
@@ -108,7 +108,7 @@ export const auth = betterAuth({
               },
             },
           },
-          where: isNull(sessionsTable),
+          where: gt(sessionsTable.expiresAt, new Date()),
         });
       }
       return {
@@ -169,7 +169,7 @@ export const auth = betterAuth({
     modelName: "verificationsTable",
   },
   emailVerification: {
-    sendVerificationEmail,
+    // sendVerificationEmail,
     sendOnSignUp: true,
   },
   emailAndPassword: {

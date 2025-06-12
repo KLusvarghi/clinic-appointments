@@ -67,12 +67,12 @@ export function SignInForm() {
       if (isAvaliableEmail?.serverError) {
         throw new Error("Email not found. Please sign up first.");
       }
-      const provider = isAvaliableEmail?.data?.provider[0];
-      if (provider !== "credential") {
-        throw new Error(
-          `This Email has been created with ${provider}. Sign in with the same provider.`,
-        );
-      }
+      // const provider = isAvaliableEmail?.data?.provider[0];
+      // if (provider !== "credential") {
+      //   throw new Error(
+      //     `This Email has been created with ${provider}. Sign in with the same provider.`,
+      //   );
+      // }
       return true;
     },
     onSuccess: () => {

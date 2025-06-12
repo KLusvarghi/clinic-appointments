@@ -23,12 +23,13 @@ export const verifyEmail = actionClient
       },
     });
 
+
     if (!user) {
       throw new Error("Does not exist any account with this email");
     }
 
     return {
       email: user.email,
-      provider: user.accounts.map((account) => account.providerId),
+      // provider: user.accounts,
     };
   });
