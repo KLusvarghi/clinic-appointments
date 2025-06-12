@@ -72,7 +72,7 @@ export const auth = betterAuth({
       });
 
       const clinicsData = clinics.map((c) => ({
-        id: c.clinic.id,
+        id: c.clinic?.id,
         name: c.clinic.name,
         plan: c.clinic.subscriptions?.[0]?.plan,
         role: c.role,

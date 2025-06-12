@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -9,49 +8,75 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { signUp } from "@/services/auth";
 
 const registerSchema = z.object({
   name: z.string().trim().min(1, { message: "Name is required" }),
   email: z.string().trim().email({ message: "Invalid email address" }),
-  password: z.string().trim().min(8, { message: "Password must be at least 8 characters" }),
+  password: z
+    .string()
+    .trim()
+    .min(8, { message: "Password must be at least 8 characters long" }),
 });
 
-export function AlphSignUpForm() {
+const SignUpForm = () => {
   const router = useRouter();
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { name: "", email: "", password: "" },
-  });
-
-  const mutation = useMutation({
-    mutationFn: (values: z.infer<typeof registerSchema>) =>
-      signUp({ name: values.name, email: values.email, password: values.password }),
-    onSuccess: () => {
-      router.push("/dashboard");
-    },
-    onError: (ctx: { error?: { code?: string } }) => {
-      if (ctx?.error?.code === "USER_ALREADY_EXISTS") {
-        toast.error("E-mail already registered");
-      } else {
-        toast.error("Failed to create account");
-      }
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof registerSchema>) => {
-    mutation.mutate(values);
-  };
+  async function onSubmit(values: z.infer<typeof registerSchema>) {
+    // https://www.better-auth.com/docs/basic-usage#sign-up
+    await signUp(
+      {
+        email: values.email,
+        password: values.password,
+        name: values.name,
+      },
+      {
+        onSuccess: () => {
+          router.push("/dashboard");
+        },
+        onError: (ctx) => {
+          if (ctx.error.code === "USER_ALREADY_EXISTS") {
+            toast.error("E-mail já cadastrado");
+            return;
+          }
+          toast.error("Erro ao cadastrar usuário");
+        },
+      },
+    );
+  }
 
   return (
-    <Card className="w-full shadow-2xl border-0">
+    <Card>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <CardHeader>
-            <CardTitle className="text-2xl font-semibold text-center">Create your account</CardTitle>
+            <CardTitle>Register</CardTitle>
+            <CardDescription>Register to your account here.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <FormField
@@ -61,7 +86,7 @@ export function AlphSignUpForm() {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="John Doe" {...field} />
+                    <Input placeholder="Kauã" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -72,9 +97,9 @@ export function AlphSignUpForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>E-mail</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="you@example.com" {...field} />
+                    <Input placeholder="kaua@gmail.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -87,24 +112,34 @@ export function AlphSignUpForm() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="********" {...field} />
+                    <Input placeholder="********" type="password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full h-12 bg-blue-600 hover:bg-blue-700" disabled={mutation.isPending}>
-              {mutation.isPending ? (
+          </CardContent>
+          <CardFooter>
+            {/* quando for enviado o submit, conseguimos capturar e desabilitar o button */}
+            <Button
+              className="w-full"
+              type="submit"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating account...
+                  <Loader2 className="mr-2 w-4 animate-spin" /> Creating
+                  account...
                 </>
               ) : (
-                "Create account"
+                "Create my account"
               )}
             </Button>
-          </CardContent>
+          </CardFooter>
         </form>
       </Form>
     </Card>
   );
-}
+};
+
+export default SignUpForm;

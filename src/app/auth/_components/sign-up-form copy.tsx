@@ -9,7 +9,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { verifyEmail } from "@/actions/get-verify-email";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -21,6 +20,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { authClient } from "@/lib/auth-client";
 import { signUp } from "@/services/auth";
 
@@ -44,7 +48,6 @@ type PasswordValidation = {
   hasSpecialChar: boolean;
 };
 
-// Password validation function
 function validatePassword(password: string): PasswordValidation {
   return {
     minLength: password.length >= 8,
@@ -77,42 +80,20 @@ export function SignUpForm() {
   });
 
   const mutation = useMutation({
-    mutationFn: async (values: z.infer<typeof registerSchema>) => {
-      const isAvaliableEmail = await verifyEmail({ email: values.email });
-      if (isAvaliableEmail?.data) {
-        toast.error("E-mail already registered");
-        form.setError("email", {
-          type: "manual",
-          message: "E-mail already registered",
-        });
-        form.setFocus("email");
-        throw new Error("E-mail already registered");
-      }
-      const response = await signUp({
+    mutationFn: (values: z.infer<typeof registerSchema>) =>
+      signUp({
         name: values.name,
         email: values.email,
         password: values.password,
-      });
-
-      if (!response.data) {
-        throw new Error("Failed to create account");
-      }
-      return response;
-    },
+      }),
     onSuccess: () => {
       router.push("/dashboard");
     },
-    onError: (error: Error) => {
-      console.log(error.message);
-      // Check if the error message contains specific error codes or messages
-      if (error.message.includes("USER_ALREADY_EXISTS")) {
+    onError: (ctx: { error?: { code?: string } }) => {
+      if (ctx?.error?.code === "USER_ALREADY_EXISTS") {
         toast.error("E-mail already registered");
-      } else if (error.message.includes("INVALID_EMAIL")) {
-        toast.error("Invalid email format");
-      } else if (error.message.includes("WEAK_PASSWORD")) {
-        toast.error("Password is too weak");
       } else {
-        toast.error("Failed to create account. Please try again.");
+        toast.error("Failed to create account");
       }
     },
   });
@@ -186,88 +167,94 @@ export function SignUpForm() {
               render={({ field }) => (
                 <FormItem className="relative">
                   <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="********"
-                      {...field}
-                      onChange={(e) => handlePasswordChange(e, field.onChange)}
-                      onFocus={() => setShowPasswordValidation(!!field.value)}
-                      onBlur={() => setShowPasswordValidation(false)}
-                      aria-invalid={
-                        !isPasswordValid(passwordValidation) && field.value
-                          ? true
-                          : undefined
-                      }
-                    />
-                  </FormControl>
+                  <Popover open={showPasswordValidation}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="********"
+                          {...field}
+                          onChange={(e) =>
+                            handlePasswordChange(e, field.onChange)
+                          }
+                          onFocus={() =>
+                            setShowPasswordValidation(!!field.value)
+                          }
+                          onBlur={() => setShowPasswordValidation(false)}
+                          aria-invalid={
+                            !isPasswordValid(passwordValidation) && field.value
+                              ? true
+                              : undefined
+                          }
+                        />
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      side="right"
+                      align="start"
+                      className="w-80 p-4"
+                    >
+                      <div className="text-sm text-gray-600">
+                        <p className="mb-2">Your password must contain:</p>
+                        <div className="space-y-1">
+                          <div
+                            className={`flex items-center ${passwordValidation.minLength ? "text-green-600" : "text-gray-500"}`}
+                          >
+                            {passwordValidation.minLength ? (
+                              <Check className="mr-2 h-3 w-3" />
+                            ) : (
+                              <X className="mr-2 h-3 w-3" />
+                            )}
+                            8 or more characters
+                          </div>
+                          <div
+                            className={`flex items-center ${passwordValidation.hasUppercase ? "text-green-600" : "text-gray-500"}`}
+                          >
+                            {passwordValidation.hasUppercase ? (
+                              <Check className="mr-2 h-3 w-3" />
+                            ) : (
+                              <X className="mr-2 h-3 w-3" />
+                            )}
+                            Uppercase letter
+                          </div>
+                          <div
+                            className={`flex items-center ${passwordValidation.hasLowercase ? "text-green-600" : "text-gray-500"}`}
+                          >
+                            {passwordValidation.hasLowercase ? (
+                              <Check className="mr-2 h-3 w-3" />
+                            ) : (
+                              <X className="mr-2 h-3 w-3" />
+                            )}
+                            Lowercase letter
+                          </div>
+                          <div
+                            className={`flex items-center ${passwordValidation.hasNumber ? "text-green-600" : "text-gray-500"}`}
+                          >
+                            {passwordValidation.hasNumber ? (
+                              <Check className="mr-2 h-3 w-3" />
+                            ) : (
+                              <X className="mr-2 h-3 w-3" />
+                            )}
+                            Number
+                          </div>
+                          <div
+                            className={`flex items-center ${passwordValidation.hasSpecialChar ? "text-green-600" : "text-gray-500"}`}
+                          >
+                            {passwordValidation.hasSpecialChar ? (
+                              <Check className="mr-2 h-3 w-3" />
+                            ) : (
+                              <X className="mr-2 h-3 w-3" />
+                            )}
+                            Special character
+                          </div>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {showPasswordValidation && !isPasswordValid(passwordValidation) && (
-              <div className="mt-2 space-y-1 rounded-md bg-gray-50 p-3">
-                <div className="text-sm text-gray-600">
-                  <p className="mb-2">Your password must contain:</p>
-                  <div className="space-y-1">
-                    <div
-                      className={`flex items-center ${passwordValidation.minLength ? "text-green-600" : "text-gray-500"}`}
-                    >
-                      {passwordValidation.minLength ? (
-                        <Check className="mr-2 h-3 w-3" />
-                      ) : (
-                        <X className="mr-2 h-3 w-3" />
-                      )}
-                      8 or more characters
-                    </div>
-                    <div
-                      className={`flex items-center ${passwordValidation.hasUppercase ? "text-green-600" : "text-gray-500"}`}
-                    >
-                      {passwordValidation.hasUppercase ? (
-                        <Check className="mr-2 h-3 w-3" />
-                      ) : (
-                        <X className="mr-2 h-3 w-3" />
-                      )}
-                      Uppercase letter
-                    </div>
-                    <div
-                      className={`flex items-center ${passwordValidation.hasLowercase ? "text-green-600" : "text-gray-500"}`}
-                    >
-                      {passwordValidation.hasLowercase ? (
-                        <Check className="mr-2 h-3 w-3" />
-                      ) : (
-                        <X className="mr-2 h-3 w-3" />
-                      )}
-                      Lowercase letter
-                    </div>
-                    <div
-                      className={`flex items-center ${passwordValidation.hasNumber ? "text-green-600" : "text-gray-500"}`}
-                    >
-                      {passwordValidation.hasNumber ? (
-                        <Check className="mr-2 h-3 w-3" />
-                      ) : (
-                        <X className="mr-2 h-3 w-3" />
-                      )}
-                      Number
-                    </div>
-                    <div
-                      className={`flex items-center ${passwordValidation.hasSpecialChar ? "text-green-600" : "text-gray-500"}`}
-                    >
-                      {passwordValidation.hasSpecialChar ? (
-                        <Check className="mr-2 h-3 w-3" />
-                      ) : (
-                        <X className="mr-2 h-3 w-3" />
-                      )}
-                      Special character
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* {errors.password && (
-              <p className="text-sm text-red-500">{errors.password}</p>
-            )} */}
             <Button
               type="submit"
               className="h-12 w-full bg-blue-600 hover:bg-blue-700"

@@ -29,9 +29,10 @@ export const changeClinic = protectedActionClient
     cookieStore.set("clinic_id", parsedInput.clinicId, { path: "/" });
 
     return {
-      id: clinic.clinic.id,
-      name: clinic.clinic.name,
+      id: clinic.id,
+      name: clinic.name,
       role: clinic.role,
-      plan: clinic.clinic.subscriptions?.[0]?.plan,
+      plan: clinic.subscriptions,
+      // plan: clinic.subscriptions?.[0]?.plan,
     };
   });
