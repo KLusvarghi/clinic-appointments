@@ -17,7 +17,7 @@ import {
   appointmentsTable,
   doctorsTable,
   patientsTable,
-} from "@/db/new_schema";
+} from "@/db/schema/schema";
 import WithAuthentication from "@/hocs/with-authentication";
 import { auth } from "@/lib/auth";
 

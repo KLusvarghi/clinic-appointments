@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { usersTable, verificationsTable } from "@/db/new_schema";
+import { usersTable, verificationsTable } from "@/db/schema/schema";
 import { sendVerificationEmail } from "@/lib/email/send-verification-email";
 
 const schema = z.object({

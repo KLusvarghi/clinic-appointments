@@ -1,5 +1,5 @@
 import { db } from "..";
-import * as schema from "../new_schema"; // sua tabela
+import * as schema from "../schema/schema"; // sua tabela
 
 async function seed() {
   await db.insert(schema.usersTable).values([

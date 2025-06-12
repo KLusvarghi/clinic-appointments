@@ -6,7 +6,7 @@ import {
   appointmentsTable,
   doctorsTable,
   patientsTable,
-} from "@/db/new_schema";
+} from "@/db/schema/schema";
 
 interface Params {
   from: string;

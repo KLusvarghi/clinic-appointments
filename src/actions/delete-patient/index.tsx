@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { patientsTable } from "@/db/new_schema";
+import { patientsTable } from "@/db/schema/schema";
 import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 /**
  * Exclui um paciente pertencente à clínica autenticada.

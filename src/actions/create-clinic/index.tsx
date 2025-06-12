@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { clinicsTable, usersToClinicsTable } from "@/db/new_schema";
+import { clinicsTable, usersToClinicsTable } from "@/db/schema/schema";
 import { protectedActionClient } from "@/lib/next-safe-action";
 
 /**

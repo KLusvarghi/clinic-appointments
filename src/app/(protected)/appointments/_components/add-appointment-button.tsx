@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { doctorsTable, patientsTable } from "@/db/new_schema";
+import { doctorsTable, patientsTable } from "@/db/schema/schema";
 import { useEmailVerified } from "@/hooks/use-email-verified";
 
 import { AddAppointmentForm } from "./add-appointment-form";

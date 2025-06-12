@@ -6,7 +6,7 @@ import utc from "dayjs/plugin/utc";
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/db";
-import { doctorsTable } from "@/db/new_schema";
+import { doctorsTable } from "@/db/schema/schema";
 import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 
 import { upsertDoctorSchema } from "./schema";

@@ -12,9 +12,9 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useAction } from "next-safe-action/hooks";
 
-import { changeClinic } from "@/actions/change-clinic";
+// import { useAction } from "next-safe-action/hooks";
+// import { changeClinic } from "@/actions/change-clinic";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -63,14 +63,17 @@ const items = [
 
 export function AppSidebar() {
   const router = useRouter();
-  const session = authClient.useSession();
-  const isAdmin = session?.data?.user?.clinic?.role === "ADMIN";
-
-  const changeClinicAction = useAction(changeClinic, {
-    onSuccess: () => router.refresh(),
-  });
-
+  const { data: session } = authClient.useSession();
   const pathName = usePathname();
+
+  if (!session?.user) return null; // ou redirecionar
+
+  const isAdmin = session?.user?.clinic?.role === "ADMIN";
+
+  // const changeClinicAction = useAction(changeClinic, {
+  //   onSuccess: () => router.refresh(),
+  // });
+
 
   const handleSignOut = async () => {
     await authClient.signOut({
@@ -148,20 +151,20 @@ export function AppSidebar() {
                     <AvatarFallback>F</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm">{session.data?.user.clinic?.name}</p>
+                    <p className="text-sm">{session.user.clinic?.name}</p>
                     <p className="text-muted-foreground text-sm">
-                      {session?.data?.user.email}
+                      {session?.user.email}
                     </p>
                   </div>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                {session.data?.user.clinics?.map((clinic) => (
+                {session.user.clinics?.map((clinic) => (
                   <DropdownMenuItem
                     key={clinic.id}
                     onSelect={(e) => {
                       e.preventDefault();
-                      changeClinicAction.execute({ clinicId: clinic.id });
+                      // changeClinicAction.execute({ clinicId: clinic.id });
                     }}
                   >
                     {clinic.name}

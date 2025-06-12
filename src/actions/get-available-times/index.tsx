@@ -7,7 +7,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { appointmentsTable, doctorsTable } from "@/db/new_schema";
+import { appointmentsTable, doctorsTable } from "@/db/schema/schema";
 import { generateTimeSlots } from "@/helpers/time";
 import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 

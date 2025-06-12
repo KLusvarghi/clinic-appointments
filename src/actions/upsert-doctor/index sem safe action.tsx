@@ -4,7 +4,7 @@
 import { headers } from "next/headers";
 
 import { db } from "@/db";
-import { doctorsTable } from "@/db/new_schema";
+import { doctorsTable } from "@/db/schema/schema";
 import { auth } from "@/lib/auth";
 
 import { UpsertDoctorSchema, upsertDoctorSchema } from "./schema";

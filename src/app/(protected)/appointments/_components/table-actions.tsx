@@ -25,7 +25,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { appointmentsTable } from "@/db/new_schema";
+import { appointmentsTable } from "@/db/schema/schema";
 
 type AppointmentWithRelations = typeof appointmentsTable.$inferSelect & {
   patient: {

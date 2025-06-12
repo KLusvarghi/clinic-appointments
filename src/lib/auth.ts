@@ -6,10 +6,9 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 // pegando todos os schemas que estão sendo exportados lá de "schemas"
-import * as schema from "@/db/new_schema";
-import { usersToClinicsTable } from "@/db/new_schema";
+import * as schema from "@/db/schema/schema";
+import { usersToClinicsTable } from "@/db/schema/schema";
 
-// import { sessionsTable } from "@/db/new_schema";
 import { sendVerificationEmail } from "./email/send-verification-email";
 import { parseCookies } from "./utils";
 
@@ -23,6 +22,9 @@ export const auth = betterAuth({
     usePlural: true, // para que o drizzle use o plural do nome da tabela
     schema, // passando o schema que criamos lá de "schemas"
   }),
+  cookieOptions: {
+    secure: process.env.NODE_ENV !== "development",
+  },
 
   rateLimit: {
     window: 60, // time window in seconds
@@ -118,7 +120,6 @@ export const auth = betterAuth({
         sessions,
       };
     }),
- 
   ],
 
   // lembra do schema que o better-auth criou? enttão, temos que deixar explicito o nome das variáveis que usamos conforme as tabelas:
@@ -157,6 +158,7 @@ export const auth = betterAuth({
       enabled: true,
       maxAge: FIVE_MINUTES,
     },
+    cookieName: "better-auth.session_token",
   },
   verification: {
     modelName: "verificationsTable",

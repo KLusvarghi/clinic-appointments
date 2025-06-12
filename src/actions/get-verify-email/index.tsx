@@ -1,12 +1,12 @@
 "use server";
 
-import "@/db/new_schema"; // força a avaliação e registro das relations
+import "@/db/schema/schema"; // força a avaliação e registro das relations
 
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { usersTable } from "@/db/new_schema";
+import { usersTable } from "@/db/schema/schema";
 import { actionClient } from "@/lib/next-safe-action";
 
 export const verifyEmail = actionClient

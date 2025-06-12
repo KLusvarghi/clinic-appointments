@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
 import { db } from "@/db";
-import { subscriptionsTable } from "@/db/new_schema";
+import { subscriptionsTable } from "@/db/schema/schema";
 
 export const POST = async (request: Request) => {
   // Essa chave usaremos para validar que quem está chamando nossa rota POST/nosso webhook, está autoriazada, que no caso tem que ser o stripe
