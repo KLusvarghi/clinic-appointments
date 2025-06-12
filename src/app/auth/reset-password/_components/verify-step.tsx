@@ -50,7 +50,7 @@ export function VerifyStep({ email, setStep }: VerifyStepProps) {
           <CardDescription>
             If <strong>{email}</strong> matches a registered address, you will
             receive an email with password reset instructions. <br /> <br />
-            If you haven't received an email within 5 minutes, check your spam
+            If you haven&apos;t received an email within 5 minutes, check your spam
             folder,{" "}
             <button
               onClick={() => mutation.mutate()}

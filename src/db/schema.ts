@@ -398,6 +398,13 @@ export const usersToClinicsTableRelations = relations(
   }),
 );
 
+export const sessionsTableRelations = relations(sessionsTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [sessionsTable.userId],
+    references: [usersTable.id],
+  }),
+}));
+
 export const accountsTableRelations = relations(accountsTable, ({ one }) => ({
   user: one(usersTable, {
     fields: [accountsTable.userId],
