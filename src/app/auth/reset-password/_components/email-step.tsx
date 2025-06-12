@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { verifyEmail } from "@/actions/get-verify-email";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -48,6 +49,17 @@ export function EmailStep({ email, setEmail, setStep }: EmailStepProps) {
 
   const mutation = useMutation({
     mutationFn: async (data: z.infer<typeof emailSchema>) => {
+      const isAvaliableEmail = await verifyEmail({ email: data.email });
+
+      if (isAvaliableEmail?.serverError) {
+        throw new Error("Email not found. Please sign up first.");
+      }
+      const provider = isAvaliableEmail?.data?.provider[0];
+      if (provider !== "credential") {
+        throw new Error(
+          `This Email has been created with ${provider}. Try to sign in with the same provider.`,
+        );
+      }
       await sendResetEmail(data.email);
     },
     onSuccess: () => {

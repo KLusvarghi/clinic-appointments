@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { usersToClinicsTable } from "@/db/schema/schema";
+import { usersToClinicsTable } from "@/db/schema";
 import { protectedActionClient } from "@/lib/next-safe-action";
 
 export const changeClinic = protectedActionClient

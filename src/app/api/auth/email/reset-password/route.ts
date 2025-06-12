@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { usersTable, verificationsTable } from "@/db/schema/schema";
+import { usersTable, verificationsTable } from "@/db/schema";
 import { sendVerificationEmail } from "@/lib/email/send-verification-email";
 
 const schema = z.object({
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
   const FIFITEN_MINUTES = 1000 * 60 * 15; // 15 minutos
   const token = randomUUID(); // gera um novo token
-  const expiresAt = new Date(Date.now() + FIFITEN_MINUTES); 
+  const expiresAt = new Date(Date.now() + FIFITEN_MINUTES);
 
   // remove tokens antigos se quiser
   await db

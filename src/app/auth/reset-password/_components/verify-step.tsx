@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -70,15 +71,17 @@ export function VerifyStep({ email, setStep }: VerifyStepProps) {
         <CardContent className="space-y-4">
           <div className="space-y-1">
             <Button
+              asChild
               type="button"
               className="h-12 w-full bg-blue-600 hover:bg-blue-700"
-              onClick={() =>
-                router.push(
-                  `https://mail.google.com/mail/u/${email}/#search/from:notifications@credlin.com`,
-                )
-              }
             >
-              Open Gmail
+              <Link
+                href="https://mail.google.com/mail/u/${email}/#search/from:notifications@credlin.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Open Gmail
+              </Link>
             </Button>
             <Button
               type="button"

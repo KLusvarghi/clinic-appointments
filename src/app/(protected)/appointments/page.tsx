@@ -12,11 +12,7 @@ import {
   PageTitle,
 } from "@/components/ui/page-container";
 import { db } from "@/db";
-import {
-  appointmentsTable,
-  doctorsTable,
-  patientsTable,
-} from "@/db/schema/schema";
+import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
 import WithAuthentication from "@/hocs/with-authentication";
 import { auth } from "@/lib/auth";
 
@@ -56,7 +52,7 @@ const AppointmentsPage = async () => {
   ]);
 
   return (
-    <WithAuthentication  mustHaveClinic>
+    <WithAuthentication mustHaveClinic>
       <PageContainer>
         <PageHeader>
           <PageHeaderContent>

@@ -27,7 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { patientsTable } from "@/db/schema/schema";
+import { patientsTable } from "@/db/schema";
 
 import { UpsertPatientForm } from "./upsert-patient-form";
 

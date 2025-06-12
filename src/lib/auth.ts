@@ -2,15 +2,30 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { customSession } from "better-auth/plugins";
-import { eq } from "drizzle-orm";
+import { eq, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
 // pegando todos os schemas que estão sendo exportados lá de "schemas"
-import * as schema from "@/db/schema/schema";
-import { usersToClinicsTable } from "@/db/schema/schema";
+import * as schema from "@/db/schema";
+import {
+  clinicsTable,
+  sessionsTable,
+  subscriptionsTable,
+  usersToClinicsTable,
+} from "@/db/schema";
 
 import { sendVerificationEmail } from "./email/send-verification-email";
 import { parseCookies } from "./utils";
+
+type UserToClinic = typeof usersToClinicsTable.$inferSelect;
+type Clinic = typeof clinicsTable.$inferSelect;
+type Subscription = typeof subscriptionsTable.$inferSelect;
+
+type LoadedClinic = Clinic & { subscriptions: Subscription[] };
+type ExtendedUserToClinic = UserToClinic & {
+  clinic: LoadedClinic;
+  user: unknown;
+};
 
 // neste caso, exécificamos o tempo para evitar números mágicos, ficando mais facil a compreensão
 const FIVE_MINUTES = 5 * 60;
@@ -25,7 +40,17 @@ export const auth = betterAuth({
   cookieOptions: {
     secure: process.env.NODE_ENV !== "development",
   },
-
+  // Configuração para autenticação com google e Linkedin:
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    },
+    // linkedin: {
+    //   clientId: process.env.LINKEDIN_CLIENT_ID as string,
+    //   clientSecret: process.env.LINKEDIN_CLIENT_SECRET as string,
+    // },
+  },
   rateLimit: {
     window: 60, // time window in seconds
     max: 100, // max requests in the window
@@ -44,23 +69,10 @@ export const auth = betterAuth({
       },
     },
   },
-
-  // Configuração para autenticação com google e Linkedin:
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    },
-    // linkedin: {
-    //   clientId: process.env.LINKEDIN_CLIENT_ID as string,
-    //   clientSecret: process.env.LINKEDIN_CLIENT_SECRET as string,
-    // },
-  },
-
   plugins: [
     // criamos um sessão customizada, para que possamos retornar mais informações do usuário, como as clinicas que ele possui, e o plano de assinatura de cada uma delas
     customSession(async ({ user, session }, ctx) => {
-      const clinics = await db.query.usersToClinicsTable.findMany({
+      const clinics = (await db.query.usersToClinicsTable.findMany({
         where: eq(usersToClinicsTable.userId, user.id),
 
         with: {
@@ -71,7 +83,7 @@ export const auth = betterAuth({
           },
           user: true,
         },
-      });
+      })) as ExtendedUserToClinic[];
 
       const clinicsData = clinics.map((c) => ({
         id: c.clinic?.id,
@@ -90,19 +102,15 @@ export const auth = betterAuth({
       if (currentClinic?.role === "ADMIN") {
         sessions = await db.query.sessionsTable.findMany({
           with: {
-            //   user: {
-            //     columns: {
-            //       email: true,
-            //     },
-            //   },
-            // },
-
-            user: true,
+            user: {
+              columns: {
+                email: true,
+              },
+            },
           },
-          // where: isNull(sessionsTable.),
+          where: isNull(sessionsTable),
         });
       }
-
       return {
         user: {
           ...user,
@@ -121,11 +129,9 @@ export const auth = betterAuth({
       };
     }),
   ],
-
   // lembra do schema que o better-auth criou? enttão, temos que deixar explicito o nome das variáveis que usamos conforme as tabelas:
   user: {
     modelName: "usersTable",
-
     // passando esses campos adicionais para o schema do user, que não estão no schema que criamos, mas que o better-auth criou
     additionalFields: {
       preferences: {
@@ -150,7 +156,6 @@ export const auth = betterAuth({
   },
   session: {
     modelName: "sessionsTable",
-
     // aqui  nós implementamos o cache, assim, ao invés de toda vez bater naquela rota de api.getSession, ele antes verifica se existe esse cache no cookie, se existir, ele retorna o cache, se não existir, ele busca no banco de dados e salva no cookie, para que na próxima vez que a pessoa fizer uma requisição, ele já tenha o cache salvo no cookie.
     // porem, ele apenas verifica se tem chache, mas não valida ele, de certo modo nos ajuda a fazer essa validação de se existe cookie, mas não valida ele
     // mas de qualquer forma diminue bastante a quantidade de chamadas

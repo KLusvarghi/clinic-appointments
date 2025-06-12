@@ -161,7 +161,7 @@ export const subscriptionsTable = pgTable("subscriptions", {
   clinicId: text("clinic_id")
     .notNull()
     .references(() => clinicsTable.id, { onDelete: "cascade" }),
-  plan: planUserEnum("plan_user").notNull(),
+  plan: planUserEnum("plan").notNull(),
   status: text("status").notNull(),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
@@ -230,15 +230,15 @@ export const sessionsTable = pgTable("sessions", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => nanoid()),
+  userId: text("user_id")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
   expiresAt: timestamp("expires_at").notNull(),
   token: text("token").notNull().unique(),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
-  userId: text("user_id")
-    .notNull()
-    .references(() => usersTable.id, { onDelete: "cascade" }),
 });
 
 // Verifications
@@ -280,10 +280,21 @@ export const accountsTable = pgTable(
   }),
 );
 
+// export const verificationsTableRelations = relations(
+//   verificationsTable,
+//   ({ one }) => ({
+//     user: one(usersTable, {
+//       fields: [verificationsTable.userId],
+//       references: [usersTable.id],
+//     }),
+//   }),
+// );
+
 export const usersTableRelations = relations(usersTable, ({ many }) => ({
   usersToClinics: many(usersToClinicsTable),
-  accounts: many(accountsTable), // ESSENCIAL
-  // sessions: many(sessionsTable),
+  accounts: many(accountsTable),
+  sessions: many(sessionsTable),
+  // verifications: many(verificationsTable),
   // appointments: many(appointmentsTable),
   // subscriptions: many(subscriptionsTable),
 }));

@@ -46,7 +46,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { doctorsTable, patientsTable } from "@/db/schema/schema";
+import { doctorsTable, patientsTable } from "@/db/schema";
 import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
@@ -177,7 +177,7 @@ export function AddAppointmentForm({
 
   return (
     <DialogContent className="sm:max-w-[500px]">
-        <DialogTitle>New appointment</DialogTitle>
+      <DialogTitle>New appointment</DialogTitle>
       <DialogHeader>
         <DialogDescription>
           Create a new appointment for your clinic.

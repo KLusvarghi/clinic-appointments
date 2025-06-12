@@ -34,7 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { patientsTable } from "@/db/schema/schema";
+import { patientsTable } from "@/db/schema";
 
 const formSchema = z.object({
   name: z.string().trim().min(1, {

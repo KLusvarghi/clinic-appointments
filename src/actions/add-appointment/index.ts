@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/db";
-import { appointmentsTable } from "@/db/schema/schema";
+import { appointmentsTable } from "@/db/schema";
 import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 
 import { getAvailableTimes } from "../get-available-times";

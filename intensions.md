@@ -88,10 +88,8 @@ Quando usar middleware? Apenas para verificar sessão, clínica ou plano?
 
 
 --------------------------------------------
-precisamos implementar o envio do email
+precisamos implementar o envio do email (esperar o resend estabilizar)
 
 e para o suuário quiser reenciar o email, temos que registar isso em banco (eu acho) porque, até o momento eu pego o email pelo params, e se ele mudar e a gente enviar o email, chegará até a caixa de email dele, então ter isso em banco pe mais segudo, a gente salva com tempo de validade, o email e um id, que ao soliciar o envio, ele vai verificar o id no banco, se bater ele resgata o email e envia naquele email (talvez eu possa enviar o email junto a requisição e add o campo email, assim ele armazena tudo e quando eu quiser reenviar só consultar o email, validar o token e enviar )
 
 validar o email do usuário ao tentar resetar o password (ver se não é um email google)
-
-e talvez incriptografar a senha do usuário (ver com gpt se necessario)

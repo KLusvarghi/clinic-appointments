@@ -3,7 +3,7 @@
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
-import { doctorsTable } from "@/db/schema/schema";
+import { doctorsTable } from "@/db/schema";
 
 // para usar o dayjs com o utc, precisamos estender o dayjs com o plugin utc
 dayjs.extend(utc);

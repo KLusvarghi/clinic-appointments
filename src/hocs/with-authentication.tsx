@@ -21,8 +21,6 @@ const WithAuthentication = async ({
     headers: await headers(),
   });
 
-  console.log("sessãpooooooooooooooooooooooooo")
-  console.log(session)
 
   if (!session?.user) {
     redirect("/auth/sign-in");

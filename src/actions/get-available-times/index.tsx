@@ -7,7 +7,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { appointmentsTable, doctorsTable } from "@/db/schema/schema";
+import { appointmentsTable, doctorsTable } from "@/db/schema";
 import { generateTimeSlots } from "@/helpers/time";
 import { protectedWithClinicActionClient } from "@/lib/next-safe-action";
 
@@ -67,7 +67,7 @@ export const getAvailableTimes = protectedWithClinicActionClient
       ),
     });
 
-    console.log(appointments)
+    console.log(appointments);
 
     // e aqui pegamos todos os agendamentos do médico nesse dia, apenas do dia selecionado
     const appointmentsOnSelectedDate = appointments

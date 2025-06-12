@@ -13,7 +13,7 @@ interface ResetPasswordFormsProps {
 
 export function ResetPasswordForm({ userEmail }: ResetPasswordFormsProps) {
   const [email, setEmail] = useState<string | null>(userEmail);
-  const [step, setStep] = useState<StepType>("verify-email");
+  const [step, setStep] = useState<StepType>("email");
 
   switch (step) {
     case "email":
