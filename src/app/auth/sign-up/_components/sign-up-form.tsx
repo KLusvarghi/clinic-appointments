@@ -103,17 +103,7 @@ export function SignUpForm() {
       router.push("/dashboard");
     },
     onError: (error: Error) => {
-      console.log(error.message);
-      // Check if the error message contains specific error codes or messages
-      if (error.message.includes("USER_ALREADY_EXISTS")) {
-        toast.error("E-mail already registered");
-      } else if (error.message.includes("INVALID_EMAIL")) {
-        toast.error("Invalid email format");
-      } else if (error.message.includes("WEAK_PASSWORD")) {
-        toast.error("Password is too weak");
-      } else {
-        toast.error("Failed to create account. Please try again.");
-      }
+      toast.error(error.message);
     },
   });
 

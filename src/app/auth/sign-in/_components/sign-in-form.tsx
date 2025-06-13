@@ -80,7 +80,6 @@ export function SignInForm() {
       setStep("password");
     },
     onError: (error) => {
-      console.log(error);
       toast.error(error.message);
     },
   });

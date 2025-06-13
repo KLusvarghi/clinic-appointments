@@ -13,7 +13,6 @@ import UpsertDoctorForm from "./upsert-doctor-form";
 const AddDoctorButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const emailVerified = useEmailVerified();
-  console.log('email é verificado?', emailVerified);
 
   const handleOpenChange = (open: boolean) => {
     if (open && !emailVerified) {

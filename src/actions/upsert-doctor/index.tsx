@@ -28,7 +28,6 @@ export const upsertDoctor = protectedWithClinicActionClient
   // e aqui, definimos a action que iremos usar para executar a lógica do nosso servidor action
   // e dentro do action, temos o parsedInput que é o valor que iremos receber do front (que é o valor do forms)
   .action(async ({ parsedInput, ctx }) => {
-    console.log(parsedInput);
     // um problemas que temos é questão das horas, e para manter a concistencia, temos que armazenar as horas em UTC (sem fuso horário)
     // pra começar vamos pegar os valores que queremos formatar antes de armazenar
     const availableFromTime = parsedInput.availableFromTime; // 15:30:00

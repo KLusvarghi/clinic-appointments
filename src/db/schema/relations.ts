@@ -195,7 +195,7 @@ export const accountsTableRelations = relations(accountsTable, ({ one }) => ({
   }),
 }));
 
-export const relations = {
+export const schemaRelations = {
   usersTableRelations,
   clinicsTableRelations,
   doctorsTableRelations,
@@ -209,4 +209,4 @@ export const relations = {
   accountsTableRelations,
 };
 
-export default relations;
+export default schemaRelations;

@@ -12,9 +12,9 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useAction } from "next-safe-action/hooks";
 
-// import { useAction } from "next-safe-action/hooks";
-// import { changeClinic } from "@/actions/change-clinic";
+import { changeClinic } from "@/actions/change-clinic";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -70,10 +70,9 @@ export function AppSidebar() {
 
   const isAdmin = session?.user?.clinic?.role === "ADMIN";
 
-  // const changeClinicAction = useAction(changeClinic, {
-  //   onSuccess: () => router.refresh(),
-  // });
-
+  const changeClinicAction = useAction(changeClinic, {
+    onSuccess: () => router.refresh(),
+  });
 
   const handleSignOut = async () => {
     await authClient.signOut({
@@ -164,7 +163,7 @@ export function AppSidebar() {
                     key={clinic.id}
                     onSelect={(e) => {
                       e.preventDefault();
-                      // changeClinicAction.execute({ clinicId: clinic.id });
+                      changeClinicAction.execute({ clinicId: clinic.id });
                     }}
                   >
                     {clinic.name}

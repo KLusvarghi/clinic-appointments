@@ -67,8 +67,6 @@ export const getAvailableTimes = protectedWithClinicActionClient
       ),
     });
 
-    console.log(appointments);
-
     // e aqui pegamos todos os agendamentos do médico nesse dia, apenas do dia selecionado
     const appointmentsOnSelectedDate = appointments
       .filter((appointment) => {
