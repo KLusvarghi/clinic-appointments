@@ -2,14 +2,13 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { customSession } from "better-auth/plugins";
-import { eq, gt } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 // pegando todos os schemas que estão sendo exportados lá de "schemas"
-import * as schema from "@/db/schema";
-import {
+import schema, {
   clinicsTable,
-  sessionsTable,
+  // sessionsTable,
   subscriptionsTable,
   usersToClinicsTable,
 } from "@/db/schema";
@@ -33,14 +32,13 @@ const TWO_MINUTE = 60 * 2;
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
-    provider: "pg", // pg of "postgres"
+    provider: "pg", 
     usePlural: true, // para que o drizzle use o plural do nome da tabela
-    schema, // passando o schema que criamos lá de "schemas"
+    schema, 
   }),
   cookieOptions: {
     secure: process.env.NODE_ENV !== "development",
   },
-  // Configuração para autenticação com google e Linkedin:
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -55,15 +53,15 @@ export const auth = betterAuth({
     window: 60, // time window in seconds
     max: 100, // max requests in the window
     customRules: {
-      "/sign-in/email": {
+      "/auth/sign-in/email": {
         window: TWO_MINUTE,
         max: 3,
       },
-      "/sign-up/email": {
+      "/auth/sign-up/email": {
         window: TWO_MINUTE,
         max: 3,
       },
-      "/sign-in/social": {
+      "/auth/sign-in/social": {
         window: TWO_MINUTE,
         max: 3,
       },
@@ -76,12 +74,12 @@ export const auth = betterAuth({
         where: eq(usersToClinicsTable.userId, user.id),
 
         with: {
+          user: true,
           clinic: {
             with: {
               subscriptions: true,
             },
           },
-          user: true,
         },
       })) as ExtendedUserToClinic[];
 
@@ -98,19 +96,19 @@ export const auth = betterAuth({
         clinicsData.find((c) => c.id === selectedClinicId) ?? clinicsData[0];
 
       // Only fetch active sessions for admin users
-      let sessions;
-      if (currentClinic?.role === "ADMIN") {
-        sessions = await db.query.sessionsTable.findMany({
-          with: {
-            user: {
-              columns: {
-                email: true,
-              },
-            },
-          },
-          where: gt(sessionsTable.expiresAt, new Date()),
-        });
-      }
+      // let sessions;
+      // if (currentClinic?.role === "ADMIN") {
+      //   sessions = await db.query.sessionsTable.findMany({
+      //     with: {
+      //       user: {
+      //         columns: {
+      //           email: true,
+      //         },
+      //       },
+      //     },
+      //     where: gt(sessionsTable.expiresAt, new Date()),
+      //   });
+      // }
       return {
         user: {
           ...user,
@@ -125,7 +123,7 @@ export const auth = betterAuth({
             : undefined,
         },
         session,
-        sessions,
+        // sessions,
       };
     }),
   ],
@@ -133,23 +131,23 @@ export const auth = betterAuth({
   user: {
     modelName: "usersTable",
     // passando esses campos adicionais para o schema do user, que não estão no schema que criamos, mas que o better-auth criou
-    // additionalFields: {
-    //   preferences: {
-    //     type: "string[]",
-    //     fieldName: "preferences",
-    //     required: false,
-    //   },
-    //   lastLoginAt: {
-    //     type: "date",
-    //     fieldName: "lastLoginAt",
-    //     required: false,
-    //   },
-    //   deletedAt: {
-    //     type: "date",
-    //     fieldName: "deletedAt",
-    //     required: false,
-    //   },
-    // },
+    additionalFields: {
+      preferences: {
+        type: "string[]",
+        fieldName: "preferences",
+        required: false,
+      },
+      lastLoginAt: {
+        type: "date",
+        fieldName: "lastLoginAt",
+        required: false,
+      },
+      deletedAt: {
+        type: "date",
+        fieldName: "deletedAt",
+        required: false,
+      },
+    },
   },
   session: {
     cookieCache: {
