@@ -168,10 +168,10 @@ export const auth = betterAuth({
   verification: {
     modelName: "verificationsTable",
   },
-  emailVerification: {
-    // sendVerificationEmail,
-    sendOnSignUp: true,
-  },
+  // emailVerification: {
+  //   sendVerificationEmail,
+  //   sendOnSignUp: true,
+  // },
   emailAndPassword: {
     // queremos que o user possar logar com email e senha. https://www.better-auth.com/docs/basic-usage#email--password
     enabled: true,

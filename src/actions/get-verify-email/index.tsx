@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { usersTable } from "@/db/schema";
+import { accountsTable, usersTable } from "@/db/schema";
 import { actionClient } from "@/lib/next-safe-action";
 
 export const verifyEmail = actionClient
@@ -18,18 +18,18 @@ export const verifyEmail = actionClient
   .action(async ({ parsedInput }) => {
     const user = await db.query.usersTable.findFirst({
       where: eq(usersTable.email, parsedInput.email),
-      with: {
-        accounts: true,
-      },
     });
-
 
     if (!user) {
       throw new Error("Does not exist any account with this email");
     }
 
+    const account = await db.query.accountsTable.findFirst({
+      where: eq(accountsTable.userId, user.id),
+    });
+
     return {
       email: user.email,
-      // provider: user.accounts,
+      provider: account?.providerId,
     };
   });
