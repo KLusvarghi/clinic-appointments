@@ -15,13 +15,14 @@ export function signUp(
 }
 
 export function signIn(
-  values: { email: string; password: string },
+  values: { email: string; password: string; rememberMe?: boolean },
   options?: Parameters<typeof authClient.signIn.email>[1],
 ) {
   return authClient.signIn.email(
     {
       email: values.email,
       password: values.password,
+      rememberMe: values.rememberMe,
     },
     options,
   );

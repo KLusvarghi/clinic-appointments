@@ -25,6 +25,7 @@ import { authClient } from "@/lib/auth-client";
 import { signUp } from "@/services/auth";
 
 import { SocialLoginButton } from "../../_components/social-login-button";
+import { sendVerificationEmail as requestVerification } from "../verify-email/_helpers/send-verification-email";
 
 const registerSchema = z.object({
   name: z.string().trim().min(1, { message: "Name is required" }),
@@ -99,8 +100,14 @@ export function SignUpForm() {
       }
       return response;
     },
-    onSuccess: () => {
-      router.push("/dashboard");
+    onSuccess: async (_data, variables) => {
+      const email = variables.email;
+      try {
+        await requestVerification(email);
+      } catch {
+        // ignore error and continue
+      }
+      router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
     },
     onError: (error: Error) => {
       toast.error(error.message);
