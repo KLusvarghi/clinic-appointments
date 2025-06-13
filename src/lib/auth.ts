@@ -133,40 +133,61 @@ export const auth = betterAuth({
   user: {
     modelName: "usersTable",
     // passando esses campos adicionais para o schema do user, que não estão no schema que criamos, mas que o better-auth criou
-    additionalFields: {
-      preferences: {
-        type: "string[]",
-        fieldName: "preferences",
-        required: false,
-      },
-      lastLoginAt: {
-        type: "date",
-        fieldName: "lastLoginAt",
-        required: false,
-      },
-      deletedAt: {
-        type: "date",
-        fieldName: "deletedAt",
-        required: false,
-      },
-    },
-  },
-  account: {
-    modelName: "accountsTable",
+    // additionalFields: {
+    //   preferences: {
+    //     type: "string[]",
+    //     fieldName: "preferences",
+    //     required: false,
+    //   },
+    //   lastLoginAt: {
+    //     type: "date",
+    //     fieldName: "lastLoginAt",
+    //     required: false,
+    //   },
+    //   deletedAt: {
+    //     type: "date",
+    //     fieldName: "deletedAt",
+    //     required: false,
+    //   },
+    // },
   },
   session: {
-    modelName: "sessionsTable",
-    // aqui  nós implementamos o cache, assim, ao invés de toda vez bater naquela rota de api.getSession, ele antes verifica se existe esse cache no cookie, se existir, ele retorna o cache, se não existir, ele busca no banco de dados e salva no cookie, para que na próxima vez que a pessoa fizer uma requisição, ele já tenha o cache salvo no cookie.
-    // porem, ele apenas verifica se tem chache, mas não valida ele, de certo modo nos ajuda a fazer essa validação de se existe cookie, mas não valida ele
-    // mas de qualquer forma diminue bastante a quantidade de chamadas
     cookieCache: {
       enabled: true,
       maxAge: FIVE_MINUTES,
     },
     cookieName: "better-auth.session_token",
+    modelName: "sessionsTable",
+  },
+  account: {
+    modelName: "accountsTable",
   },
   verification: {
     modelName: "verificationsTable",
+  },
+  doctor: {
+    modelName: "doctorsTable",
+  },
+  patient: {
+    modelName: "patientsTable",
+  },
+  clinic: {
+    modelName: "clinicsTable",
+  },
+  appointment: {
+    modelName: "appointmentsTable",
+  },
+  prescription: {
+    modelName: "prescriptionsTable",
+  },
+  diagnosis: {
+    modelName: "diagnosesTable",
+  },
+  subscription: {
+    modelName: "subscriptionsTable",
+  },
+  usersToClinics: {
+    modelName: "usersToClinicsTable",
   },
   // emailVerification: {
   //   sendVerificationEmail,
