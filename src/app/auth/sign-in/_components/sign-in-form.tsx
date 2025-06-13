@@ -43,6 +43,7 @@ export function SignInForm() {
   const router = useRouter();
   const [step, setStep] = useState<"email" | "password">("email");
   const [email, setEmail] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
 
   const emailForm = useForm<z.infer<typeof emailSchema>>({
     resolver: zodResolver(emailSchema),
@@ -89,6 +90,7 @@ export function SignInForm() {
       const response = await signIn({
         email: values.email,
         password: values.password,
+        rememberMe,
       });
       if (!response?.data?.user) {
         throw new Error("Authentication failed");
@@ -228,6 +230,18 @@ export function SignInForm() {
                   </FormItem>
                 )}
               />
+              <div className="flex items-center space-x-2">
+                <input
+                  id="rememberMe"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                <label htmlFor="rememberMe" className="text-sm">
+                  Remember me
+                </label>
+              </div>
               <div className="flex w-full justify-end">
                 <button
                   type="button"
