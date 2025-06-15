@@ -1,6 +1,6 @@
 import { authClient } from "@/lib/auth-client";
 
-export function signUp(
+export function signUpsignUp(
   values: { name: string; email: string; password: string },
   options?: Parameters<typeof authClient.signUp.email>[1],
 ) {

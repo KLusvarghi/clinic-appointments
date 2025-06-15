@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { verifyEmail } from "@/actions/get-verify-email";
+import { sendEmailRequest } from "@/client-actions/send-email";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -27,7 +28,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-import { sendResetEmail } from "../_helpers/send-reset-email";
 import { StepType } from "../_types";
 
 const emailSchema = z.object({
@@ -38,9 +38,10 @@ interface EmailStepProps {
   email: string | null;
   setEmail: (email: string) => void;
   setStep: (step: StepType) => void;
+  url: string;
 }
 
-export function EmailStep({ email, setEmail, setStep }: EmailStepProps) {
+export function EmailStep({ email, setEmail, setStep, url }: EmailStepProps) {
   const router = useRouter();
   const form = useForm({
     resolver: zodResolver(emailSchema),
@@ -60,7 +61,7 @@ export function EmailStep({ email, setEmail, setStep }: EmailStepProps) {
           `This Email has been created with ${provider}. Try to sign in with the same provider.`,
         );
       }
-      await sendResetEmail(data.email);
+      await sendEmailRequest(data.email, url);
     },
     onSuccess: () => {
       const submittedEmail = form.getValues("email");

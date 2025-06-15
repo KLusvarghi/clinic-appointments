@@ -6,6 +6,7 @@ import {
   KeyRound,
   LayoutDashboard,
   LogOut,
+  Settings,
   Stethoscope,
   UsersRound,
 } from "lucide-react";
@@ -63,16 +64,15 @@ const items = [
 
 export function AppSidebar() {
   const router = useRouter();
-  const { data: session } = authClient.useSession();
-  const pathName = usePathname();
-
-  if (!session?.user) return null; // ou redirecionar
-
-  const isAdmin = session?.user?.clinic?.role === "ADMIN";
-
   const changeClinicAction = useAction(changeClinic, {
     onSuccess: () => router.refresh(),
   });
+  const { data: session } = authClient.useSession();
+  const pathName = usePathname();
+
+  // if (!session?.user) return null; // ou redirecionar
+
+  const isAdmin = session?.user?.clinic?.role === "ADMIN";
 
   const handleSignOut = async () => {
     await authClient.signOut({
@@ -122,6 +122,14 @@ export function AppSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathName === "/settings"}>
+                  <Link href="/settings">
+                    <Settings />
+                    <span>Settings</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               {isAdmin && (
                 <SidebarMenuItem>
                   <SidebarMenuButton
@@ -143,6 +151,8 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
+
+            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size="lg">
@@ -150,7 +160,7 @@ export function AppSidebar() {
                     <AvatarFallback>F</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm">{session.user.clinic?.name}</p>
+                    <p className="text-sm">{session?.user.clinic?.name}</p>
                     <p className="text-muted-foreground text-sm">
                       {session?.user.email}
                     </p>
@@ -158,7 +168,7 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                {session.user.clinics?.map((clinic) => (
+                {session?.user.clinics?.map((clinic) => (
                   <DropdownMenuItem
                     key={clinic.id}
                     onSelect={(e) => {
@@ -176,6 +186,8 @@ export function AppSidebar() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

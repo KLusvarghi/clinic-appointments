@@ -10,8 +10,16 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { verifyEmail } from "@/actions/get-verify-email";
+import { sendEmailRequest } from "@/client-actions/send-email";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -22,10 +30,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
-import { signUp } from "@/services/auth";
 
 import { SocialLoginButton } from "../../_components/social-login-button";
-import { sendVerificationEmail as requestVerification } from "../verify-email/_helpers/send-verification-email";
 
 const registerSchema = z.object({
   name: z.string().trim().min(1, { message: "Name is required" }),
@@ -61,6 +67,7 @@ function isPasswordValid(validation: PasswordValidation) {
 }
 
 export function SignUpForm() {
+  const [dialogOpen, setDialogOpen] = useState(false);
   const router = useRouter();
   const [passwordValidation, setPasswordValidation] =
     useState<PasswordValidation>({
@@ -89,7 +96,7 @@ export function SignUpForm() {
         form.setFocus("email");
         throw new Error("E-mail already registered");
       }
-      const response = await signUp({
+      const response = await authClient.signUp.email({
         name: values.name,
         email: values.email,
         password: values.password,
@@ -98,16 +105,14 @@ export function SignUpForm() {
       if (!response.data) {
         throw new Error("Failed to create account");
       }
-      return response;
+      setDialogOpen(true);
+      return true;
     },
     onSuccess: async (_data, variables) => {
       const email = variables.email;
-      try {
-        await requestVerification(email);
-      } catch {
-        // ignore error and continue
-      }
-      router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
+      await sendEmailRequest(email, "verify");
+      console.log(_data);
+      console.log(variables);
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -138,175 +143,209 @@ export function SignUpForm() {
   };
 
   return (
-    <Card className="w-full border-0 shadow-2xl">
-      <CardHeader>
-        <CardTitle className="text-center text-2xl font-semibold">
-          Create your account
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="John Doe" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="you@example.com"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem className="relative">
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="********"
-                      {...field}
-                      onChange={(e) => handlePasswordChange(e, field.onChange)}
-                      onFocus={() => setShowPasswordValidation(!!field.value)}
-                      onBlur={() => setShowPasswordValidation(false)}
-                      aria-invalid={
-                        !isPasswordValid(passwordValidation) && field.value
-                          ? true
-                          : undefined
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {showPasswordValidation && !isPasswordValid(passwordValidation) && (
-              <div className="mt-2 space-y-1 rounded-md bg-gray-50 p-3">
-                <div className="text-sm text-gray-600">
-                  <p className="mb-2">Your password must contain:</p>
-                  <div className="space-y-1">
-                    <div
-                      className={`flex items-center ${passwordValidation.minLength ? "text-green-600" : "text-gray-500"}`}
-                    >
-                      {passwordValidation.minLength ? (
-                        <Check className="mr-2 h-3 w-3" />
-                      ) : (
-                        <X className="mr-2 h-3 w-3" />
-                      )}
-                      8 or more characters
-                    </div>
-                    <div
-                      className={`flex items-center ${passwordValidation.hasUppercase ? "text-green-600" : "text-gray-500"}`}
-                    >
-                      {passwordValidation.hasUppercase ? (
-                        <Check className="mr-2 h-3 w-3" />
-                      ) : (
-                        <X className="mr-2 h-3 w-3" />
-                      )}
-                      Uppercase letter
-                    </div>
-                    <div
-                      className={`flex items-center ${passwordValidation.hasLowercase ? "text-green-600" : "text-gray-500"}`}
-                    >
-                      {passwordValidation.hasLowercase ? (
-                        <Check className="mr-2 h-3 w-3" />
-                      ) : (
-                        <X className="mr-2 h-3 w-3" />
-                      )}
-                      Lowercase letter
-                    </div>
-                    <div
-                      className={`flex items-center ${passwordValidation.hasNumber ? "text-green-600" : "text-gray-500"}`}
-                    >
-                      {passwordValidation.hasNumber ? (
-                        <Check className="mr-2 h-3 w-3" />
-                      ) : (
-                        <X className="mr-2 h-3 w-3" />
-                      )}
-                      Number
-                    </div>
-                    <div
-                      className={`flex items-center ${passwordValidation.hasSpecialChar ? "text-green-600" : "text-gray-500"}`}
-                    >
-                      {passwordValidation.hasSpecialChar ? (
-                        <Check className="mr-2 h-3 w-3" />
-                      ) : (
-                        <X className="mr-2 h-3 w-3" />
-                      )}
-                      Special character
+    <>
+      <Card className="w-full border-0 shadow-2xl">
+        <CardHeader>
+          <CardTitle className="text-center text-2xl font-semibold">
+            Create your account
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="John Doe" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="you@example.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem className="relative">
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="********"
+                        {...field}
+                        onChange={(e) =>
+                          handlePasswordChange(e, field.onChange)
+                        }
+                        onFocus={() => setShowPasswordValidation(!!field.value)}
+                        onBlur={() => setShowPasswordValidation(false)}
+                        aria-invalid={
+                          !isPasswordValid(passwordValidation) && field.value
+                            ? true
+                            : undefined
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {showPasswordValidation &&
+                !isPasswordValid(passwordValidation) && (
+                  <div className="mt-2 space-y-1 rounded-md bg-gray-50 p-3">
+                    <div className="text-sm text-gray-600">
+                      <p className="mb-2">Your password must contain:</p>
+                      <div className="space-y-1">
+                        <div
+                          className={`flex items-center ${passwordValidation.minLength ? "text-green-600" : "text-gray-500"}`}
+                        >
+                          {passwordValidation.minLength ? (
+                            <Check className="mr-2 h-3 w-3" />
+                          ) : (
+                            <X className="mr-2 h-3 w-3" />
+                          )}
+                          8 or more characters
+                        </div>
+                        <div
+                          className={`flex items-center ${passwordValidation.hasUppercase ? "text-green-600" : "text-gray-500"}`}
+                        >
+                          {passwordValidation.hasUppercase ? (
+                            <Check className="mr-2 h-3 w-3" />
+                          ) : (
+                            <X className="mr-2 h-3 w-3" />
+                          )}
+                          Uppercase letter
+                        </div>
+                        <div
+                          className={`flex items-center ${passwordValidation.hasLowercase ? "text-green-600" : "text-gray-500"}`}
+                        >
+                          {passwordValidation.hasLowercase ? (
+                            <Check className="mr-2 h-3 w-3" />
+                          ) : (
+                            <X className="mr-2 h-3 w-3" />
+                          )}
+                          Lowercase letter
+                        </div>
+                        <div
+                          className={`flex items-center ${passwordValidation.hasNumber ? "text-green-600" : "text-gray-500"}`}
+                        >
+                          {passwordValidation.hasNumber ? (
+                            <Check className="mr-2 h-3 w-3" />
+                          ) : (
+                            <X className="mr-2 h-3 w-3" />
+                          )}
+                          Number
+                        </div>
+                        <div
+                          className={`flex items-center ${passwordValidation.hasSpecialChar ? "text-green-600" : "text-gray-500"}`}
+                        >
+                          {passwordValidation.hasSpecialChar ? (
+                            <Check className="mr-2 h-3 w-3" />
+                          ) : (
+                            <X className="mr-2 h-3 w-3" />
+                          )}
+                          Special character
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
+                )}
 
-            {/* {errors.password && (
+              {/* {errors.password && (
               <p className="text-sm text-red-500">{errors.password}</p>
             )} */}
-            <Button
-              type="submit"
-              className="h-12 w-full bg-blue-600 hover:bg-blue-700"
-              disabled={mutation.isPending}
-            >
-              {mutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating
-                  account...
-                </>
-              ) : (
-                "Create account"
-              )}
-            </Button>
-          </form>
-        </Form>
-        <div className="relative py-2">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
+              <Button
+                type="submit"
+                className="h-12 w-full bg-blue-600 hover:bg-blue-700"
+                disabled={mutation.isPending}
+              >
+                {mutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating
+                    account...
+                  </>
+                ) : (
+                  "Create account"
+                )}
+              </Button>
+            </form>
+          </Form>
+          <div className="relative py-2">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="text-muted-foreground bg-white px-2">Or</span>
+            </div>
           </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="text-muted-foreground bg-white px-2">Or</span>
+          <div className="space-y-3">
+            <SocialLoginButton
+              provider="google"
+              text="Sign up with Google"
+              onClick={handleGoogle}
+            />
           </div>
-        </div>
-        <div className="space-y-3">
-          <SocialLoginButton
-            provider="google"
-            text="Sign up with Google"
-            onClick={handleGoogle}
-          />
-        </div>
-      </CardContent>
+        </CardContent>
 
-      <div className="text-center text-sm">
-        <span className="text-muted-foreground">Already have an account? </span>
-        <button
-          onClick={() => redirect("/auth/sign-in")}
-          className="cursor-pointer font-medium text-blue-600 hover:text-blue-700"
-        >
-          Sign in
-        </button>
-      </div>
-    </Card>
+        <div className="text-center text-sm">
+          <span className="text-muted-foreground">
+            Already have an account?{" "}
+          </span>
+          <button
+            onClick={() => redirect("/auth/sign-in")}
+            className="cursor-pointer font-medium text-blue-600 hover:text-blue-700"
+          >
+            Sign in
+          </button>
+        </div>
+      </Card>
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          setDialogOpen(open);
+          if (!open) {
+            router.push("/dashboard");
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Check your email</DialogTitle>
+          </DialogHeader>
+          <p className="text-muted-foreground text-sm">
+            We sent a verification link to your email. Please verify your
+            account.
+          </p>
+          <DialogFooter>
+            <Button
+              onClick={() => setDialogOpen(false)}
+              className="h-12 w-full bg-blue-600 hover:bg-blue-700"
+            >
+              Continue to dashboard
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

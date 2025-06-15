@@ -1,4 +1,5 @@
 export * from "./relations";
 export { default as relations } from "./relations";
 export * from "./tables";
-export { default as schema } from "./tables";
+// Exporta `schema` como **nomeado**, para que seja usado com `import { schema }`
+export { schema } from "./tables";

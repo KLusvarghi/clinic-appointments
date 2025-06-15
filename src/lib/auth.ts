@@ -2,13 +2,14 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { customSession } from "better-auth/plugins";
-import { eq } from "drizzle-orm";
+import { eq, gt } from "drizzle-orm";
 
 import { db } from "@/db";
 // pegando todos os schemas que estão sendo exportados lá de "schemas"
-import schema, {
+import {
   clinicsTable,
-  // sessionsTable,
+  schema,
+  sessionsTable,
   subscriptionsTable,
   usersToClinicsTable,
 } from "@/db/schema";
@@ -32,9 +33,9 @@ const TWO_MINUTE = 60 * 2;
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
-    provider: "pg", 
+    provider: "pg",
     usePlural: true, // para que o drizzle use o plural do nome da tabela
-    schema, 
+    schema,
   }),
   cookieOptions: {
     secure: process.env.NODE_ENV !== "development",
@@ -96,19 +97,19 @@ export const auth = betterAuth({
         clinicsData.find((c) => c.id === selectedClinicId) ?? clinicsData[0];
 
       // Only fetch active sessions for admin users
-      // let sessions;
-      // if (currentClinic?.role === "ADMIN") {
-      //   sessions = await db.query.sessionsTable.findMany({
-      //     with: {
-      //       user: {
-      //         columns: {
-      //           email: true,
-      //         },
-      //       },
-      //     },
-      //     where: gt(sessionsTable.expiresAt, new Date()),
-      //   });
-      // }
+      let sessions;
+      if (currentClinic?.role === "ADMIN") {
+        sessions = await db.query.sessionsTable.findMany({
+          with: {
+            user: {
+              columns: {
+                email: true,
+              },
+            },
+          },
+          where: gt(sessionsTable.expiresAt, new Date()),
+        });
+      }
       return {
         user: {
           ...user,
@@ -123,7 +124,7 @@ export const auth = betterAuth({
             : undefined,
         },
         session,
-        // sessions,
+        sessions,
       };
     }),
   ],

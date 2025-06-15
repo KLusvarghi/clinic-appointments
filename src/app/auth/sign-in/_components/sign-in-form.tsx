@@ -23,8 +23,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
-import { signIn } from "@/services/auth";
 
+// import { signIn } from "@/services/auth";
 import { SocialLoginButton } from "../../_components/social-login-button";
 
 const emailSchema = z.object({
@@ -70,6 +70,11 @@ export function SignInForm() {
       }
       const provider = isAvaliableEmail?.data?.provider;
       if (provider !== "credential") {
+        emailForm.setError("email", {
+          type: "manual",
+          message: `This Email has been created with ${provider}. Sign in with the same provider.`,
+        });
+        emailForm.setFocus("email");
         throw new Error(
           `This Email has been created with ${provider}. Sign in with the same provider.`,
         );
@@ -87,7 +92,7 @@ export function SignInForm() {
 
   const loginMutation = useMutation({
     mutationFn: async (values: z.infer<typeof loginSchema>) => {
-      const response = await signIn({
+      const response = await authClient.signIn.email({
         email: values.email,
         password: values.password,
         rememberMe,

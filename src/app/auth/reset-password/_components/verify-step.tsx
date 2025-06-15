@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import { sendEmailRequest } from "@/client-actions/send-email";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,21 +16,22 @@ import {
 } from "@/components/ui/card";
 import { LoadingOverlay } from "@/components/ui/loadingOverlay";
 
-import { sendResetEmail } from "../_helpers/send-reset-email";
 import { StepType } from "../_types";
 
 interface VerifyStepProps {
   email?: string | null;
   setStep: (step: StepType) => void;
+  url: string
+
 }
 
-export function VerifyStep({ email, setStep }: VerifyStepProps) {
+export function VerifyStep({ email, setStep, url }: VerifyStepProps) {
   const router = useRouter();
 
   const mutation = useMutation({
     mutationFn: async () => {
       if (!email) throw new Error();
-      await sendResetEmail(email);
+      await sendEmailRequest(email, url);
     },
     onSuccess: () => {
       setStep("resend-email");
@@ -50,8 +52,8 @@ export function VerifyStep({ email, setStep }: VerifyStepProps) {
           <CardDescription>
             If <strong>{email}</strong> matches a registered address, you will
             receive an email with password reset instructions. <br /> <br />
-            If you haven&apos;t received an email within 5 minutes, check your spam
-            folder,{" "}
+            If you haven&apos;t received an email within 5 minutes, check your
+            spam folder,{" "}
             <button
               onClick={() => mutation.mutate()}
               className="cursor-pointer text-blue-600 underline"

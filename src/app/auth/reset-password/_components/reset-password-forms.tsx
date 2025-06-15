@@ -14,12 +14,12 @@ interface ResetPasswordFormsProps {
 export function ResetPasswordForm({ userEmail }: ResetPasswordFormsProps) {
   const [email, setEmail] = useState<string | null>(userEmail);
   const [step, setStep] = useState<StepType>("email");
-
+  const url = "reset-password"
   switch (step) {
     case "email":
-      return <EmailStep email={email} setEmail={setEmail} setStep={setStep} />;
+      return <EmailStep email={email} setEmail={setEmail} setStep={setStep} url={url} />;
     case "verify-email":
-      return <VerifyStep email={email} setStep={setStep} />;
+      return <VerifyStep email={email} setStep={setStep} url={url}/>;
     case "resend-email":
       return <ResendStep email={email} />;
   }

@@ -1,7 +1,7 @@
 ## Implementações
 
 - [ ] Validação de email
-- [ ] Login com outra plataforma
+- [ x ] Login com outra plataforma (não sera mais necessário)
 - [ ] Prontuário do paciente
 - [ ] Colocar cache onde necessário (para rotas muito acessadas)
 - [ ] Permitir que o usuário adicione mais de uma clínica
@@ -92,4 +92,32 @@ precisamos implementar o envio do email (esperar o resend estabilizar)
 
 e para o suuário quiser reenciar o email, temos que registar isso em banco (eu acho) porque, até o momento eu pego o email pelo params, e se ele mudar e a gente enviar o email, chegará até a caixa de email dele, então ter isso em banco pe mais segudo, a gente salva com tempo de validade, o email e um id, que ao soliciar o envio, ele vai verificar o id no banco, se bater ele resgata o email e envia naquele email (talvez eu possa enviar o email junto a requisição e add o campo email, assim ele armazena tudo e quando eu quiser reenviar só consultar o email, validar o token e enviar )
 
-validar o email do usuário ao tentar resetar o password (ver se não é um email google)
+ver se precisa criptografar a senha
+
+
+
+
+
+
+proximos passos:
+
+-> validar o processo do usuário logar e ter a data de expiração do token dele diferente de quando ele seleciona o "remember-me" e ver se está expirando mesmo, fazer testes com pouco tempo
+
+-> Validar se o email está sendo enviado (esperar a verificação de domino do resend)
+
+-> componentizar o app-sidebar conforme o chat na v0: https://v0.dev/chat/open-in-v0-ZQbqsw2VaNy
+
+-> monstar a página de "profile" e a edição de:
+  - nome
+  - senha
+  - nome da clinica
+  - idioma
+  -thema
+  - envio de emails (posso adiar isso)
+
+
+
+-> implementar thema escuro
+  - quando o usuário fizer seu logout, já definir o theme conforme o do sistema dele
+
+-> implementar idioma

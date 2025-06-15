@@ -30,9 +30,9 @@ export const changeClinic = protectedActionClient
 
     return {
       id: clinic.id,
-      name: clinic.name,
+      name: clinic.clinic.name,
       role: clinic.role,
-      plan: clinic.subscriptions,
+      plan: clinic.clinic.subscriptions?.[0]?.plan,
       // plan: clinic.subscriptions?.[0]?.plan,
     };
   });
