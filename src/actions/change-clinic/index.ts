@@ -2,14 +2,21 @@
 
 import { and, eq } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { z } from "zod";
 
 import { db } from "@/db";
 import { usersToClinicsTable } from "@/db/schema";
 import { protectedActionClient } from "@/lib/next-safe-action";
 
+import { changeClinicResultSchema, changeClinicSchema } from "./schema";
+
+/**
+ * ÚNICO export runtime do arquivo!
+ * `protectedActionClient.action()` já devolve uma `async function`,
+ * então a regra do `"use server"` é satisfeita.
+ */
+
 export const changeClinic = protectedActionClient
-  .schema(z.object({ clinicId: z.string().min(1) }))
+  .schema(changeClinicSchema)
   .action(async ({ parsedInput, ctx }) => {
     const clinic = await db.query.usersToClinicsTable.findFirst({
       where: and(
@@ -28,11 +35,11 @@ export const changeClinic = protectedActionClient
     const cookieStore = await cookies();
     cookieStore.set("clinic_id", parsedInput.clinicId, { path: "/" });
 
-    return {
+    return changeClinicResultSchema.parse({
       id: clinic.id,
       name: clinic.clinic.name,
       role: clinic.role,
-      plan: clinic.clinic.subscriptions?.[0]?.plan,
-      logo: "/logo.svg"
-    };
+      plan: clinic.clinic.subscriptions?.[0]?.plan ?? null,
+      logo: "/logo.svg",
+    });
   });

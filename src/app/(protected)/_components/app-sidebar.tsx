@@ -10,10 +10,9 @@ import {
   UsersRound,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
 
-import { changeClinic } from "@/actions/change-clinic";
+import { useChangeClinicAction } from "@/client-actions/use-change-clinic";
 import {
   Sidebar,
   SidebarContent,
@@ -38,6 +37,7 @@ export function AppSidebar() {
   const router = useRouter();
   const { data: session } = authClient.useSession();
   const [openForm, setOPenForm] = useState(false);
+  const changeClinicAction = useChangeClinicAction();
 
   // -------------------------------------------------------------------------
   // Domain‑level data --------------------------------------------------------
@@ -91,11 +91,6 @@ export function AppSidebar() {
   // Actions ------------------------------------------------------------------
   // -------------------------------------------------------------------------
 
-  const { execute: selectClinic } = useAction(changeClinic, {
-    // aqui preciso exibir ativivar um loader enquando a action está sendo realizada, como o LoadingOverlay passanod a mensagem
-    onSuccess: () => router.refresh(),
-  });
-
   const handleSignOut = async () => {
     await authClient.signOut({
       fetchOptions: { onSuccess: () => router.push("/auth/sign-in") },
@@ -108,8 +103,7 @@ export function AppSidebar() {
 
   return (
     <>
-    {/* TODO: melhorar a abertura e fechamanto do componente */}
-      {openForm && <ClinicFormComponent isOpen={openForm}/>}
+      {openForm && <ClinicFormComponent isOpen={openForm} setIsOpen={() => setOPenForm(false)}/>}
       <Sidebar>
         <SidebarHeader className="border-b-4 p-2">
           {/* <Image
@@ -120,10 +114,12 @@ export function AppSidebar() {
           priority
         /> */}
           <ClinicSelector
-            clinics={session?.user.clinics}
+            clinics={session?.user.clinics ?? []}
             selectedClinic={session?.user.clinic}
-            onSelectClinic={(id) => selectClinic({ clinicId: id })}
-            onAddClinic={() => setOPenForm(openForm!)}
+            onSelectClinic={({ clinicId }) =>
+              changeClinicAction.execute({ clinicId })
+            }
+            onAddClinic={() => setOPenForm(true)}
           />
         </SidebarHeader>
 

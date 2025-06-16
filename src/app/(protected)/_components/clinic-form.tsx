@@ -8,9 +8,17 @@ import {
 
 import ClinicForm from "../clinic-form/_components/form";
 
-const ClinicFormComponent = (isOPen: boolean) => {
+interface ClinicFormComponentProps {
+  isOpen: boolean;
+  setIsOpen: () => void;
+}
+
+const ClinicFormComponent = ({
+  isOpen,
+  setIsOpen,
+}: ClinicFormComponentProps) => {
   return (
-    <Dialog open={isOPen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add a clinic</DialogTitle>

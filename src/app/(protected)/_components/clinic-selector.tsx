@@ -3,6 +3,7 @@
 import { CheckIcon, ChevronsUpDownIcon, PlusIcon } from "lucide-react";
 import * as React from "react";
 
+import { ChangeClinicInput } from "@/actions/change-clinic";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -22,14 +23,14 @@ interface Clinic {
   id: string;
   name: string;
   role: string;
-  plan: string;
+  plan: string | null;
   logo: string;
 }
 
 interface ClinicSelectorProps {
   clinics: Clinic[];
-  selectedClinic?: Clinic;
-  onSelectClinic?: (clinicId: string) => void;
+  selectedClinic?: Clinic |null;
+  onSelectClinic?: (input: ChangeClinicInput) => void | Promise<void>;
   onAddClinic?: () => void;
 }
 
@@ -54,7 +55,9 @@ export function ClinicSelector({
               <span className="text-sm font-semibold">NC</span>
             </div>
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-semibold">Does not have any Clinic</span>
+              <span className="truncate font-semibold">
+                Does not have any Clinic
+              </span>
               <span className="text-muted-foreground truncate text-xs">
                 Add a clinic
               </span>
