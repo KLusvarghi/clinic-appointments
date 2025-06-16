@@ -89,6 +89,7 @@ export const auth = betterAuth({
         name: c.clinic.name,
         plan: c.clinic.subscriptions?.[0]?.plan,
         role: c.role,
+        logo: "/logo.svg",
       }));
 
       const cookies = parseCookies(ctx.headers?.get("cookie"));
@@ -104,6 +105,8 @@ export const auth = betterAuth({
             user: {
               columns: {
                 email: true,
+                name: true,
+                image: true,
               },
             },
           },
@@ -120,6 +123,8 @@ export const auth = betterAuth({
                 id: currentClinic.id,
                 name: currentClinic.name,
                 role: currentClinic.role,
+                plan: currentClinic.plan,
+                logo: "/logo.svg",
               }
             : undefined,
         },

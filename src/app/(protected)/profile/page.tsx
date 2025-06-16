@@ -21,7 +21,7 @@ const ProfilePage = async () => {
       <PageContainer>
         <PageHeader>
           <PageHeaderContent>
-            <PageTitle>Settings</PageTitle>
+            <PageTitle>My Profile</PageTitle>
             <PageDescription>Update your profile information</PageDescription>
           </PageHeaderContent>
         </PageHeader>
