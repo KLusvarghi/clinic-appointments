@@ -28,19 +28,21 @@ export function LoadingOverlay({
       className="fixed inset-0 z-50 grid place-items-center"
     >
       {/* backdrop */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" />
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
 
       {/* conteúdo do loading */}
       <Card className="animate-in fade-in zoom-in-95 relative z-10 min-w-[280px]">
-        <CardHeader className="items-center space-y-3">
+        <CardHeader className="flex flex-col items-center justify-center space-y-3 px-0 pt-6 pb-6">
           <Loader2
             aria-hidden="true"
             className="text-primary h-8 w-8 animate-spin"
           />
           <CardTitle className="text-center text-lg">{message}</CardTitle>
-          <CardDescription className="text-center">
-            {subMessage}
-          </CardDescription>
+          {subMessage && (
+            <CardDescription className="text-center">
+              {subMessage}
+            </CardDescription>
+          )}
         </CardHeader>
       </Card>
     </div>

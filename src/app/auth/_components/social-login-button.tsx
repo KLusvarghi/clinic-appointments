@@ -9,12 +9,14 @@ interface SocialLoginButtonProps {
   provider: "google" | "linkedin" | "sso";
   onClick: () => void;
   text: string;
+  isLoading?: boolean
 }
 
 export function SocialLoginButton({
   provider,
   onClick,
   text,
+  isLoading
 }: SocialLoginButtonProps) {
   const config = {
     google: {
@@ -37,9 +39,10 @@ export function SocialLoginButton({
       variant="outline"
       onClick={onClick}
       className="h-12 w-full justify-center gap-2"
+      disabled={isLoading}
     >
       {config.icon}
-      {config.text}
+      {isLoading ? "Signing in..." : config.text}
     </Button>
   );
 }

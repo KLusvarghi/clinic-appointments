@@ -112,6 +112,23 @@ export function SignInForm() {
     },
   });
 
+  const googleMutation = useMutation({
+    mutationFn: async () => {
+      const response = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/dashboard",
+        scopes: ["email", "profile"],
+      });
+      if (!response?.data?.redirect) {
+        throw new Error("Authentication failed");
+      }
+      return response;
+    },
+    onError: () => {
+      toast.error("Invalid email or password");
+    },
+  });
+
   const onEmailSubmit = (values: z.infer<typeof emailSchema>) => {
     emailMutation.mutate(values);
   };
@@ -119,20 +136,16 @@ export function SignInForm() {
   const onLoginSubmit = (values: z.infer<typeof loginSchema>) => {
     loginMutation.mutate(values);
   };
+  
+  const handleGoogle = async () => {
+    googleMutation.mutate();
+  };
 
   const handleBackToEmail = () => {
     setStep("email");
     setEmail("");
     loginForm.reset();
     emailForm.reset();
-  };
-
-  const handleGoogle = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/dashboard",
-      scopes: ["email", "profile"],
-    });
   };
 
   return (
@@ -304,6 +317,7 @@ export function SignInForm() {
                 provider="google"
                 text="Sign in with Google"
                 onClick={handleGoogle}
+                isLoading={googleMutation.isPending}
               />
             </div>
           </>

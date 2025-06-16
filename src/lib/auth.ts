@@ -37,6 +37,8 @@ export const auth = betterAuth({
     provider: "pg",
     usePlural: true, // para que o drizzle use o plural do nome da tabela
     schema,
+    // sync: process.env.NODE_ENV === "development",
+
   }),
   cookieOptions: {
     secure: process.env.NODE_ENV !== "development",
@@ -107,7 +109,6 @@ export const auth = betterAuth({
               columns: {
                 email: true,
                 name: true,
-                image: true,
               },
             },
           },
@@ -138,23 +139,23 @@ export const auth = betterAuth({
   user: {
     modelName: "usersTable",
     // passando esses campos adicionais para o schema do user, que não estão no schema que criamos, mas que o better-auth criou
-    additionalFields: {
-      preferences: {
-        type: "string[]",
-        fieldName: "preferences",
-        required: false,
-      },
-      lastLoginAt: {
-        type: "date",
-        fieldName: "lastLoginAt",
-        required: false,
-      },
-      deletedAt: {
-        type: "date",
-        fieldName: "deletedAt",
-        required: false,
-      },
-    },
+    // additionalFields: {
+    //   preferences: {
+    //     type: "string[]",
+    //     fieldName: "preferences",
+    //     required: false,
+    //   },
+    //   lastLoginAt: {
+    //     type: "date",
+    //     fieldName: "lastLoginAt",
+    //     required: false,
+    //   },
+    //   deletedAt: {
+    //     type: "date",
+    //     fieldName: "deletedAt",
+    //     required: false,
+    //   },
+    // },
   },
   session: {
     cookieCache: {

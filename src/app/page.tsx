@@ -1,3 +1,5 @@
+"use-client";
+
 import {
   ArrowRight,
   BarChart3,
@@ -54,7 +56,9 @@ export default function Home() {
             >
               Contato
             </Link>
-            <Button variant="outline">Entrar</Button>
+            <Button variant="outline">
+              Entrar
+            </Button>
             <Button>Começar Grátis</Button>
           </nav>
           <Button variant="ghost" size="icon" className="md:hidden">
