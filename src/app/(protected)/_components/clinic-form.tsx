@@ -24,7 +24,7 @@ const ClinicFormComponent = ({
           <DialogTitle>Add a clinic</DialogTitle>
           <DialogDescription>Add a clinic to continue.</DialogDescription>
         </DialogHeader>
-        <ClinicForm />
+        <ClinicForm setIsOpen/>
       </DialogContent>
     </Dialog>
   );

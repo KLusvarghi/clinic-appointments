@@ -39,7 +39,6 @@ export async function sendEmail({ user, token, options }: EmailSendOptions) {
     from: process.env.RESEND_FROM_EMAIL,
     to: user.email,
     subject: options.subject,
-    html: "<p>it works!</p>",
-    // react: reactTemplate,
+    react: reactTemplate,
   });
 }

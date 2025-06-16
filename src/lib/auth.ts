@@ -14,7 +14,7 @@ import {
   usersToClinicsTable,
 } from "@/db/schema";
 
-// import { sendVerificationEmail } from "./email/send-verification-email";
+// import { sendEmail } from "./email/send-verification-email";
 import { parseCookies } from "./utils";
 
 type UserToClinic = typeof usersToClinicsTable.$inferSelect;
@@ -28,8 +28,9 @@ type ExtendedUserToClinic = UserToClinic & {
 };
 
 // neste caso, exécificamos o tempo para evitar números mágicos, ficando mais facil a compreensão
-const FIVE_MINUTES = 5 * 60;
 const TWO_MINUTE = 60 * 2;
+const FIVE_MINUTES = 5 * 60;
+const FIVE_DAYS = 60 * 60 * 24 * 5;
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -160,6 +161,7 @@ export const auth = betterAuth({
       enabled: true,
       maxAge: FIVE_MINUTES,
     },
+    expiresIn: FIVE_DAYS,
     cookieName: "better-auth.session_token",
     modelName: "sessionsTable",
   },
@@ -194,7 +196,7 @@ export const auth = betterAuth({
     modelName: "usersToClinicsTable",
   },
   // emailVerification: {
-  //   sendVerificationEmail,
+  //   sendEmail,
   //   sendOnSignUp: true,
   // },
   emailAndPassword: {

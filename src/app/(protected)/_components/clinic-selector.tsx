@@ -3,7 +3,7 @@
 import { CheckIcon, ChevronsUpDownIcon, PlusIcon } from "lucide-react";
 import * as React from "react";
 
-import { ChangeClinicInput } from "@/actions/change-clinic";
+import { ChangeClinicInput } from "@/actions/change-clinic/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -29,7 +29,7 @@ interface Clinic {
 
 interface ClinicSelectorProps {
   clinics: Clinic[];
-  selectedClinic?: Clinic |null;
+  selectedClinic?: Clinic | null;
   onSelectClinic?: (input: ChangeClinicInput) => void | Promise<void>;
   onAddClinic?: () => void;
 }
@@ -114,7 +114,7 @@ export function ClinicSelector({
               <DropdownMenuItem
                 key={clinic.id}
                 onClick={() => {
-                  onSelectClinic?.(clinic.id);
+                  onSelectClinic?.({ clinicId: clinic.id });
                   setOpen(false);
                 }}
                 className="flex cursor-pointer items-center gap-3 px-2 py-2"

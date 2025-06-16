@@ -29,15 +29,15 @@ export interface Clinic {
 }
 
 export interface UserSession {
-  user: {
-    email: string;
-    image: string | null;
-    name: string;
+  user?: {
+    email?: string;
+    image?: string | null;
+    name?: string;
   };
 }
 
 interface NavUserProps {
-  session: UserSession
+  session?: UserSession | null;
   onSignOut: () => void;
 }
 
@@ -65,9 +65,7 @@ export function NavUser({ session, onSignOut }: NavUserProps) {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="text-sm font-medium">
-                  {session?.user?.name}
-                </p>
+                <p className="text-sm font-medium">{session?.user?.name}</p>
                 <p className="text-muted-foreground text-sm">
                   {session?.user?.email}
                 </p>

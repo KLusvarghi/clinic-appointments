@@ -24,7 +24,11 @@ const clinicFormSchema = z.object({
   name: z.string().trim().min(1, { message: "Clinic name is required" }),
 });
 
-const ClinicForm = () => {
+interface ClinicFormComponentProps {
+  setIsOpen: () => void;
+}
+
+const ClinicForm = ({ setIsOpen }: ClinicFormComponentProps) => {
   const form = useForm<z.infer<typeof clinicFormSchema>>({
     resolver: zodResolver(clinicFormSchema),
     defaultValues: {
@@ -39,6 +43,7 @@ const ClinicForm = () => {
     } catch (error) {
       // como no nosso server component, temos o redirect, temos que tratar isso aqui, já que ele gerá um erro que não é um erro de servidor, mas sim um erro de redirect:
       if (isRedirectError(error)) {
+        setIsOpen();
         return;
       }
       toast.error("Error creating clinic");
@@ -66,7 +71,8 @@ const ClinicForm = () => {
             <Button type="submit" disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting ? (
                 <>
-                  <Loader2 className="mr-2 w-4 animate-spin" /> Creating clinic...
+                  <Loader2 className="mr-2 w-4 animate-spin" /> Creating
+                  clinic...
                 </>
               ) : (
                 "Create clinic"

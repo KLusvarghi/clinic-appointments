@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useEmailVerified } from "@/hooks/use-email-verified";
-import { sendVerificationEmail } from "@/lib/email/send";
 
 interface ProfileFormProps {
   user: {
@@ -48,7 +47,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
 
   const resendMutation = useMutation({
     mutationFn: async () => {
-      await sendVerificationEmail(user.email);
+      // await sendEmail(user.email);
     },
     onSuccess: () => toast.success("Verification email sent"),
     onError: () => toast.error("Failed to send verification email"),

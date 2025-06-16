@@ -103,7 +103,12 @@ export function AppSidebar() {
 
   return (
     <>
-      {openForm && <ClinicFormComponent isOpen={openForm} setIsOpen={() => setOPenForm(false)}/>}
+      {openForm && (
+        <ClinicFormComponent
+          isOpen={openForm}
+          setIsOpen={() => setOPenForm(false)}
+        />
+      )}
       <Sidebar>
         <SidebarHeader className="border-b-4 p-2">
           {/* <Image
