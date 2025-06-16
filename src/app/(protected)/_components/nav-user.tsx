@@ -105,10 +105,10 @@ export function NavUser({ session, onSignOut }: NavUserProps) {
 
             <DropdownMenuItem
               onClick={() => {
-                router.push("/profile");
+                router.push("/settings");
               }}
             >
-              Profile
+              Settings
             </DropdownMenuItem>
 
             <DropdownMenuItem

@@ -103,20 +103,17 @@ proximos passos:
 
 -> ter maneira de passar para o compoente pai de todos ou layout, o overlaylaod, e quando mudar o estado dele, ele aparece em tele, porque, precisaremos aplicar isso para quando quisermos fazer log out
 
--> implementar a troca de clinica (se houver mais de uma) pelo componente que é exibido a imagem/logo da clinica
 
--> validar o processo do usuário logar e ter a data de expiração do token dele diferente de quando ele seleciona o "remember-me" e ver se está expirando mesmo, fazer testes com pouco tempo
 
 -> Validar se o email está sendo enviado (esperar a verificação de domino do resend)
 
--> componentizar o app-sidebar conforme o chat na v0: https://v0.dev/chat/open-in-v0-ZQbqsw2VaNy
 
 -> monstar a página de "profile" e a edição de:
   - nome
   - senha
   - nome da clinica
   - idioma
-  -thema
+  - thema
   - envio de emails (posso adiar isso)
 
 

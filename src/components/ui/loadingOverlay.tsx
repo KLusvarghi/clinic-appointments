@@ -28,7 +28,7 @@ export function LoadingOverlay({
       className="fixed inset-0 z-50 grid place-items-center"
     >
       {/* backdrop */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" />
 
       {/* conteúdo do loading */}
       <Card className="animate-in fade-in zoom-in-95 relative z-10 min-w-[280px]">

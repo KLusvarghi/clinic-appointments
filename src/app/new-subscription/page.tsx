@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
 
-import SubscriptionPlan from "../(protected)/subscription/_components/subscription-plan";
+import SubscriptionPlan from "../(protected)/settings/subscription/_components/subscription-plan";
 
 export default async function Home() {
   const session = await auth.api.getSession({
