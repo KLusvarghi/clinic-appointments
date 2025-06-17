@@ -6,6 +6,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { Toaster } from "@/components/ui/sonner";
 import { ReactQueryProvider } from "@/providers/react-query";
+import { ThemeProvider } from "@/providers/theme-provider";
 
 const monrope = Manrope({
   variable: "--font-monrope",
@@ -24,13 +25,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${monrope.variable} antialiased`}
-      >
-        <ReactQueryProvider>
-          <NuqsAdapter>{children}</NuqsAdapter>
-        </ReactQueryProvider>
-        <Toaster position="bottom-center" richColors theme="light" />
+      <body className={`${monrope.variable} antialiased`}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ReactQueryProvider>
+            <NuqsAdapter>{children}</NuqsAdapter>
+          </ReactQueryProvider>
+          <Toaster position="bottom-center" richColors />
+        </ThemeProvider>
       </body>
     </html>
   );
