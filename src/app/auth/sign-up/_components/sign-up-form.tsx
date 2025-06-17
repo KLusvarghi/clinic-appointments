@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { Check, Loader2, X } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -11,6 +11,7 @@ import { z } from "zod";
 
 import { verifyEmail } from "@/actions/get-verify-email";
 import { sendEmailRequest } from "@/client-actions/send-email";
+import { PasswordRequirements } from "@/components/password-requirements";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -29,6 +30,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  isPasswordValid,
+  usePasswordValidation,
+} from "@/hooks/use-password-validation";
 import { authClient } from "@/lib/auth-client";
 
 import { SocialLoginButton } from "../../_components/social-login-button";
@@ -42,42 +47,17 @@ const registerSchema = z.object({
     .min(8, { message: "Password must be at least 8 characters" }),
 });
 
-// Password validation type and function
-type PasswordValidation = {
-  minLength: boolean;
-  hasUppercase: boolean;
-  hasLowercase: boolean;
-  hasNumber: boolean;
-  hasSpecialChar: boolean;
-};
-
-// Password validation function
-function validatePassword(password: string): PasswordValidation {
-  return {
-    minLength: password.length >= 8,
-    hasUppercase: /[A-Z]/.test(password),
-    hasLowercase: /[a-z]/.test(password),
-    hasNumber: /\d/.test(password),
-    hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-  };
-}
-
-function isPasswordValid(validation: PasswordValidation) {
-  return Object.values(validation).every(Boolean);
-}
 
 export function SignUpForm() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const router = useRouter();
-  const [passwordValidation, setPasswordValidation] =
-    useState<PasswordValidation>({
-      minLength: false,
-      hasUppercase: false,
-      hasLowercase: false,
-      hasNumber: false,
-      hasSpecialChar: false,
-    });
-  const [showPasswordValidation, setShowPasswordValidation] = useState(false);
+  const {
+    passwordValidation,
+    showPasswordValidation,
+    handleChange: handlePasswordChange,
+    handleFocus,
+    handleBlur,
+  } = usePasswordValidation();
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -131,16 +111,6 @@ export function SignUpForm() {
     });
   };
 
-  const handlePasswordChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    fieldOnChange: (value: string) => void,
-  ) => {
-    const value = e.target.value;
-    fieldOnChange(value);
-    const validation = validatePassword(value);
-    setPasswordValidation(validation);
-    setShowPasswordValidation(value.length > 0);
-  };
 
   return (
     <>
@@ -197,8 +167,8 @@ export function SignUpForm() {
                         onChange={(e) =>
                           handlePasswordChange(e, field.onChange)
                         }
-                        onFocus={() => setShowPasswordValidation(!!field.value)}
-                        onBlur={() => setShowPasswordValidation(false)}
+                        onFocus={() => handleFocus(field.value)}
+                        onBlur={handleBlur}
                         aria-invalid={
                           !isPasswordValid(passwordValidation) && field.value
                             ? true
@@ -212,63 +182,7 @@ export function SignUpForm() {
               />
               {showPasswordValidation &&
                 !isPasswordValid(passwordValidation) && (
-                  <div className="mt-2 space-y-1 rounded-md bg-gray-50 p-3">
-                    <div className="text-sm text-gray-600">
-                      <p className="mb-2">Your password must contain:</p>
-                      <div className="space-y-1">
-                        <div
-                          className={`flex items-center ${passwordValidation.minLength ? "text-green-600" : "text-gray-500"}`}
-                        >
-                          {passwordValidation.minLength ? (
-                            <Check className="mr-2 h-3 w-3" />
-                          ) : (
-                            <X className="mr-2 h-3 w-3" />
-                          )}
-                          8 or more characters
-                        </div>
-                        <div
-                          className={`flex items-center ${passwordValidation.hasUppercase ? "text-green-600" : "text-gray-500"}`}
-                        >
-                          {passwordValidation.hasUppercase ? (
-                            <Check className="mr-2 h-3 w-3" />
-                          ) : (
-                            <X className="mr-2 h-3 w-3" />
-                          )}
-                          Uppercase letter
-                        </div>
-                        <div
-                          className={`flex items-center ${passwordValidation.hasLowercase ? "text-green-600" : "text-gray-500"}`}
-                        >
-                          {passwordValidation.hasLowercase ? (
-                            <Check className="mr-2 h-3 w-3" />
-                          ) : (
-                            <X className="mr-2 h-3 w-3" />
-                          )}
-                          Lowercase letter
-                        </div>
-                        <div
-                          className={`flex items-center ${passwordValidation.hasNumber ? "text-green-600" : "text-gray-500"}`}
-                        >
-                          {passwordValidation.hasNumber ? (
-                            <Check className="mr-2 h-3 w-3" />
-                          ) : (
-                            <X className="mr-2 h-3 w-3" />
-                          )}
-                          Number
-                        </div>
-                        <div
-                          className={`flex items-center ${passwordValidation.hasSpecialChar ? "text-green-600" : "text-gray-500"}`}
-                        >
-                          {passwordValidation.hasSpecialChar ? (
-                            <Check className="mr-2 h-3 w-3" />
-                          ) : (
-                            <X className="mr-2 h-3 w-3" />
-                          )}
-                          Special character
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <PasswordRequirements validation={passwordValidation} />
                 )}
 
               {/* {errors.password && (

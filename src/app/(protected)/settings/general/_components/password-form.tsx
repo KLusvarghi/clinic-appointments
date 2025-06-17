@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { updatePassword } from "@/actions/update-password";
+import { PasswordRequirements } from "@/components/password-requirements";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -18,10 +19,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  isPasswordValid,
+  usePasswordValidation,
+} from "@/hooks/use-password-validation";
 
 const formSchema = z.object({
   currentPassword: z.string().min(1, { message: "Required" }),
-  newPassword: z.string().min(6, { message: "Min 6 characters" }),
+  newPassword: z.string().min(8, { message: "Password must be at least 8 characters" }),
 });
 
 export default function PasswordForm() {
@@ -29,6 +34,14 @@ export default function PasswordForm() {
     resolver: zodResolver(formSchema),
     defaultValues: { currentPassword: "", newPassword: "" },
   });
+
+  const {
+    passwordValidation,
+    showPasswordValidation,
+    handleChange: handlePasswordChange,
+    handleFocus,
+    handleBlur,
+  } = usePasswordValidation();
 
   const action = useAction(updatePassword, {
     onSuccess: () => {
@@ -65,13 +78,31 @@ export default function PasswordForm() {
             <FormItem>
               <FormLabel>New password</FormLabel>
               <FormControl>
-                <Input type="password" {...field} />
+                <Input
+                  type="password"
+                  {...field}
+                  onChange={(e) => handlePasswordChange(e, field.onChange)}
+                  onFocus={() => handleFocus(field.value)}
+                  onBlur={handleBlur}
+                  aria-invalid={
+                    !isPasswordValid(passwordValidation) && field.value
+                      ? true
+                      : undefined
+                  }
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={action.isPending}>
+        {showPasswordValidation &&
+          !isPasswordValid(passwordValidation) && (
+            <PasswordRequirements validation={passwordValidation} />
+          )}
+        <Button
+          type="submit"
+          disabled={action.isPending || !isPasswordValid(passwordValidation)}
+        >
           {action.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Save
           changes
         </Button>
