@@ -13,7 +13,6 @@ import SessionsTable from "./_components/sessions-table";
 
 const SessionsPage = async () => {
 
-
   return (
     <WithAuthentication mustHaveRole="ADMIN">
       <PageContainer>

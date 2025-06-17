@@ -262,7 +262,7 @@ export const getDashboard = async ({ from, to, session }: Params) => {
       .select({
         id: doctorsTable.id,
         name: doctorsTable.name,
-        avatarImageUrl: doctorsTable.avatarImageUrl,
+        // avatarImageUrl: doctorsTable.,
         specialty: doctorsTable.specialty,
         appointments: count(appointmentsTable.id),
       })

@@ -44,9 +44,9 @@ export default function SettingsLayout({
   const pathname = usePathname();
 
   return (
-    <div className="bg-background flex min-h-screen">
+    <div className=" flex min-h-screen">
       {/* Sidebar Navigation */}
-      <div className="bg-muted/10 w-64 p-6">
+      <div className="w-64 p-6">
         <div className="mb-8">
           <h1 className="text-2xl font-semibold">Settings</h1>
         </div>
@@ -75,7 +75,7 @@ export default function SettingsLayout({
 
       {/* Main Content */}
       <div className="flex-1">
-        <div className="container max-w-4xl py-8">{children}</div>
+        <div className="container max-w-4xl py-12">{children}</div>
       </div>
     </div>
   );

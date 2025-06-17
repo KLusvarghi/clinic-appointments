@@ -101,19 +101,18 @@ ver se precisa criptografar a senha
 
 proximos passos:
 
--> ter maneira de passar para o compoente pai de todos ou layout, o overlaylaod, e quando mudar o estado dele, ele aparece em tele, porque, precisaremos aplicar isso para quando quisermos fazer log out
-
 
 
 -> Validar se o email está sendo enviado (esperar a verificação de domino do resend)
 
 
 -> monstar a página de "profile" e a edição de:
-  - nome
-  - senha
-  - nome da clinica
-  - idioma
-  - thema
+  - nome (consiga alterar o nome do usuário)
+  - senha (consiga alterar a senha do usuário)
+  - nome da clinica (consiga alterar nome da clinica)
+  - idioma (consiga alterar o idioma do sistema, sendo um select com os idiomas)
+  - theme (consiga alterar o theme, entre claro, escuro e do sistema do usuário)
+    - com isso já implemente a mudança de theme
   - envio de emails (posso adiar isso)
 
 

@@ -40,6 +40,6 @@ export const changeClinic = protectedActionClient
       name: clinic.clinic.name,
       role: clinic.role,
       plan: clinic.clinic.subscriptions?.[0]?.plan ?? null,
-      logo: "/logo.svg",
+      // logo: "/logo.svg",
     });
   });

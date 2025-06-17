@@ -109,6 +109,7 @@ export const auth = betterAuth({
               columns: {
                 email: true,
                 name: true,
+                preferences: true,
               },
             },
           },

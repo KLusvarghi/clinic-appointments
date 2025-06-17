@@ -106,8 +106,11 @@ export function AppSidebar() {
 
   return (
     <>
-      {isSigningOut && <LoadingOverlay message="Signing out..." />}
-
+      {(isSigningOut || changeClinicAction.isPending) && (
+        <LoadingOverlay
+          message={isSigningOut ? "Signing out..." : "Switching clinic..."}
+        />
+      )}
       {openForm && (
         <ClinicFormComponent
           isOpen={openForm}

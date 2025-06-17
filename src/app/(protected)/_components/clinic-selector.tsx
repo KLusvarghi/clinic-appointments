@@ -24,7 +24,7 @@ interface Clinic {
   name: string;
   role: string;
   plan: string | null;
-  logo: string;
+  // logo: string;
 }
 
 interface ClinicSelectorProps {
@@ -82,7 +82,7 @@ export function ClinicSelector({
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-blue-600 text-white">
                 <Avatar className="h-6 w-6">
                   <AvatarImage
-                    src={currentClinic.logo || "/placeholder.svg"}
+                    src={"/placeholder.svg"}
                     alt={currentClinic.name}
                   />
                   <AvatarFallback className="rounded-lg bg-transparent text-xs font-semibold text-white">
@@ -122,7 +122,7 @@ export function ClinicSelector({
                 <div className="flex size-6 items-center justify-center rounded-md bg-blue-600 text-white">
                   <Avatar className="h-4 w-4">
                     <AvatarImage
-                      src={clinic.logo || "/placeholder.svg"}
+                      src={"/placeholder.svg"}
                       alt={clinic.name}
                     />
                     <AvatarFallback className="rounded-md bg-transparent text-xs font-semibold text-white">

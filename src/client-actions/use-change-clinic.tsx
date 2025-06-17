@@ -14,7 +14,8 @@ export function useChangeClinicAction() {
   return useAction(changeClinic, {
     onSuccess: () => {
       session.refetch();
-      router.refresh();
+      // router.refresh();
+      router.push('/dashboard');
     },
   });
 }
