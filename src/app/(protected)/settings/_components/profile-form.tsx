@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useAutoSaveSetting } from "@/hooks/use-auto-save-setting";
 import { useEmailVerified } from "@/hooks/use-email-verified";
 
 interface ProfileFormProps {
@@ -40,10 +41,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
     defaultValues: { name: user.name },
   });
 
-  const updateAction = useAction(updateProfile, {
-    onSuccess: () => toast.success("Profile updated"),
-    onError: () => toast.error("Failed to update profile"),
-  });
+  const updateAction = useAction(updateProfile);
 
   const resendMutation = useMutation({
     mutationFn: async () => {
@@ -53,13 +51,13 @@ export default function ProfileForm({ user }: ProfileFormProps) {
     onError: () => toast.error("Failed to send verification email"),
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    updateAction.execute(values);
-  };
+  const savingState = useAutoSaveSetting(form.watch("name"), (v) =>
+    updateAction.executeAsync({ name: v }),
+  );
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -69,6 +67,12 @@ export default function ProfileForm({ user }: ProfileFormProps) {
               <FormControl>
                 <Input {...field} />
               </FormControl>
+              {savingState === "saving" && (
+                <p className="text-muted-foreground text-xs">Saving…</p>
+              )}
+              {savingState === "idle" && (
+                <p className="text-xs text-green-600">Saved</p>
+              )}
               <FormMessage />
             </FormItem>
           )}
@@ -98,13 +102,6 @@ export default function ProfileForm({ user }: ProfileFormProps) {
             </div>
           )}
         </div>
-
-        <Button type="submit" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting && (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          )}
-          Save changes
-        </Button>
       </form>
     </Form>
   );
