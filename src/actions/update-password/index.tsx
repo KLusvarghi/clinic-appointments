@@ -13,7 +13,9 @@ export const updatePassword = protectedActionClient
   .schema(
     z.object({
       currentPassword: z.string(),
-      newPassword: z.string().min(6, { message: "Password must have at least 6 characters" }),
+      newPassword: z
+        .string()
+        .min(8, { message: "Password must be at least 8 characters" }),
     }),
   )
   .action(async ({ parsedInput, ctx }) => {
