@@ -1,15 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useTheme } from "next-themes";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import { updatePreferences } from "@/actions/update-preferences";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -18,7 +16,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useAutoSaveSetting } from "@/hooks/use-auto-save-setting";
 
 const formSchema = z.object({
   language: z.string().optional(),
@@ -30,27 +35,31 @@ interface PreferencesFormProps {
   defaultTheme: "light" | "dark" | "system" | null;
 }
 
-export default function PreferencesForm({ defaultLanguage, defaultTheme }: PreferencesFormProps) {
+export default function PreferencesForm({
+  defaultLanguage,
+  defaultTheme,
+}: PreferencesFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { language: defaultLanguage ?? "en", theme: defaultTheme ?? "system" },
+    defaultValues: {
+      language: defaultLanguage ?? "en",
+      theme: defaultTheme ?? "system",
+    },
   });
 
   const { setTheme } = useTheme();
 
-  const action = useAction(updatePreferences, {
-    onSuccess: () => toast.success("Preferences updated"),
-    onError: () => toast.error("Failed to update preferences"),
-  });
+  const action = useAction(updatePreferences);
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    action.execute(values);
+  const values = form.watch();
+  const savingState = useAutoSaveSetting(values, (v) => action.executeAsync(v));
+  useEffect(() => {
     setTheme(values.theme);
-  };
+  }, [values.theme, setTheme]);
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form className="space-y-4">
         <FormField
           control={form.control}
           name="language"
@@ -58,7 +67,10 @@ export default function PreferencesForm({ defaultLanguage, defaultTheme }: Prefe
             <FormItem>
               <FormLabel>Language</FormLabel>
               <FormControl>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <SelectTrigger className="w-[200px]">
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
@@ -80,7 +92,10 @@ export default function PreferencesForm({ defaultLanguage, defaultTheme }: Prefe
             <FormItem>
               <FormLabel>Theme</FormLabel>
               <FormControl>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <SelectTrigger className="w-[200px]">
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
@@ -95,10 +110,12 @@ export default function PreferencesForm({ defaultLanguage, defaultTheme }: Prefe
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={action.isPending}>
-          {action.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Save
-          changes
-        </Button>
+        {savingState === "saving" && (
+          <p className="text-muted-foreground text-xs">Saving…</p>
+        )}
+        {savingState === "idle" && (
+          <p className="text-xs text-green-600">Saved</p>
+        )}
       </form>
     </Form>
   );

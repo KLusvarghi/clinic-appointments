@@ -118,8 +118,8 @@ export default function GeneralSettingsPage() {
           <div>
             <Label className="text-base font-medium">Leave Organization</Label>
             <p className="text-muted-foreground text-sm">
-              Once you leave, you'll lose access to this organization. The
-              organization data won't be deleted.
+              Once you leave, you&apos;ll lose access to this organization. The
+              organization data won&apos;t be deleted.
             </p>
           </div>
           <Button variant="outline" className="text-muted-foreground">
