@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 
+import { PageContainer, PageContent } from "@/components/ui/page-container";
 import WithAuthentication from "@/hocs/with-authentication";
 import { auth } from "@/lib/auth";
 
@@ -13,15 +14,19 @@ export default async function GeneralSettingsPage() {
 
   return (
     <WithAuthentication mustHaveClinic>
-      <div className="space-y-8 pt-12">
-        <ProfileForm user={{ name: session!.user.name, email: session!.user.email }} />
-        <ClinicNameForm defaultName={session!.user.clinic!.name} />
-        <PasswordForm />
-        <PreferencesForm
-          defaultLanguage={session!.user.preferences?.language}
-          defaultTheme={session!.user.preferences?.theme}
-        />
-      </div>
+      <PageContainer>
+        <PageContent>
+          <ProfileForm
+            user={{ name: session!.user.name, email: session!.user.email }}
+          />
+          <ClinicNameForm defaultName={session!.user.clinic!.name} />
+          <PasswordForm />
+          <PreferencesForm
+            defaultLanguage={session!.user.preferences?.language}
+            defaultTheme={session!.user.preferences?.theme}
+          />
+        </PageContent>
+      </PageContainer>
     </WithAuthentication>
   );
 }
