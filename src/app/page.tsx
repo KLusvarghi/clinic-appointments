@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,8 +27,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useLocale } from "@/providers/locale-provider";
 
 export default function Home() {
+  const { t } = useLocale();
   return (
     <div className="bg-background min-h-screen">
       {/* Header */}
@@ -42,28 +45,27 @@ export default function Home() {
               href="#features"
               className="text-muted-foreground hover:text-foreground"
             >
-              Recursos
+              {t("nav.features")}
             </Link>
             <Link
               href="#pricing"
               className="text-muted-foreground hover:text-foreground"
             >
-              Preços
+              {t("nav.pricing")}
             </Link>
             <Link
               href="#contact"
               className="text-muted-foreground hover:text-foreground"
             >
-              Contato
+              {t("nav.contact")}
             </Link>
-            <Button variant="outline">
-              Entrar
-            </Button>
-            <Button>Começar Grátis</Button>
+            <Button variant="outline">{t("nav.signIn")}</Button>
+            <Button>{t("nav.startFree")}</Button>
           </nav>
           <Button variant="ghost" size="icon" className="md:hidden">
             <Menu className="h-6 w-6" />
           </Button>
+          <LanguageSwitcher />
         </div>
       </header>
 
@@ -71,38 +73,35 @@ export default function Home() {
       <section className="px-4 py-20">
         <div className="container mx-auto max-w-4xl text-center">
           <Badge variant="secondary" className="mb-4">
-            ✨ Novo: Integração com WhatsApp disponível
+            {t("hero.newIntegration")}
           </Badge>
           <h1 className="from-primary to-primary/60 mb-6 bg-gradient-to-r bg-clip-text text-4xl font-bold text-transparent md:text-6xl">
-            Simplifique seus agendamentos com inteligência
+            {t("hero.heading")}
           </h1>
           <p className="text-muted-foreground mx-auto mb-8 max-w-2xl text-xl">
-            Gerencie compromissos, clientes e pagamentos em uma única
-            plataforma. Automatize seu negócio e foque no que realmente importa.
+            {t("hero.description")}
           </p>
           <div className="mb-12 flex flex-col justify-center gap-4 sm:flex-row">
             <Button size="lg" className="px-8 text-lg">
-              Começar Gratuitamente
+              {t("hero.startFree")}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button size="lg" variant="outline" className="px-8 text-lg">
-              Ver Demonstração
+              {t("hero.demo")}
             </Button>
           </div>
           <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
             <div className="text-center">
               <div className="text-primary mb-2 text-3xl font-bold">50k+</div>
-              <div className="text-muted-foreground">
-                Agendamentos realizados
-              </div>
+              <div className="text-muted-foreground">{t("hero.metrics1")}</div>
             </div>
             <div className="text-center">
               <div className="text-primary mb-2 text-3xl font-bold">2k+</div>
-              <div className="text-muted-foreground">Empresas ativas</div>
+              <div className="text-muted-foreground">{t("hero.metrics2")}</div>
             </div>
             <div className="text-center">
               <div className="text-primary mb-2 text-3xl font-bold">99.9%</div>
-              <div className="text-muted-foreground">Uptime garantido</div>
+              <div className="text-muted-foreground">{t("hero.metrics3")}</div>
             </div>
           </div>
         </div>
