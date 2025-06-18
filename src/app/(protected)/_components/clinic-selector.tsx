@@ -95,7 +95,7 @@ export function ClinicSelector({
                   {currentClinic.name}
                 </span>
                 <span className="text-muted-foreground truncate text-xs">
-                  {currentClinic.plan || "Plano Básico"}
+                  {currentClinic.plan || "Basic Plan"}
                 </span>
               </div>
               <ChevronsUpDownIcon className="text-muted-foreground ml-auto size-4" />

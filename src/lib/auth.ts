@@ -11,9 +11,11 @@ import {
   schema,
   sessionsTable,
   subscriptionsTable,
+  usersTable,
   usersToClinicsTable,
 } from "@/db/schema";
 
+import { createAssetFromUrl } from "./upload/create-asset-from-url";
 // import { sendEmail } from "./email/send-verification-email";
 import { parseCookies } from "./utils";
 
@@ -27,6 +29,7 @@ type ExtendedUserToClinic = UserToClinic & {
   user: unknown;
 };
 
+type DbUser = typeof usersTable.$inferSelect;
 // neste caso, exécificamos o tempo para evitar números mágicos, ficando mais facil a compreensão
 const TWO_MINUTE = 60 * 2;
 const FIVE_MINUTES = 5 * 60;
@@ -38,7 +41,6 @@ export const auth = betterAuth({
     usePlural: true, // para que o drizzle use o plural do nome da tabela
     schema,
     // sync: process.env.NODE_ENV === "development",
-
   }),
   cookieOptions: {
     secure: process.env.NODE_ENV !== "development",
@@ -71,14 +73,30 @@ export const auth = betterAuth({
       },
     },
   },
+  onCreateUser: async ({ user, provider }: { user: any; provider: string }) => {
+    if (provider === "google" && user.image) {
+      const asset = await createAssetFromUrl({
+        imageUrl: user.image,
+        ownerId: user.id, // ou crie depois
+        ownerType: "user",
+        type: "user_avatar",
+      });
+
+      // 2. retornar os campos adicionais que o BetterAuth vai usar no insert
+      return {
+        avatarId: asset.id, // isso vai popular corretamente sua FK
+      };
+    }
+
+    return {};
+  },
   plugins: [
     // criamos um sessão customizada, para que possamos retornar mais informações do usuário, como as clinicas que ele possui, e o plano de assinatura de cada uma delas
     customSession(async ({ user, session }, ctx) => {
       const clinics = (await db.query.usersToClinicsTable.findMany({
         where: eq(usersToClinicsTable.userId, user.id),
-
         with: {
-          user: true,
+          // user: true,
           clinic: {
             with: {
               subscriptions: true,
@@ -95,13 +113,24 @@ export const auth = betterAuth({
         logo: "/logo.svg",
       }));
 
-      const cookies = parseCookies(ctx.headers?.get("cookie"));
-      const selectedClinicId = cookies["clinic_id"];
+      // const cookies = parseCookies(ctx.headers?.get("cookie"));
+      // const selectedClinicId = cookies["clinic_id"];
+      // const currentClinic =
+      // clinicsData.find((c) => c.id === selectedClinicId) ?? clinicsData[0];
+
+      // 2. define a clínica atual (pelo cookie ou 1ª da lista)
+      const { clinic_id: selectedClinicId } = parseCookies(
+        ctx.headers?.get("cookie"),
+      );
       const currentClinic =
         clinicsData.find((c) => c.id === selectedClinicId) ?? clinicsData[0];
 
+      // 3. pega as preferências diretamente do objeto `user`
+      // (você já configurou o column mapping ou $type no schema, então vem tipado)
+      const preferences = (user as DbUser).preferences ?? null;
+
       // Only fetch active sessions for admin users
-      let sessions;
+      let sessions: (typeof sessionsTable.$inferSelect)[] | undefined;
       if (currentClinic?.role === "ADMIN") {
         sessions = await db.query.sessionsTable.findMany({
           with: {
@@ -116,20 +145,24 @@ export const auth = betterAuth({
           where: gt(sessionsTable.expiresAt, new Date()),
         });
       }
+
       return {
         user: {
           ...user,
+          preferences,
           clinics: clinicsData,
           plan: currentClinic?.plan,
-          clinic: currentClinic
-            ? {
-                id: currentClinic.id,
-                name: currentClinic.name,
-                role: currentClinic.role,
-                plan: currentClinic.plan,
-                logo: "/logo.svg",
-              }
-            : undefined,
+          clinic: currentClinic,
+
+          // clinic: currentClinic
+          //   ? {
+          //       id: currentClinic.id,
+          //       name: currentClinic.name,
+          //       role: currentClinic.role,
+          //       plan: currentClinic.plan,
+          //       logo: "/logo.svg",
+          //     }
+          //   : undefined,
         },
         session,
         sessions,
@@ -139,24 +172,19 @@ export const auth = betterAuth({
   // lembra do schema que o better-auth criou? enttão, temos que deixar explicito o nome das variáveis que usamos conforme as tabelas:
   user: {
     modelName: "usersTable",
-    // passando esses campos adicionais para o schema do user, que não estão no schema que criamos, mas que o better-auth criou
-    // additionalFields: {
-    //   preferences: {
-    //     type: "string[]",
-    //     fieldName: "preferences",
-    //     required: false,
-    //   },
-    //   lastLoginAt: {
-    //     type: "date",
-    //     fieldName: "lastLoginAt",
-    //     required: false,
-    //   },
-    //   deletedAt: {
-    //     type: "date",
-    //     fieldName: "deletedAt",
-    //     required: false,
-    //   },
-    // },
+    // Explicitly map additional user fields that should be returned on `session.user`.
+    additionalFields: {
+      preferences: {
+        type: "string",
+        fieldName: "preferences",
+        required: false,
+      },
+      image: {
+        type: "string",
+        fieldName: "avatarId", // caso queira manter como substituto do image
+        required: false,
+      },
+    },
   },
   session: {
     cookieCache: {

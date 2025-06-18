@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Key, Loader2, Lock } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -26,7 +26,9 @@ import {
 
 const formSchema = z.object({
   currentPassword: z.string().min(1, { message: "Required" }),
-  newPassword: z.string().min(8, { message: "Password must be at least 8 characters" }),
+  newPassword: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters" }),
 });
 
 export default function PasswordForm() {
@@ -58,54 +60,72 @@ export default function PasswordForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="currentPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Current password</FormLabel>
-              <FormControl>
-                <Input type="password" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="newPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>New password</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  {...field}
-                  onChange={(e) => handlePasswordChange(e, field.onChange)}
-                  onFocus={() => handleFocus(field.value)}
-                  onBlur={handleBlur}
-                  aria-invalid={
-                    !isPasswordValid(passwordValidation) && field.value
-                      ? true
-                      : undefined
-                  }
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {showPasswordValidation &&
-          !isPasswordValid(passwordValidation) && (
-            <PasswordRequirements validation={passwordValidation} />
-          )}
-        <Button
-          type="submit"
-          disabled={action.isPending || !isPasswordValid(passwordValidation)}
-        >
-          {action.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Save
-          changes
-        </Button>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="currentPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <Lock className="h-4 w-4" />
+                  Current Password
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="Enter current password"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="newPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <Key className="h-4 w-4" />
+                  New Password
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="Enter new password"
+                    {...field}
+                    onChange={(e) => handlePasswordChange(e, field.onChange)}
+                    onFocus={() => handleFocus(field.value)}
+                    onBlur={handleBlur}
+                    aria-invalid={
+                      !isPasswordValid(passwordValidation) && field.value
+                        ? true
+                        : undefined
+                    }
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        {showPasswordValidation && !isPasswordValid(passwordValidation) && (
+          <PasswordRequirements validation={passwordValidation} />
+        )}
+        <div className="flex items-center justify-end pt-4">
+          <Button
+            type="submit"
+            disabled={action.isPending || !isPasswordValid(passwordValidation)}
+            className="min-w-[140px]"
+          >
+            {action.isPending && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            {action.isPending ? "Updating..." : "Update Password"}
+          </Button>
+        </div>
       </form>
     </Form>
   );

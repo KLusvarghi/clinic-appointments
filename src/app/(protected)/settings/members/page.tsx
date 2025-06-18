@@ -140,7 +140,7 @@ export default function MembersSettingsPage() {
                     />
                     <Avatar className="h-10 w-10">
                       <AvatarImage
-                        src={member.avatar || "/placeholder.svg"}
+                        src={member.avatar ?? "/placeholder.svg"}
                         alt={member.name}
                       />
                       <AvatarFallback>

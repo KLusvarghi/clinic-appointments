@@ -1,9 +1,13 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import { sendEmailRequest } from "@/client-actions/send-email";
 import { Button } from "@/components/ui/button";
@@ -14,27 +18,64 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { LoadingOverlay } from "@/components/ui/loadingOverlay";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
-import { StepType } from "../_types";
+import { useResendTimer } from "../_hooks/use-resend-timer";
+import { verifyCodeSchema } from "../_types/schema";
 
 interface VerifyStepProps {
-  email?: string | null;
-  setStep: (step: StepType) => void;
-  url: string
-
+  email: string;
+  onSuccess: () => void;
+  url: string;
 }
 
-export function VerifyStep({ email, setStep, url }: VerifyStepProps) {
+export function VerifyStep({ email, onSuccess, url }: VerifyStepProps) {
   const router = useRouter();
+  const { timeLeft, isTimerActive, startTimer } = useResendTimer();
 
-  const mutation = useMutation({
+  const form = useForm<z.infer<typeof verifyCodeSchema>>({
+    resolver: zodResolver(verifyCodeSchema),
+    defaultValues: { code: "" },
+  });
+
+  const verifyMutation = useMutation({
+    mutationFn: async (values: z.infer<typeof verifyCodeSchema>) => {
+      console.log(values);
+    },
+    onSuccess: () => {
+      toast.success("Code verified successfully!");
+      onSuccess();
+    },
+    onError: (error) => {
+      form.setError("code", {
+        type: "manual",
+        message:
+          error instanceof Error ? error.message : "Invalid verification code",
+      });
+    },
+  });
+
+  const resendMutation = useMutation({
     mutationFn: async () => {
-      if (!email) throw new Error();
       await sendEmailRequest(email, url);
     },
     onSuccess: () => {
-      setStep("resend-email");
+      toast.success("Reset email sent!");
+      startTimer();
     },
     onError: () => {
       toast.error("Failed to resend email.");
@@ -42,69 +83,85 @@ export function VerifyStep({ email, setStep, url }: VerifyStepProps) {
   });
 
   return (
-    <>
-      {mutation.isPending && <LoadingOverlay message="Resending email" />}
-      <Card className="h-auto w-full border-0 shadow-2xl">
-        <CardHeader className="space-y-2">
-          <CardTitle className="text-2xl font-semibold">
-            Check your email
-          </CardTitle>
-          <CardDescription>
-            If <strong>{email}</strong> matches a registered address, you will
-            receive an email with password reset instructions. <br /> <br />
-            If you haven&apos;t received an email within 5 minutes, check your
-            spam folder,{" "}
-            <button
-              onClick={() => mutation.mutate()}
-              className="cursor-pointer text-blue-600 underline"
-            >
-              request that the message be resent{" "}
-            </button>
-            , or{" "}
-            <button
-              onClick={() => router.push("/auth/sign-in")}
-              className="cursor-pointer text-blue-600 underline"
-              disabled={mutation.isPending}
-            >
-              try using another email address.
-            </button>
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-1">
-            <Button
-              asChild
-              type="button"
-              className="h-12 w-full bg-blue-600 hover:bg-blue-700"
-            >
-              <Link
-                href="https://mail.google.com/mail/u/${email}/#search/from:notifications@credlin.com"
-                target="_blank"
-                rel="noopener noreferrer"
+    <Card className="h-auto w-full space-y-4 border-0 shadow-2xl">
+      <CardHeader className="space-y-2">
+        <CardTitle className="text-2xl font-semibold">
+          Check your email
+        </CardTitle>
+        <CardDescription>
+          We sent a verification code to <strong>{email}</strong>. <br />
+          If you haven&apos;t received an email within 5 minutes,{" "}
+          <Link
+            href={`https://mail.google.com/mail/u/${email}/#search/from:notifications@credlin.com`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cursor-pointer font-bold"
+          >
+            check your spam
+          </Link>{" "}
+          folder or{" "}
+          <button
+            onClick={() => resendMutation.mutate()}
+            disabled={isTimerActive || resendMutation.isPending}
+            className="cursor-pointer text-blue-600 underline disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {resendMutation.isPending
+              ? "Resending..."
+              : isTimerActive
+                ? `Request a new code in ${timeLeft}s`
+                : "Request a new code"}
+          </button>
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit((values) =>
+              verifyMutation.mutate(values),
+            )}
+            className="space-y-4"
+          >
+            <FormField
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem className="mb-6 flex flex-col items-center justify-center">
+                  <FormLabel>Verification Code</FormLabel>
+                  <FormControl>
+                    <InputOTP maxLength={6}>
+                      <InputOTPGroup>
+                        <InputOTPSlot index={0} />
+                        <InputOTPSlot index={1} />
+                        <InputOTPSlot index={2} />
+                      </InputOTPGroup>
+                      <InputOTPSeparator />
+                      <InputOTPGroup>
+                        <InputOTPSlot index={3} />
+                        <InputOTPSlot index={4} />
+                        <InputOTPSlot index={5} />
+                      </InputOTPGroup>
+                    </InputOTP>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="space-y-1">
+              <Button
+                type="submit"
+                className="h-12 w-full bg-blue-600 hover:bg-blue-700"
+                disabled={verifyMutation.isPending}
               >
-                Open Gmail
-              </Link>
-            </Button>
-            <Button
-              type="button"
-              className="h-12 w-full text-blue-600"
-              variant="ghost"
-              onClick={() => router.push("/auth/sign-in")}
-            >
-              Go back to login
-            </Button>
-          </div>
-          <div className="text-center text-sm">
-            <span className="text-muted-foreground">New to Credlin? </span>
-            <button
-              onClick={() => router.push("/auth/sign-up")}
-              className="cursor-pointer font-medium text-blue-600 hover:text-blue-700"
-            >
-              Create account
-            </button>
-          </div>
-        </CardContent>
-      </Card>
-    </>
+                {verifyMutation.isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  "Verify Code"
+                )}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }

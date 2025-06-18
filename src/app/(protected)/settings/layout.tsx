@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  CreditCardIcon,
-  Gem,
-  SettingsIcon,
-  UsersIcon,
-} from "lucide-react";
+import { CreditCardIcon, Gem, SettingsIcon, UsersIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type * as React from "react";
@@ -33,7 +28,7 @@ const settingsNavItems = [
     title: "Members",
     href: "/settings/members",
     icon: UsersIcon,
-  }, 
+  },
 ];
 
 export default function SettingsLayout({
@@ -44,9 +39,9 @@ export default function SettingsLayout({
   const pathname = usePathname();
 
   return (
-    <div className=" flex min-h-screen">
+    <div className="flex min-h-screen">
       {/* Sidebar Navigation */}
-      <div className="w-64 p-6">
+      <aside className="bg-background sticky top-0 h-screen w-64 shrink-0 p-6">
         <div className="mb-8">
           <h1 className="text-2xl font-semibold">Settings</h1>
         </div>
@@ -71,7 +66,7 @@ export default function SettingsLayout({
             );
           })}
         </nav>
-      </div>
+      </aside>
 
       {/* Main Content */}
       <div className="flex-1">

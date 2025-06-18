@@ -1,16 +1,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 
-import { verifyEmail } from "@/actions/get-verify-email";
-import { sendEmailRequest } from "@/client-actions/send-email";
 import { PasswordRequirements } from "@/components/password-requirements";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,19 +30,12 @@ import {
   isPasswordValid,
   usePasswordValidation,
 } from "@/hooks/use-password-validation";
-import { authClient } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
 
 import { SocialLoginButton } from "../../_components/social-login-button";
-
-const registerSchema = z.object({
-  name: z.string().trim().min(1, { message: "Name is required" }),
-  email: z.string().trim().email({ message: "Invalid email address" }),
-  password: z
-    .string()
-    .trim()
-    .min(8, { message: "Password must be at least 8 characters" }),
-});
-
+import { useGoogleMutation } from "../../_hooks/use-google-mutation";
+import { useRegisterMutation } from "../_hooks/use-register-mutation";
+import { registerSchema } from "../_types/schema";
 
 export function SignUpForm() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -64,53 +53,12 @@ export function SignUpForm() {
     defaultValues: { name: "", email: "", password: "" },
   });
 
-  const mutation = useMutation({
-    mutationFn: async (values: z.infer<typeof registerSchema>) => {
-      const isAvaliableEmail = await verifyEmail({ email: values.email });
-      if (isAvaliableEmail?.data) {
-        toast.error("E-mail already registered");
-        form.setError("email", {
-          type: "manual",
-          message: "E-mail already registered",
-        });
-        form.setFocus("email");
-        throw new Error("E-mail already registered");
-      }
-      const response = await authClient.signUp.email({
-        name: values.name,
-        email: values.email,
-        password: values.password,
-      });
+  const registerMut = useRegisterMutation(
+    () => setDialogOpen(true),
+    (msg) => form.setError("email", { type: "manual", message: msg }),
+  );
 
-      if (!response.data) {
-        throw new Error("Failed to create account");
-      }
-      setDialogOpen(true);
-      return true;
-    },
-    onSuccess: async (_data, variables) => {
-      const email = variables.email;
-      await sendEmailRequest(email, "verify");
-      console.log(_data);
-      console.log(variables);
-    },
-    onError: (error: Error) => {
-      toast.error(error.message);
-    },
-  });
-
-  const onSubmit = (values: z.infer<typeof registerSchema>) => {
-    mutation.mutate(values);
-  };
-
-  const handleGoogle = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/dashboard",
-      scopes: ["email", "profile"],
-    });
-  };
-
+  const googleMut = useGoogleMutation();
 
   return (
     <>
@@ -122,7 +70,13 @@ export function SignUpForm() {
         </CardHeader>
         <CardContent className="space-y-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form
+              onSubmit={form.handleSubmit((values) =>
+                registerMut.mutate(values),
+              )}
+              className="space-y-4"
+            >
+              {/* Name */}
               <FormField
                 control={form.control}
                 name="name"
@@ -136,6 +90,7 @@ export function SignUpForm() {
                   </FormItem>
                 )}
               />
+              {/* Email */}
               <FormField
                 control={form.control}
                 name="email"
@@ -153,6 +108,7 @@ export function SignUpForm() {
                   </FormItem>
                 )}
               />
+              {/* Password */}
               <FormField
                 control={form.control}
                 name="password"
@@ -185,15 +141,12 @@ export function SignUpForm() {
                   <PasswordRequirements validation={passwordValidation} />
                 )}
 
-              {/* {errors.password && (
-              <p className="text-sm text-red-500">{errors.password}</p>
-            )} */}
               <Button
                 type="submit"
                 className="h-12 w-full bg-blue-600 hover:bg-blue-700"
-                disabled={mutation.isPending}
+                disabled={registerMut.isPending}
               >
-                {mutation.isPending ? (
+                {registerMut.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating
                     account...
@@ -204,19 +157,24 @@ export function SignUpForm() {
               </Button>
             </form>
           </Form>
+          {/* Divider + Google */}
+
           <div className="relative py-2">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="text-muted-foreground bg-white px-2">Or</span>
+              <span className={cn("text-muted-foreground bg-card px-2")}>
+                Or
+              </span>
             </div>
           </div>
           <div className="space-y-3">
             <SocialLoginButton
               provider="google"
               text="Sign up with Google"
-              onClick={handleGoogle}
+              onClick={googleMut.mutate}
+              isLoading={googleMut.isPending}
             />
           </div>
         </CardContent>

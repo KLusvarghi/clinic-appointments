@@ -21,7 +21,8 @@ export function AddPatientButton() {
   const emailVerified = useEmailVerified();
 
   const handleOpenChange = (open: boolean) => {
-    if (open && !emailVerified) {
+    // if (open && !emailVerified) {
+    if (open && emailVerified) {
       toast.error("Verify your email to add a patient");
       return;
     }
@@ -31,7 +32,8 @@ export function AddPatientButton() {
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button disabled={!emailVerified}>
+        {/* <Button disabled={!emailVerified}> */}
+        <Button>
           <Plus className="mr-2 h-4 w-4" />
           Add new Patient
         </Button>

@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-import { StepType } from "../_types";
+import { StepType } from "../_types/schema";
 
 const emailSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }),

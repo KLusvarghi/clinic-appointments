@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Building2 } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,7 +22,7 @@ const formSchema = z.object({
   name: z.string().trim().min(1, { message: "Clinic name is required" }),
 });
 
-export default function ClinicNameForm({
+export default function ClinicForm({
   defaultName,
 }: {
   defaultName: string;
@@ -44,18 +45,35 @@ export default function ClinicNameForm({
           control={form.control}
           name="name"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Clinic name</FormLabel>
+            <FormItem className="space-y-3">
+              <FormLabel className="flex items-center gap-2">
+                <Building2 className="h-4 w-4" />
+                Clinic Name
+              </FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input
+                  placeholder="Enter your clinic name"
+                  {...field}
+                  className="max-w-md"
+                />
               </FormControl>
-              {savingState === "saving" && (
-                <p className="text-muted-foreground text-xs">Saving…</p>
-              )}
-              {savingState === "idle" && (
-                <p className="text-xs text-green-600">Saved</p>
-              )}
-              <FormMessage />
+              <div className="flex items-center justify-between">
+                <FormMessage />
+                <div>
+                  {savingState === "saving" && (
+                    <p className="text-muted-foreground flex items-center gap-2 text-sm">
+                      <div className="h-2 w-2 animate-pulse rounded-full bg-blue-500" />
+                      Saving...
+                    </p>
+                  )}
+                  {savingState === "idle" && (
+                    <p className="flex items-center gap-2 text-sm text-green-600">
+                      <div className="h-2 w-2 rounded-full bg-green-500" />
+                      Saved
+                    </p>
+                  )}
+                </div>
+              </div>
             </FormItem>
           )}
         />

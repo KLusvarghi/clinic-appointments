@@ -101,23 +101,30 @@ ver se precisa criptografar a senha
 
 proximos passos:
 
+-> resolver o problema que ele não está salvando os dados após digitar e sair da págna de setting/general
+
+-> implementar a visualização dos usuários da clinica
+  - filtrando pelo campo de busca
+  - permitindo a mudança da role e de dados expecíficos (podemos abrir um dropdown com as infos dele e alterar)
+  - pra issso, para ter mais segurança, ver com o chat se implementamos alguma validação por token (se o token enviado a server action é o mesmo do admin da clinica [por exemplo])
+
+-> e depois das sessões ativas (podendo revogar elas [admin])
+
+-> a parte de convidar um usuário a clinica, deve envolver a questão de ter um domínio (ver com o chat)
+-> podemos substituir por um formulário simples em uma nova rota por enquanto
 
 
+-> planejar como será a questão das nova metricas
+  - por patient, doctor, appointments, etc
+
+(acho melhor fazer tudo na visão do adm e dpois do doctor)
+-> ver melhor como listar os appointments do doctor, ter vizão dos atuais, futuros e antigos
+  - e cada appointment ele conseguir ver o "diagnoses" e "prescriptions"
+
+-> em doctors, podemos add mais um botão ao lado de see details, e deixar esse como ver os detalhes do médico, pacientes futuros, rpesentes e apssado, consultas, etc e outro botão apra editar informações
+-> o mesmo se repete para patients, mas é só acrescentar botão para ver detalhes e ver suas consultas antigasm atuais e futuros 
+
+-> arrumar o data picker (caso não consiga com o shadcn, usar o originUI)
+
+------------------
 -> Validar se o email está sendo enviado (esperar a verificação de domino do resend)
-
-
--> monstar a página de "profile" e a edição de:
-  - nome (consiga alterar o nome do usuário)
-  - senha (consiga alterar a senha do usuário)
-  - nome da clinica (consiga alterar nome da clinica)
-  - idioma (consiga alterar o idioma do sistema, sendo um select com os idiomas)
-  - theme (consiga alterar o theme, entre claro, escuro e do sistema do usuário)
-    - com isso já implemente a mudança de theme
-  - envio de emails (posso adiar isso)
-
-
-
--> implementar thema escuro
-  - quando o usuário fizer seu logout, já definir o theme conforme o do sistema dele
-
--> implementar idioma

@@ -15,7 +15,8 @@ const AddDoctorButton = () => {
   const emailVerified = useEmailVerified();
 
   const handleOpenChange = (open: boolean) => {
-    if (open && !emailVerified) {
+    // if (open && !emailVerified) {
+    if (open && emailVerified) {
       toast.error("Verify your email to add a doctor");
       return;
     }
@@ -25,7 +26,8 @@ const AddDoctorButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button disabled={!emailVerified}>
+        <Button>
+          {/* <Button disabled={!emailVerified}> */}
           <Plus />
           Add new doctor
         </Button>

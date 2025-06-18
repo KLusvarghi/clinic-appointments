@@ -57,7 +57,7 @@ export function NavUser({ session, onSignOut }: NavUserProps) {
             <SidebarMenuButton size="lg">
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
-                  src={session?.user?.image}
+                  src={session?.user?.image ?? "/placeholder.svg"}
                   alt={session?.user?.name}
                 />
                 <AvatarFallback className="rounded-lg">
@@ -82,7 +82,7 @@ export function NavUser({ session, onSignOut }: NavUserProps) {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage
-                    src={session?.user?.image}
+                    src={session?.user?.image ?? "/placeholder.svg"}
                     alt={session?.user?.name}
                   />
                   <AvatarFallback className="rounded-lg">
@@ -105,7 +105,7 @@ export function NavUser({ session, onSignOut }: NavUserProps) {
 
             <DropdownMenuItem
               onClick={() => {
-                router.push("/settings");
+                router.push("/settings/general");
               }}
             >
               Settings

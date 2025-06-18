@@ -10,13 +10,15 @@ interface SocialLoginButtonProps {
   onClick: () => void;
   text: string;
   isLoading?: boolean
+  isVerifyEmail?: boolean
 }
 
 export function SocialLoginButton({
   provider,
   onClick,
   text,
-  isLoading
+  isLoading,
+  isVerifyEmail
 }: SocialLoginButtonProps) {
   const config = {
     google: {
@@ -39,7 +41,7 @@ export function SocialLoginButton({
       variant="outline"
       onClick={onClick}
       className="h-12 w-full justify-center gap-2"
-      disabled={isLoading}
+      disabled={isLoading || isVerifyEmail}
     >
       {config.icon}
       {isLoading ? "Signing in..." : config.text}

@@ -8,9 +8,7 @@ export const usersTables = pgTable("users_tables", {
  image: text('image'),
  createdAt: timestamp('created_at').$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
  updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
- stripeCustomerId: text('stripe_customer_id'),
- stripeSubscriptionId: text('stripe_subscription_id'),
- subscriptionPlan: text('subscription_plan')
+ preferences: text('preferences')
 				});
 
 export const sessionsTables = pgTable("sessions_tables", {

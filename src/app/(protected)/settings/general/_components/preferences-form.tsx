@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Languages, Palette } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
@@ -32,7 +33,7 @@ const formSchema = z.object({
 
 interface PreferencesFormProps {
   defaultLanguage?: string | null;
-  defaultTheme: "light" | "dark" | "system" | null;
+  defaultTheme?: "light" | "dark" | "system" | null;
 }
 
 export default function PreferencesForm({
@@ -59,63 +60,81 @@ export default function PreferencesForm({
 
   return (
     <Form {...form}>
-      <form className="space-y-4">
-        <FormField
-          control={form.control}
-          name="language"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Language</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="pt">Portuguese</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form className="space-y-6">
+        <div className="grid gap-6 sm:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="language"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <Languages className="h-4 w-4" />
+                  Language
+                </FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="pt">Portuguese</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="theme"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Theme</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="light">Light</SelectItem>
-                    <SelectItem value="dark">Dark</SelectItem>
-                    <SelectItem value="system">System</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          <FormField
+            control={form.control}
+            name="theme"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <Palette className="h-4 w-4" />
+                  Theme
+                </FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select theme" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="light">Light</SelectItem>
+                      <SelectItem value="dark">Dark</SelectItem>
+                      <SelectItem value="system">System</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Save Status */}
+        <div className="flex items-center justify-end">
+          {savingState === "saving" && (
+            <p className="text-muted-foreground flex items-center gap-2 text-sm">
+              <div className="h-2 w-2 animate-pulse rounded-full bg-blue-500" />
+              Saving preferences...
+            </p>
           )}
-        />
-        {savingState === "saving" && (
-          <p className="text-muted-foreground text-xs">Saving…</p>
-        )}
-        {savingState === "idle" && (
-          <p className="text-xs text-green-600">Saved</p>
-        )}
+          {savingState === "idle" && (
+            <p className="flex items-center gap-2 text-sm text-green-600">
+              <div className="h-2 w-2 rounded-full bg-green-500" />
+              Preferences saved
+            </p>
+          )}
+        </div>
       </form>
     </Form>
   );

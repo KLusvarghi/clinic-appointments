@@ -1,35 +1,40 @@
-export const PageContainer = ({ children }: { children: React.ReactNode }) => {
-  return <div className="space-y-6 p-6">{children}</div>;
-};
+import { cn } from "@/lib/utils"; // Certifique-se de ter essa função utilitária
 
-export const PageHeader = ({ children }: { children: React.ReactNode }) => {
-  return <div className="itens-center flex justify-between">{children}</div>;
-};
-
-export const PageHeaderContent = ({
-  children,
-}: {
+interface PageProps {
   children: React.ReactNode;
-}) => {
-  return <div className="space-y-1">{children}</div>;
+  className?: string;
+}
+
+export const PageContainer = ({ children, className }: PageProps) => {
+  return <div className={cn("space-y-6 p-6", className)}>{children}</div>;
 };
 
-export const PageTitle = ({ children }: { children: React.ReactNode }) => {
-  return <h1 className="text-2xl font-bold">{children}</h1>;
+export const PageHeader = ({ children, className }: PageProps) => {
+  return (
+    <div className={cn("flex items-center justify-between", className)}>
+      {children}
+    </div>
+  );
 };
 
-export const PageDescription = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
-  return <p className="text-muted-foreground text-sm">{children}</p>;
+export const PageHeaderContent = ({ children, className }: PageProps) => {
+  return <div className={cn("space-y-1", className)}>{children}</div>;
 };
 
-export const PageActions = ({ children }: { children: React.ReactNode }) => {
-  return <div className="flex items-center gap-2">{children}</div>;
+export const PageTitle = ({ children, className }: PageProps) => {
+  return <h1 className={cn("text-2xl font-bold", className)}>{children}</h1>;
 };
 
-export const PageContent = ({ children }: { children: React.ReactNode }) => {
-  return <div className="space-y-6">{children}</div>;
+export const PageDescription = ({ children, className }: PageProps) => {
+  return (
+    <p className={cn("text-sm text-muted-foreground", className)}>{children}</p>
+  );
+};
+
+export const PageActions = ({ children, className }: PageProps) => {
+  return <div className={cn("flex items-center gap-2", className)}>{children}</div>;
+};
+
+export const PageContent = ({ children, className }: PageProps) => {
+  return <div className={cn("space-y-6", className)}>{children}</div>;
 };
