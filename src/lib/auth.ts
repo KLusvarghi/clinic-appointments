@@ -73,22 +73,33 @@ export const auth = betterAuth({
       },
     },
   },
-  onCreateUser: async ({ user, provider }: { user: any; provider: string }) => {
-    if (provider === "google" && user.image) {
-      const asset = await createAssetFromUrl({
-        imageUrl: user.image,
-        ownerId: user.id, // ou crie depois
-        ownerType: "user",
-        type: "user_avatar",
-      });
-
-      // 2. retornar os campos adicionais que o BetterAuth vai usar no insert
-      return {
-        avatarId: asset.id, // isso vai popular corretamente sua FK
-      };
-    }
-
-    return {};
+  databaseHooks: {
+    user: {
+      create: {
+        async after(user, ctx) {
+          const params = ctx.params as {
+            providerId?: string;
+            provider?: string;
+            profile?: { picture?: string };
+          };
+          const provider = params?.providerId ?? params?.provider;
+          const image =
+            params.profile?.picture || (user as { image?: string }).image;
+          if (provider === "google" && image) {
+            const asset = await createAssetFromUrl({
+              imageUrl: image,
+              ownerId: user.id,
+              ownerType: "user",
+              type: "user_avatar",
+            });
+            await db
+              .update(usersTable)
+              .set({ avatarId: asset.id })
+              .where(eq(usersTable.id, user.id));
+          }
+        },
+      },
+    },
   },
   plugins: [
     // criamos um sessão customizada, para que possamos retornar mais informações do usuário, como as clinicas que ele possui, e o plano de assinatura de cada uma delas
@@ -179,7 +190,7 @@ export const auth = betterAuth({
         fieldName: "preferences",
         required: false,
       },
-      image: {
+      avatarId: {
         type: "string",
         fieldName: "avatarId", // caso queira manter como substituto do image
         required: false,

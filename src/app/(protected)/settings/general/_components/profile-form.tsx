@@ -2,13 +2,13 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { Loader2, Mail, User } from "lucide-react";
+import { Loader2, User } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { updateClinic } from "@/actions/update-clinic";
+import { updateProfile } from "@/actions/update-profile";
 import { sendEmailRequest } from "@/client-actions/send-email";
 import AvatarUpload from "@/components/ui/avatar-upload";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAutoSaveSetting } from "@/hooks/use-auto-save-setting";
 import { useEmailVerified } from "@/hooks/use-email-verified";
-import { sendEmail } from "@/lib/email/send";
 
 interface ProfileFormProps {
   user: {
@@ -44,7 +43,7 @@ export default function ClinicForm({ user }: ProfileFormProps) {
     defaultValues: { name: user.name },
   });
 
-  const action = useAction(updateClinic);
+  const action = useAction(updateProfile);
 
   const resendMutation = useMutation({
     mutationFn: async () => {

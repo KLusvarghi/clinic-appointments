@@ -101,7 +101,6 @@ ver se precisa criptografar a senha
 
 proximos passos:
 
--> resolver o problema que ele não está salvando os dados após digitar e sair da págna de setting/general
 
 -> implementar a visualização dos usuários da clinica
   - filtrando pelo campo de busca
