@@ -1,35 +1,25 @@
 "use client";
 
-import { CreditCardIcon, Gem, SettingsIcon, UsersIcon } from "lucide-react";
+import {
+  CreditCardIcon,
+  Gem,
+  KeyRound,
+  SettingsIcon,
+  UsersIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type * as React from "react";
 
 import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
-const settingsNavItems = [
-  {
-    title: "General",
-    href: "/settings/general",
-    icon: SettingsIcon,
-  },
-  {
-    title: "Subscription",
-    href: "/settings/subscription",
-    icon: Gem,
-  },
-  {
-    title: "Invoices",
-    href: "/settings/invoices",
-    icon: CreditCardIcon,
-  },
-  {
-    title: "Members",
-    href: "/settings/members",
-    icon: UsersIcon,
-  },
-];
+interface NavItem {
+  title: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
 
 export default function SettingsLayout({
   children,
@@ -37,6 +27,41 @@ export default function SettingsLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { data: session } = authClient.useSession();
+
+  const isAdmin = session?.user?.clinic?.role === "ADMIN";
+
+  const settingsNavItems: NavItem[] = [
+    {
+      title: "General",
+      href: "/settings/general",
+      icon: SettingsIcon,
+    },
+    {
+      title: "Subscription",
+      href: "/settings/subscription",
+      icon: Gem,
+    },
+    {
+      title: "Invoices",
+      href: "/settings/invoices",
+      icon: CreditCardIcon,
+    },
+    {
+      title: "Members",
+      href: "/settings/members",
+      icon: UsersIcon,
+    },
+    ...(isAdmin
+      ? ([
+          {
+            title: "Sessions",
+            href: "/settings/sessions",
+            icon: KeyRound,
+          },
+        ] as const)
+      : []),
+  ];
 
   return (
     <div className="flex min-h-screen">
