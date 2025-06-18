@@ -18,6 +18,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useAvatarUrl } from "@/hooks/use-avatar-url";
 
 // ---------------------------------------------------------------------------
 // Types ---------------------------------------------------------------------
@@ -48,6 +49,7 @@ interface NavUserProps {
 export function NavUser({ session, onSignOut }: NavUserProps) {
   const { isMobile } = useSidebar();
   const router = useRouter();
+  const avatarUrl = useAvatarUrl();
 
   return (
     <SidebarMenu>
@@ -57,7 +59,7 @@ export function NavUser({ session, onSignOut }: NavUserProps) {
             <SidebarMenuButton size="lg">
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
-                  src={session?.user?.image ?? "/placeholder.svg"}
+                  src={avatarUrl ?? session?.user?.image ?? "/placeholder.svg"}
                   alt={session?.user?.name}
                 />
                 <AvatarFallback className="rounded-lg">
