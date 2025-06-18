@@ -1,27 +1,30 @@
 "use client";
 
 import { useAction } from "next-safe-action/hooks";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { revokeSession } from "@/actions/revoke-session";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { sessionsTable } from "@/db/schema";
+import { useSession } from "@/hooks/use-session";
 
-interface SessionsTableProps {
-  sessions: typeof sessionsTable.$inferSelect[];
-}
+import { SessionRow } from "./sessions-row";
 
-const SessionsTable = ({ sessions: initialSessions }: SessionsTableProps) => {
-  const [sessions, setSessions] = useState(initialSessions);
+const SessionsTable = () => {
+  const { session, sessions } = useSession();
+  const [allActiveSessions, setActiveSessions] = useState(sessions);
+
+  useEffect(() => {
+    setActiveSessions(sessions);
+  }, [sessions]);
+
+  const isCurrentSession = (id: string) => id === session?.id;
 
   const revokeSessionAction = useAction(revokeSession, {
     onSuccess: () => {
@@ -33,10 +36,13 @@ const SessionsTable = ({ sessions: initialSessions }: SessionsTableProps) => {
   });
 
   const handleRevokeSession = useCallback(
-    async (sessionId: string) => {
-      const res = await revokeSessionAction.execute({ sessionId });
-      if (res?.success) {
-        setSessions((prev) => prev.filter((s) => s.id !== sessionId));
+    async (sessionToken: string) => {
+      console.log(sessionToken);
+      const res = await revokeSessionAction.execute({ sessionToken });
+      if (res) {
+        setActiveSessions((prev) =>
+          prev.filter((s) => s.token !== sessionToken),
+        );
       }
     },
     [revokeSessionAction],
@@ -52,7 +58,7 @@ const SessionsTable = ({ sessions: initialSessions }: SessionsTableProps) => {
         <TableHeader>
           <TableRow>
             <TableHead>User</TableHead>
-            <TableHead>IP Address</TableHead>
+            <TableHead>Email</TableHead>
             <TableHead>User Agent</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead>Expires At</TableHead>
@@ -60,28 +66,14 @@ const SessionsTable = ({ sessions: initialSessions }: SessionsTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sessions.map((s) => (
-            <TableRow key={s.id}>
-              {/* <TableCell>{s.user.email}</TableCell> */}
-              <TableCell>{s.ipAddress || "Unknown"}</TableCell>
-              <TableCell>{s.userAgent || "Unknown"}</TableCell>
-              <TableCell>
-                {new Date(s.createdAt).toLocaleDateString()}
-              </TableCell>
-              <TableCell>
-                {new Date(s.expiresAt).toLocaleDateString()}
-              </TableCell>
-              <TableCell>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleRevokeSession(s.id)}
-                  // disabled={s.id === session.data.session.id}
-                >
-                  Revoke
-                </Button>
-              </TableCell>
-            </TableRow>
+          {allActiveSessions.map((s) => (
+            <SessionRow
+              key={s.id}
+              session={s}
+              isLoading={revokeSessionAction.isPending}
+              onRevoke={handleRevokeSession}
+              isCurrentSession={isCurrentSession(s.id)}
+            />
           ))}
         </TableBody>
       </Table>

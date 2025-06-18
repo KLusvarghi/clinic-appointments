@@ -57,6 +57,7 @@ export const protectedWithPlanActionClient = protectedActionClient.use(
 
 export const protectedWithRoleActionClient = protectedActionClient.use(
   async ({ next, ctx }) => {
+    console.log('role', ctx.user.clinic?.role)
     if (!ctx.user.clinic?.role) throw new Error("Clinic not found!");
 
     if (ctx.user.clinic.role !== "ADMIN") throw new Error("Unauthorized");

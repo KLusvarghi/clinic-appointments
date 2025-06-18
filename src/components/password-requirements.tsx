@@ -1,6 +1,7 @@
 import { Check, X } from "lucide-react";
 
 import { PasswordValidation } from "@/hooks/use-password-validation";
+import { cn } from "@/lib/utils";
 
 interface PasswordRequirementsProps {
   validation: PasswordValidation;
@@ -8,7 +9,7 @@ interface PasswordRequirementsProps {
 
 export function PasswordRequirements({ validation }: PasswordRequirementsProps) {
   return (
-    <div className="mt-2 space-y-1 rounded-md bg-gray-50 p-3">
+    <div className={cn("mt-2 space-y-1 rounded-md bg-card p-3")}>
       <div className="text-sm text-gray-600">
         <p className="mb-2">Your password must contain:</p>
         <div className="space-y-1">

@@ -1,6 +1,12 @@
-
-import { headers } from "next/headers";
-
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   PageContainer,
   PageContent,
@@ -10,13 +16,9 @@ import {
   PageTitle,
 } from "@/components/ui/page-container";
 import WithAuthentication from "@/hocs/with-authentication";
-import { auth } from "@/lib/auth";
 
 import SessionsTable from "./_components/sessions-table";
-
 const SessionsPage = async () => {
-  const session = await auth.api.getSession({ headers: await headers() });
-
   return (
     <WithAuthentication mustHaveRole="ADMIN">
       <PageContainer>
@@ -27,8 +29,29 @@ const SessionsPage = async () => {
           </PageHeaderContent>
         </PageHeader>
         <PageContent>
-          <SessionsTable sessions={session!.sessions ?? []} />
+          <SessionsTable />
         </PageContent>
+        <PageContainer>
+          <Card className="border-destructive/50">
+            <CardHeader>
+              <CardTitle className="text-destructive flex items-center gap-2">
+                <Badge variant="destructive" className="text-xs">
+                  DANGER ZONE
+                </Badge>
+              </CardTitle>
+              <CardDescription>
+                <strong>Revoke all sessions</strong>
+                <br />
+                All of the sessions data will be{" "}
+                <strong>revoke</strong>. This action is not
+                reversible, so please continue with caution.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="destructive">Revoke Sessions</Button>
+            </CardContent>
+          </Card>
+        </PageContainer>
       </PageContainer>
     </WithAuthentication>
   );

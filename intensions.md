@@ -127,3 +127,14 @@ proximos passos:
 
 ------------------
 -> Validar se o email está sendo enviado (esperar a verificação de domino do resend)
+
+
+-----
+
+## REFATORAÇÕES
+
+- compnentizar os botões de add doctor, patient, user
+
+- Terminar o fluxo de reset password
+
+- refatornar os componentes de settings (general, members e sessions)

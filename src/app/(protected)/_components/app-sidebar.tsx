@@ -4,10 +4,11 @@ import {
   CalendarDays,
   LayoutDashboard,
   Stethoscope,
+  UserPlus2,
   UsersRound,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import React, { useState } from "react";
 
 import { useChangeClinicAction } from "@/client-actions/use-change-clinic";
 import { LoadingOverlay } from "@/components/ui/loadingOverlay";
@@ -44,47 +45,53 @@ export function AppSidebar() {
 
   const isAdmin = session?.user?.clinic?.role === "ADMIN";
 
-  const mainItems: ReadonlyArray<NavItem> = [
-    {
-      type: "group",
-      title: "Dashboard",
-      icon: LayoutDashboard,
-      defaultOpen: true,
-      // primeira rota servirá como “principal” (renderizada no mount)
-      children: [
-        {
-          type: "link",
-          title: "Overview",
-          url: "/dashboard",
-          icon: LayoutDashboard,
-        },
-        {
-          type: "link",
-          title: "Patients Metrics",
-          url: "/dashboard/metrics/patients",
-          icon: LayoutDashboard,
-        },
-      ],
-    },
-    {
-      type: "link",
-      title: "Appointments",
-      url: "/appointments",
-      icon: CalendarDays,
-    },
-    { type: "link", title: "Doctors", url: "/doctors", icon: Stethoscope },
-    { type: "link", title: "Patients", url: "/patients", icon: UsersRound },
-  ];
+  const mainItems: ReadonlyArray<NavItem> = React.useMemo(
+    () => [
+      {
+        type: "group",
+        title: "Dashboard",
+        icon: LayoutDashboard,
+        defaultOpen: true,
+        // primeira rota servirá como “principal” (renderizada no mount)
+        children: [
+          {
+            type: "link",
+            title: "Overview",
+            url: "/dashboard",
+            icon: LayoutDashboard,
+          },
+          {
+            type: "link",
+            title: "Patients Metrics",
+            url: "/dashboard/metrics/patients",
+            icon: LayoutDashboard,
+          },
+        ],
+      },
+      {
+        type: "link",
+        title: "Appointments",
+        url: "/appointments",
+        icon: CalendarDays,
+      },
+      { type: "link", title: "Doctors", url: "/doctors", icon: Stethoscope },
+      { type: "link", title: "Patients", url: "/patients", icon: UsersRound },
+    ],
+    [],
+  );
 
-  const secondaryItems: ReadonlyArray<NavSecondaryItem> = [
-    // { title: "Settings", url: "/settings", icon: Settings },
-    ...(isAdmin
-      ? ([
-          // { title: "Active Sessions", url: "/sessions", icon: KeyRound },
-        ] as const)
-      : []),
-  ];
-
+  const secondaryItems: ReadonlyArray<NavSecondaryItem> = React.useMemo(
+    () => [
+      // { title: "Settings", url: "/settings", icon: Settings },
+      ...(isAdmin
+        ? ([
+            { type: "link", title: "Users", url: "/users", icon: UserPlus2 },
+            // { title: "Active Sessions", url: "/sessions", icon: KeyRound },
+          ] as const)
+        : []),
+    ],
+    [isAdmin],
+  );
   // -------------------------------------------------------------------------
   // Actions ------------------------------------------------------------------
   // -------------------------------------------------------------------------

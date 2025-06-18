@@ -15,6 +15,7 @@ import {
   usersToClinicsTable,
 } from "@/db/schema";
 
+import { SessionWithUser } from "../types/session-with-user";
 import { createAssetFromUrl } from "./upload/create-asset-from-url";
 // import { sendEmail } from "./email/send-verification-email";
 import { parseCookies } from "./utils";
@@ -141,19 +142,19 @@ export const auth = betterAuth({
       const preferences = (user as DbUser).preferences ?? null;
 
       // Only fetch active sessions for admin users
-      let sessions: (typeof sessionsTable.$inferSelect)[] | undefined;
+      let sessions: SessionWithUser[] | undefined;
       if (currentClinic?.role === "ADMIN") {
         sessions = await db.query.sessionsTable.findMany({
+          where: gt(sessionsTable.expiresAt, new Date()),
           with: {
             user: {
               columns: {
-                email: true,
                 name: true,
+                email: true,
                 preferences: true,
               },
             },
           },
-          where: gt(sessionsTable.expiresAt, new Date()),
         });
       }
 

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type * as React from "react";
+import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
@@ -28,40 +28,19 @@ export default function SettingsLayout({
 }) {
   const pathname = usePathname();
   const { data: session } = authClient.useSession();
-
   const isAdmin = session?.user?.clinic?.role === "ADMIN";
-
-  const settingsNavItems: NavItem[] = [
-    {
-      title: "General",
-      href: "/settings/general",
-      icon: SettingsIcon,
-    },
-    {
-      title: "Subscription",
-      href: "/settings/subscription",
-      icon: Gem,
-    },
-    {
-      title: "Invoices",
-      href: "/settings/invoices",
-      icon: CreditCardIcon,
-    },
-    {
-      title: "Members",
-      href: "/settings/members",
-      icon: UsersIcon,
-    },
-    ...(isAdmin
-      ? ([
-          {
-            title: "Sessions",
-            href: "/settings/sessions",
-            icon: KeyRound,
-          },
-        ] as const)
-      : []),
-  ];
+  const settingsNavItems: NavItem[] = React.useMemo(
+    () => [
+      { title: "General", href: "/settings/general", icon: SettingsIcon },
+      { title: "Subscription", href: "/settings/subscription", icon: Gem },
+      { title: "Invoices", href: "/settings/invoices", icon: CreditCardIcon },
+      { title: "Members", href: "/settings/members", icon: UsersIcon },
+      ...(isAdmin
+        ? ([{ title: "Sessions", href: "/settings/sessions", icon: KeyRound }] as const)
+        : []),
+    ],
+    [isAdmin],
+  );
 
   return (
     <div className="flex min-h-screen">

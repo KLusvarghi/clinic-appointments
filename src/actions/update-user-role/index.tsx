@@ -4,12 +4,13 @@ import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { userRoleEnum, usersToClinicsTable } from "@/db/schema";
+import { usersToClinicsTable } from "@/db/schema";
 import { protectedWithRoleActionClient } from "@/lib/next-safe-action";
+
 
 const schema = z.object({
   membershipId: z.string(),
-  role: z.enum(userRoleEnum.enumValues as [string, ...string[]]),
+  role: z.enum(["ADMIN", "MANAGER", "ASSISTANT"]),
 });
 
 export const updateUserRole = protectedWithRoleActionClient

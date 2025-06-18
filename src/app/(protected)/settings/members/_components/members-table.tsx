@@ -3,7 +3,7 @@
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
-import { updateUserRole } from "@/actions/update-user-role";
+import { upsertUser } from "@/actions/upsert-user";
 import {
   Select,
   SelectContent,
@@ -21,9 +21,11 @@ import {
 } from "@/components/ui/table";
 import { userRoleEnum } from "@/db/schema";
 
+type UserRole = (typeof userRoleEnum.enumValues)[number];
+
 interface Member {
   id: string;
-  role: (typeof userRoleEnum.enumValues)[number];
+  role: UserRole;
   user: {
     id: string;
     name: string;
@@ -36,17 +38,17 @@ interface MembersTableProps {
 }
 
 export default function MembersTable({ members }: MembersTableProps) {
-  const updateRoleAction = useAction(updateUserRole, {
+  const updateRoleAction = useAction(upsertUser, {
     onSuccess: () => toast.success("Role updated"),
     onError: () => toast.error("Failed to update role"),
   });
 
-  const handleChange = (id: string, role: string) => {
-    updateRoleAction.execute({ membershipId: id, role });
+  const handleChange = (id: string, role: UserRole) => {
+    updateRoleAction.execute({ id, role: role, email: "", name: "" });
   };
 
   return (
-    <div className="rounded-md border overflow-x-auto">
+    <div className="overflow-x-auto rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
@@ -63,7 +65,9 @@ export default function MembersTable({ members }: MembersTableProps) {
               <TableCell>
                 <Select
                   defaultValue={m.role}
-                  onValueChange={(value) => handleChange(m.id, value)}
+                  onValueChange={(value) =>
+                    handleChange(m.id, value as UserRole)
+                  }
                 >
                   <SelectTrigger className="w-32">
                     <SelectValue />
