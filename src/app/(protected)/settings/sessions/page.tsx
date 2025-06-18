@@ -1,4 +1,6 @@
 
+import { headers } from "next/headers";
+
 import {
   PageContainer,
   PageContent,
@@ -8,10 +10,12 @@ import {
   PageTitle,
 } from "@/components/ui/page-container";
 import WithAuthentication from "@/hocs/with-authentication";
+import { auth } from "@/lib/auth";
 
 import SessionsTable from "./_components/sessions-table";
 
 const SessionsPage = async () => {
+  const session = await auth.api.getSession({ headers: await headers() });
 
   return (
     <WithAuthentication mustHaveRole="ADMIN">
@@ -23,7 +27,7 @@ const SessionsPage = async () => {
           </PageHeaderContent>
         </PageHeader>
         <PageContent>
-          <SessionsTable />
+          <SessionsTable sessions={session!.sessions ?? []} />
         </PageContent>
       </PageContainer>
     </WithAuthentication>

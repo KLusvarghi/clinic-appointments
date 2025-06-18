@@ -1,7 +1,7 @@
 "use client";
 
 import { useAction } from "next-safe-action/hooks";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 import { revokeSession } from "@/actions/revoke-session";
@@ -14,10 +14,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { authClient } from "@/lib/auth-client";
+import { sessionsTable } from "@/db/schema";
 
-const SessionsTable = () => {
-  const session = authClient.useSession();
+interface SessionsTableProps {
+  sessions: typeof sessionsTable.$inferSelect[];
+}
+
+const SessionsTable = ({ sessions: initialSessions }: SessionsTableProps) => {
+  const [sessions, setSessions] = useState(initialSessions);
 
   const revokeSessionAction = useAction(revokeSession, {
     onSuccess: () => {
@@ -30,12 +34,15 @@ const SessionsTable = () => {
 
   const handleRevokeSession = useCallback(
     async (sessionId: string) => {
-      await revokeSessionAction.execute({ sessionId });
+      const res = await revokeSessionAction.execute({ sessionId });
+      if (res?.success) {
+        setSessions((prev) => prev.filter((s) => s.id !== sessionId));
+      }
     },
     [revokeSessionAction],
   );
 
-  if (!session?.data?.sessions) {
+  if (!sessions.length) {
     return null;
   }
 
@@ -53,7 +60,7 @@ const SessionsTable = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {session.data.sessions.map((s) => (
+          {sessions.map((s) => (
             <TableRow key={s.id}>
               {/* <TableCell>{s.user.email}</TableCell> */}
               <TableCell>{s.ipAddress || "Unknown"}</TableCell>
