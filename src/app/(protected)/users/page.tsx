@@ -1,3 +1,6 @@
+import { eq } from "drizzle-orm";
+import { headers } from "next/headers";
+
 import {
   PageActions,
   PageContainer,
@@ -7,26 +10,42 @@ import {
   PageHeaderContent,
   PageTitle,
 } from "@/components/ui/page-container";
+import { db } from "@/db";
+import { usersToClinicsTable } from "@/db/schema";
 import WithAuthentication from "@/hocs/with-authentication";
+import { auth } from "@/lib/auth";
 
 import AddUserButton from "./_components/add-user-button";
-import UpsertUserForm from "./_components/upset-user-form";
+import UsersTable from "./_components/users-table";
 
-const UsersPage = () => {
+const UsersPage = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  const members = await db.query.usersToClinicsTable.findMany({
+    where: eq(usersToClinicsTable.clinicId, session!.user.clinic!.id),
+    with: {
+      user: {
+        columns: { id: true, name: true, email: true },
+      },
+    },
+  });
+
   return (
     <WithAuthentication mustHaveRole="ADMIN">
       <PageContainer>
         <PageHeader>
           <PageHeaderContent>
-            <PageTitle>Maneger Users</PageTitle>
-            <PageDescription>Add or edit a collaborator to your clinic</PageDescription>
+            <PageTitle>Users</PageTitle>
+            <PageDescription>Manage clinic users</PageDescription>
           </PageHeaderContent>
-            <PageActions>
-              <AddUserButton />   
-            </PageActions>
+          <PageActions>
+            <AddUserButton />
+          </PageActions>
         </PageHeader>
         <PageContent>
-          <UpsertUserForm />
+          <UsersTable members={members} />
         </PageContent>
       </PageContainer>
     </WithAuthentication>
