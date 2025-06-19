@@ -69,7 +69,7 @@ export default function AvatarUpload() {
           tabIndex={-1}
         />
       </div>
-      <p
+      {/* <p
         aria-live="polite"
         role="region"
         className="text-muted-foreground mt-2 text-xs"
@@ -81,7 +81,7 @@ export default function AvatarUpload() {
         >
           API
         </a>
-      </p>
+      </p> */}
     </div>
   );
 }

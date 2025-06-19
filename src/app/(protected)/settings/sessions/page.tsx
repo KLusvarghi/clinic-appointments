@@ -48,7 +48,7 @@ const SessionsPage = async () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="destructive">Revoke Sessions</Button>
+              <Button variant="destructive">Revoke All Sessions</Button>
             </CardContent>
           </Card>
         </PageContainer>

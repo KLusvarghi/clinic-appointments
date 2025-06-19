@@ -2,7 +2,6 @@ import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 
 import {
-  PageActions,
   PageContainer,
   PageContent,
   PageDescription,
@@ -15,7 +14,6 @@ import { usersToClinicsTable } from "@/db/schema";
 import WithAuthentication from "@/hocs/with-authentication";
 import { auth } from "@/lib/auth";
 
-import AddUserButton from "./_components/add-user-button";
 import UsersTable from "./_components/users-table";
 
 const UsersPage = async () => {
@@ -27,10 +25,25 @@ const UsersPage = async () => {
     where: eq(usersToClinicsTable.clinicId, session!.user.clinic!.id),
     with: {
       user: {
-        columns: { id: true, name: true, email: true },
+        columns: {
+          id: true,
+          avatarId: true,
+          name: true,
+          email: true,
+          emailVerified: true,
+          createdAt: true,
+          deletedAt: true,
+        },
       },
     },
   });
+
+  if (!session?.user?.clinic?.id) {
+    throw new Error("Sessão inválida: clínica não encontrada.");
+  }
+
+  const activeMembers = members.filter((m) => m.user?.deletedAt === null);
+  // const inactiveMembers = members.filter((m) => m.user?.deletedAt !== null);
 
   return (
     <WithAuthentication mustHaveRole="ADMIN">
@@ -40,12 +53,13 @@ const UsersPage = async () => {
             <PageTitle>Users</PageTitle>
             <PageDescription>Manage clinic users</PageDescription>
           </PageHeaderContent>
-          <PageActions>
-            <AddUserButton />
-          </PageActions>
         </PageHeader>
         <PageContent>
-          <UsersTable members={members} />
+          <UsersTable
+            activeMembers={activeMembers}
+            // inactiveMembers={inactiveMembers}
+            userId={session.user.id}
+          />
         </PageContent>
       </PageContainer>
     </WithAuthentication>
