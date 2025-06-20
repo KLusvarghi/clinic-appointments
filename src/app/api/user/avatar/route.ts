@@ -47,6 +47,14 @@ export async function POST(req: NextRequest) {
     return new NextResponse("File not provided", { status: 400 });
   }
 
+  if (file.size > 5 * 1024 * 1024) {
+    return new NextResponse("File too large", { status: 400 });
+  }
+
+  if (!file.type.startsWith("image/")) {
+    return new NextResponse("Invalid file type", { status: 400 });
+  }
+
   const arrayBuffer = await file.arrayBuffer();
   const key = `uploads/${nanoid()}`;
 
