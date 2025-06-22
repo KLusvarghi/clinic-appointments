@@ -39,7 +39,7 @@ import { userRoleEnum } from "@/db/schema";
 import { useAvatarUploader } from "@/hooks/use-avatar-uploader";
 import { AvatarUrlResponse } from "@/hooks/use-avatar-url";
 
-import { AvatarUpload } from "../../../_components/avatar-upload";
+import { AvatarUpload } from "../../../../../components/ui/avatar-upload";
 import { Member } from "../_types";
 
 const formSchema = z.object({
@@ -132,6 +132,7 @@ export default function UpsertUserForm({
         </DialogDescription>
       </DialogHeader>
       <AvatarUpload
+        avatarFallback={member?.user.name.slice(0, 1).toUpperCase()}
         previewUrl={avatarUrl}
         isUploading={uploadAvatarMutation.isPending}
         onUpload={(file) => {

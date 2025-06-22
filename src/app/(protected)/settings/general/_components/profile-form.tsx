@@ -10,9 +10,9 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { updateProfile } from "@/actions/update-profile";
-import { AvatarUpload } from "@/app/(protected)/_components/avatar-upload";
 import { clientGetAvatarUrlAction } from "@/client-actions/client-get-avatar-url";
 import { sendEmailRequest } from "@/client-actions/send-email";
+import { AvatarUpload } from "@/components/ui/avatar-upload";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -61,12 +61,11 @@ export default function ClinicForm({ user }: ProfileFormProps) {
 
   const savingState = useAutoSaveSetting(form.watch("name"), async (v) => {
     const result = await action.executeAsync({ name: v });
-  
+
     if (result?.serverError || result?.validationErrors) {
       toast.error("Failed to save changes");
     }
   });
-  
 
   useEffect(() => {
     // form.reset({
@@ -98,6 +97,7 @@ export default function ClinicForm({ user }: ProfileFormProps) {
   return (
     <div className="space-y-6">
       <AvatarUpload
+        avatarFallback={user.name.slice(0, 1).toUpperCase()}
         previewUrl={avatarUrl}
         isUploading={uploadAvatarMutation.isPending}
         onUpload={(file) => {
@@ -114,7 +114,7 @@ export default function ClinicForm({ user }: ProfileFormProps) {
           });
         }}
       />
-   
+
       {/* Form Section */}
       <Form {...form}>
         <form className="space-y-6">
