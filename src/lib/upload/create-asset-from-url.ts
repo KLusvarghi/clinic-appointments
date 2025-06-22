@@ -2,15 +2,8 @@ import { nanoid } from "nanoid";
 
 import { db } from "@/db";
 import { assetsTable } from "@/db/schema";
+import { assetType, OwnerType } from "@/types/assets-avatar";
 // import { putObjectInS3 } from "@/lib/s3"; // sua função de upload
-
-type ownerTypeEnum = "user" | "doctor" | "patient" | "clinic";
-type assetsTypeEnum =
-  | "user_avatar"
-  | "doctor_avatar"
-  | "patient_avatar"
-  | "clinic_logo"
-  | "other";
 
 export async function createAssetFromUrl({
   imageUrl,
@@ -20,8 +13,8 @@ export async function createAssetFromUrl({
 }: {
   imageUrl: string;
   ownerId: string;
-  ownerType: ownerTypeEnum;
-  type: assetsTypeEnum;
+  ownerType: OwnerType;
+  type: assetType;
 }) {
   const res = await fetch(imageUrl);
   const buffer = await res.arrayBuffer();

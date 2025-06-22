@@ -138,3 +138,9 @@ proximos passos:
 - Terminar o fluxo de reset password
 
 - refatornar os componentes de settings (general, members e sessions)
+
+
+----
+
+
+preciso fazer com que ao clicar em editar user, ele faça a requsição da foto pelo hook

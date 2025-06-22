@@ -2,7 +2,6 @@ import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 
 import {
-  PageActions,
   PageContainer,
   PageContent,
   PageDescription,
@@ -15,42 +14,47 @@ import { usersToClinicsTable } from "@/db/schema";
 import WithAuthentication from "@/hocs/with-authentication";
 import { auth } from "@/lib/auth";
 
-import MembersTable from "./_components/members-table";
+import UsersTable from "./_components/users-table";
+import { Member } from "./_types";
 
-const MembersPage = async () => {
+const MembersSettingsPage = async () => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  const members = await db.query.usersToClinicsTable.findMany({
-    where: eq(usersToClinicsTable.clinicId, session!.user.clinic!.id),
+  if (!session?.user.clinic?.id) {
+    throw new Error("Sessão inválida: clínica não encontrada.");
+  }
+
+  const members = (await db.query.usersToClinicsTable.findMany({
+    where: eq(usersToClinicsTable.clinicId, session?.user.clinic?.id),
     with: {
-      user: {
-        columns: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
+      user: true,
     },
-  });
+  })) as Member[];
+
+  const activeMembers = members.filter((m) => m.user?.deletedAt === null);
+  // const inactiveMembers = members.filter((m) => m.user?.deletedAt !== null);
 
   return (
-    <WithAuthentication mustHaveClinic>
+    <WithAuthentication mustHaveRole="ADMIN">
       <PageContainer>
         <PageHeader>
           <PageHeaderContent>
-            <PageTitle>Members</PageTitle>
+            <PageTitle>Users</PageTitle>
             <PageDescription>Manage clinic users</PageDescription>
           </PageHeaderContent>
-          <PageActions />
         </PageHeader>
         <PageContent>
-          <MembersTable members={members} />
+          <UsersTable
+            // inactiveMembers={inactiveMembers}
+            activeMembers={activeMembers}
+            userId={session?.user?.id}
+          />
         </PageContent>
       </PageContainer>
     </WithAuthentication>
   );
 };
 
-export default MembersPage;
+export default MembersSettingsPage;

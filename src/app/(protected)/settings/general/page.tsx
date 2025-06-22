@@ -19,6 +19,7 @@ import ProfileForm from "./_components/profile-form";
 
 export default async function GeneralSettingsPage() {
   const session = await auth.api.getSession({ headers: await headers() });
+  const id = session!.user.id;
   const name = session!.user.name;
   const email = session!.user.email;
   const clinicName = session!.user.clinic!.name;
@@ -53,7 +54,7 @@ export default async function GeneralSettingsPage() {
             </CardHeader>
             <CardContent>
               <ProfileForm
-                user={{ name, email}}
+                user={{ name, email, id}}
               />
             </CardContent>
           </Card>

@@ -30,7 +30,7 @@ type ExtendedUserToClinic = UserToClinic & {
   user: unknown;
 };
 
-type DbUser = typeof usersTable.$inferSelect;
+export type DbUser = typeof usersTable.$inferSelect;
 // neste caso, exécificamos o tempo para evitar números mágicos, ficando mais facil a compreensão
 const TWO_MINUTE = 60 * 2;
 const FIVE_MINUTES = 5 * 60;
@@ -78,7 +78,7 @@ export const auth = betterAuth({
     user: {
       create: {
         async after(user, ctx) {
-          const params = ctx.params as {
+          const params = ctx?.params as {
             providerId?: string;
             provider?: string;
             profile?: { picture?: string };
@@ -122,7 +122,6 @@ export const auth = betterAuth({
         name: c.clinic.name,
         plan: c.clinic.subscriptions?.[0]?.plan,
         role: c.role,
-        logo: "/logo.svg",
       }));
 
       // const cookies = parseCookies(ctx.headers?.get("cookie"));
@@ -149,6 +148,7 @@ export const auth = betterAuth({
           with: {
             user: {
               columns: {
+                id: true,
                 name: true,
                 email: true,
                 preferences: true,
@@ -165,16 +165,6 @@ export const auth = betterAuth({
           clinics: clinicsData,
           plan: currentClinic?.plan,
           clinic: currentClinic,
-
-          // clinic: currentClinic
-          //   ? {
-          //       id: currentClinic.id,
-          //       name: currentClinic.name,
-          //       role: currentClinic.role,
-          //       plan: currentClinic.plan,
-          //       logo: "/logo.svg",
-          //     }
-          //   : undefined,
         },
         session,
         sessions,

@@ -1,18 +1,17 @@
 "use client";
 
-import * as React from "react";
+import React from "react";
 
 import { Select } from "@/components/ui/select";
 import { Locale, useLocale } from "@/providers/locale-provider";
 
 export function LanguageSwitcher() {
   const { locale, setLocale } = useLocale();
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLocale(e.target.value as Locale);
-  };
+
   return (
     <Select
-      onValueChange={() =>handleChange}
+      aria-label="Language Selector"
+      onValueChange={(value) => setLocale(value as Locale)}
       defaultValue={locale}
       // className="bg-background rounded border p-1 text-sm"
     >

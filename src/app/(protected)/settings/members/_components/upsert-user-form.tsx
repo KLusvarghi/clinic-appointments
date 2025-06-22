@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { upsertUser } from "@/actions/upsert-user";
+import { clientGetAvatarUrlAction } from "@/client-actions/client-get-avatar-url";
 import { Button } from "@/components/ui/button";
 import {
   DialogContent,
@@ -36,8 +37,9 @@ import {
 } from "@/components/ui/select";
 import { userRoleEnum } from "@/db/schema";
 import { useAvatarUploader } from "@/hooks/use-avatar-uploader";
+import { AvatarUrlResponse } from "@/hooks/use-avatar-url";
 
-import { AvatarUpload } from "../../_components/avatar-upload";
+import { AvatarUpload } from "../../../_components/avatar-upload";
 import { Member } from "../_types";
 
 const formSchema = z.object({
@@ -76,9 +78,22 @@ export default function UpsertUserForm({
         email: member?.user?.email ?? "",
         role: member?.role ?? "MANAGER",
       });
-      setAvatarUrl(member?.user?.avatarId ?? null);
+      const fetchAvatar = async () => {
+        if (!member?.user.id) return;
+        try {
+          const res: AvatarUrlResponse = await clientGetAvatarUrlAction({
+            userId: member.user.id,
+          });
+          if (res?.data?.url) setAvatarUrl(res.data.url);
+        } catch {
+          setAvatarUrl(null);
+        }
+      };
+
+      fetchAvatar();
     }
   }, [isOpen, form, member]);
+
   const uploadAvatarMutation = useAvatarUploader({
     onSuccess: (url) => {
       setAvatarUrl(url);

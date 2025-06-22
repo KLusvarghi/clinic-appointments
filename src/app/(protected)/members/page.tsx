@@ -15,32 +15,23 @@ import WithAuthentication from "@/hocs/with-authentication";
 import { auth } from "@/lib/auth";
 
 import UsersTable from "./_components/users-table";
+import { Member } from "./_types";
 
 const UsersPage = async () => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  const members = await db.query.usersToClinicsTable.findMany({
-    where: eq(usersToClinicsTable.clinicId, session!.user.clinic!.id),
-    with: {
-      user: {
-        columns: {
-          id: true,
-          avatarId: true,
-          name: true,
-          email: true,
-          emailVerified: true,
-          createdAt: true,
-          deletedAt: true,
-        },
-      },
-    },
-  });
-
-  if (!session?.user?.clinic?.id) {
+  if (!session?.user.clinic?.id) {
     throw new Error("Sessão inválida: clínica não encontrada.");
   }
+
+  const members = (await db.query.usersToClinicsTable.findMany({
+    where: eq(usersToClinicsTable.clinicId, session?.user.clinic?.id),
+    with: {
+      user: true,
+    },
+  })) as Member[];
 
   const activeMembers = members.filter((m) => m.user?.deletedAt === null);
   // const inactiveMembers = members.filter((m) => m.user?.deletedAt !== null);
@@ -56,9 +47,9 @@ const UsersPage = async () => {
         </PageHeader>
         <PageContent>
           <UsersTable
-            activeMembers={activeMembers}
             // inactiveMembers={inactiveMembers}
-            userId={session.user.id}
+            activeMembers={activeMembers}
+            userId={session?.user?.id}
           />
         </PageContent>
       </PageContainer>

@@ -2,9 +2,23 @@
 
 import { useEffect, useState } from "react";
 
+import { UserRole } from "@/db/schema";
 import { authClient } from "@/lib/auth-client";
+import { CustomSession } from "@/types/auth-session";
 
-export const useSession = () => {
+export const useSession = (): {
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  error: unknown;
+  session: CustomSession["session"] | null;
+  user: CustomSession["user"] | null;
+  clinic: CustomSession["user"]["clinic"] | null;
+  clinics: CustomSession["user"]["clinics"];
+  plan: CustomSession["user"]["plan"];
+  role: UserRole | null;
+  preferences: CustomSession["user"]["preferences"] | null;
+  sessions: CustomSession["sessions"];
+} => {
   const { data, error } = authClient.useSession();
   const [status, setStatus] = useState<
     "loading" | "authenticated" | "unauthenticated"
@@ -14,11 +28,7 @@ export const useSession = () => {
   const isAuthenticated = status === "authenticated" && !!data?.session;
 
   useEffect(() => {
-    if (!data) {
-      setStatus("unauthenticated");
-    } else {
-      setStatus("authenticated");
-    }
+    setStatus(data ? "authenticated" : "unauthenticated");
   }, [data]);
 
   if (isLoading) {
@@ -56,11 +66,11 @@ export const useSession = () => {
   const session = data?.session ?? null;
   const sessions = data?.sessions ?? [];
   const user = data?.user ?? null;
-  const plan = user?.plan ?? null;
-  const role = user?.clinic?.role ?? null;
-  const preferences = user?.preferences ?? null;
   const clinic = user?.clinic ?? null;
   const clinics = user?.clinics ?? [];
+  const plan = user?.plan ?? null;
+  const role = clinic?.role ?? null;
+  const preferences = user?.preferences ?? null;
 
   return {
     isLoading: false,

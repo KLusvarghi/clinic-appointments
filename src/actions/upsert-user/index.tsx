@@ -49,7 +49,7 @@ export const upsertUser = protectedWithClinicActionClient
       });
     }
 
-    revalidatePath("/users");
+    revalidatePath("/members");
 
     return { success: true };
   });

@@ -1,4 +1,5 @@
 import { pgEnum } from "drizzle-orm/pg-core";
+import { z } from "zod";
 
 export const appointmentStatusEnum = pgEnum("appointment_status", [
   "pending",
@@ -9,6 +10,10 @@ export const appointmentStatusEnum = pgEnum("appointment_status", [
 
 export const planUserEnum = pgEnum("plan_user", ["free", "essential", "pro"]);
 
+export const planUserEnumSchema = z.enum([...planUserEnum.enumValues] as const);
+
+export type PlanUser = z.infer<typeof planUserEnumSchema>;
+
 export const patientSexEnum = pgEnum("patient_sex", ["male", "female"]);
 
 export const userRoleEnum = pgEnum("user_role", [
@@ -16,6 +21,10 @@ export const userRoleEnum = pgEnum("user_role", [
   "MANAGER",
   "ASSISTANT",
 ]);
+
+export const userRoleSchema = z.enum([...userRoleEnum.enumValues] as const);
+
+export type UserRole = z.infer<typeof userRoleSchema>;
 
 export const doctorStatusEnum = pgEnum("doctor_status", [
   "active",

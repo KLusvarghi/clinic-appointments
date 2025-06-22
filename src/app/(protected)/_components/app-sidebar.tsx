@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import {
@@ -18,6 +19,7 @@ import {
   SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar";
+import { useSession } from "@/hooks/use-session";
 import { authClient } from "@/lib/auth-client";
 
 import ClinicFormComponent from "./clinic-form";
@@ -33,17 +35,19 @@ import { NavUser } from "./nav-user";
  *  • Orquestrar actions globais (logout / troca de clínica).
  */
 export function AppSidebar() {
+  // const { data: session } = authClient.useSession();
   const router = useRouter();
-  const { data: session } = authClient.useSession();
+  const {role, clinic, clinics, user} = useSession();
   const [openForm, setOPenForm] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const changeClinicAction = useChangeClinicAction();
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // -------------------------------------------------------------------------
   // Domain‑level data --------------------------------------------------------
   // -------------------------------------------------------------------------
 
-  const isAdmin = session?.user?.clinic?.role === "ADMIN";
+  const isAdmin = role === "ADMIN";
 
   const mainItems: ReadonlyArray<NavItem> = React.useMemo(
     () => [
@@ -85,7 +89,12 @@ export function AppSidebar() {
       // { title: "Settings", url: "/settings", icon: Settings },
       ...(isAdmin
         ? ([
-            { type: "link", title: "Members", url: "/members", icon: UserPlus2 },
+            {
+              type: "link",
+              title: "Members",
+              url: "/members",
+              icon: UserPlus2,
+            },
             // { title: "Active Sessions", url: "/sessions", icon: KeyRound },
           ] as const)
         : []),
@@ -127,8 +136,8 @@ export function AppSidebar() {
       <Sidebar>
         <SidebarHeader className="border-b-4 p-2">
           <ClinicSelector
-            clinics={session?.user.clinics ?? []}
-            selectedClinic={session?.user.clinic}
+            clinics={clinics ?? []}
+            selectedClinic={clinic}
             onSelectClinic={({ clinicId }) =>
               changeClinicAction.execute({ clinicId })
             }
@@ -142,7 +151,11 @@ export function AppSidebar() {
         </SidebarContent>
 
         <SidebarFooter>
-          <NavUser session={session} onSignOut={handleSignOut} />
+          <NavUser
+            user={user}
+            onSignOut={handleSignOut}
+            refreshKey={refreshKey}
+          />
         </SidebarFooter>
       </Sidebar>
     </>
