@@ -89,12 +89,6 @@ export function AppSidebar() {
       // { title: "Settings", url: "/settings", icon: Settings },
       ...(isAdmin
         ? ([
-            {
-              type: "link",
-              title: "Members",
-              url: "/members",
-              icon: UserPlus2,
-            },
             // { title: "Active Sessions", url: "/sessions", icon: KeyRound },
           ] as const)
         : []),
